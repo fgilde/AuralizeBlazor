@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using AuralizeBlazor.Features;
 using BlazorJS.Attributes;
 
 namespace AuralizeBlazor;
@@ -14,7 +15,7 @@ public class VisualizerPreset
         _action = action;
     }
 
-    internal void Apply(BlazorAudioVisualizer blazorAudioVisualizer)
+    public void Apply(BlazorAudioVisualizer blazorAudioVisualizer)
     {
         Default._action(blazorAudioVisualizer);
         _action(blazorAudioVisualizer);
@@ -98,6 +99,12 @@ public class VisualizerPreset
         visualizer.Overlay = true;
     });
 
+    public static VisualizerPreset RadialSpectrumScale => new(visualizer =>
+    {
+        RadialSpectrum.Apply(visualizer);
+        visualizer.Features = new[] { new RadialRadiusFeature() };
+    });
+
     public static VisualizerPreset RadialInverse => new(visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneEighthOctaveBands;
@@ -133,6 +140,12 @@ public class VisualizerPreset
         visualizer.ReflexRatio = 0.3;
         visualizer.ShowScaleX = true;
         visualizer.WeightingFilter = WeightingFilter.D;
+    });
+
+    public static VisualizerPreset BarkScaleLinearAmplitudeWithWaveNode => new(visualizer =>
+    {
+        BarkScaleLinearAmplitude.Apply(visualizer);
+        visualizer.Features = new[] { new WaveNodeFeature() };
     });
 
     public static VisualizerPreset DualChannelCombined => new(visualizer =>

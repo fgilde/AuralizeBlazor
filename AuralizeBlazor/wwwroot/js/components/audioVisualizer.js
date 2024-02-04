@@ -18,6 +18,24 @@
         this.reconnectInputs();
     }
 
+    invokeMethod(namespaceString, methodName, ...args) {
+        const namespaceParts = namespaceString.split('.');
+        let context = window;
+
+        for (const part of namespaceParts.slice(0, -1)) {
+            context = context[part];
+            if (!context) return; 
+        }
+
+        context = context[namespaceParts[namespaceParts.length - 1]];
+        if(!context) return;
+        const func = context[methodName];
+        if (func && typeof func === 'function') {
+            func.apply(context, [context].concat(args));
+        }
+    }
+
+
     prepareOptions(options) {
         options.fsElement = options.fsElement || options.visualizer;
         options.gradientLeft = options.gradientLeft || options.gradient;
@@ -28,146 +46,17 @@
         container.style.backgroundSize = options.backgroundSize || 'cover';
         container.style.backgroundRepeat = options.backgroundRepeat || 'no-repeat';
         container.style.backgroundPosition = options.backgroundPosition || 'center';
-
+        
         options.onCanvasDraw = (instance, info) => {
-            const audioMotion = this.audioMotion;
-            const features = {
-                energyMeter: true,
-                showLogo: true,
-                songProgress: true
-
-            };
-            const canvas = audioMotion.canvas,
-                ctx = audioMotion.canvasCtx,
-                pixelRatio = audioMotion.pixelRatio, // for scaling the size of things drawn on canvas, on Hi-DPI screens or loRes mode
-                baseSize = Math.max(20 * pixelRatio, canvas.height / 27 | 0),
-                centerX = canvas.width >> 1,
-                centerY = canvas.height >> 1;
-
-            if (true) {
-                if (!this.waveformNode) {
-                    this.waveformNode = this.audioMotion.audioCtx.createAnalyser();
-                    this.waveformNode.fftSize = 4096;
-
-                    this.bufferLength = this.waveformNode.fftSize;
-                    this.dataArray = new Uint8Array(this.bufferLength);
-                }
-                const bufferLength = this.bufferLength,
-                    waveformNode = this.waveformNode,
-                    dataArray = this.dataArray;
-                const idxStep = Math.max(1, Math.floor(bufferLength / canvas.width)),
-                    sliceWidth = canvas.width / bufferLength * idxStep,
-                    baseY = canvas.height / 4;
-
-                // obtain time-domain data from the waveform analyzer
-                waveformNode.getByteTimeDomainData(dataArray);
-
-                // draw the waveform
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = info.canvasGradients[1],
-                    ctx.beginPath();
-                let x = 0;
-                for (let i = 0; i < bufferLength - idxStep; i += idxStep) {
-                    const y = dataArray[i] / 128 * baseY;
-                    if (i == 0)
-                        ctx.moveTo(x, y);
-                    else
-                        ctx.lineTo(x, y);
-                    x += sliceWidth;
-                }
-                ctx.stroke();
+            if (options.features) {
+                options.features.forEach(feature => {
+                    const methodName = feature.onCanvasDrawCallbackName;
+                    const namespace = feature.jsNamespace;
+                    this.invokeMethod(namespace, methodName, this, feature.options || {}, instance, info);
+                });
             }
-            if (features.energyMeter) {
-                const energy = audioMotion.getEnergy(),
-                    peakEnergy = audioMotion.getEnergy('peak');
-
-                // overall energy peak
-                const width = 50 * pixelRatio;
-                const peakY = -canvas.height * (peakEnergy - 1);
-                ctx.fillStyle = '#f008';
-                ctx.fillRect(width, peakY, width, 2);
-
-                ctx.font = `${16 * pixelRatio}px sans-serif`;
-                ctx.textAlign = 'left';
-                ctx.fillText(peakEnergy.toFixed(4), width, peakY - 4);
-
-                // overall energy bar
-                ctx.fillStyle = '#fff8';
-                ctx.fillRect(width, canvas.height, width, -canvas.height * energy);
-
-                // bass, midrange and treble meters
-
-                const drawLight = (posX, color, alpha) => {
-                    const halfWidth = width >> 1,
-                        doubleWidth = width << 1;
-
-                    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                    grad.addColorStop(0, color);
-                    grad.addColorStop(.75, `${color}0`);
-
-                    ctx.beginPath();
-                    ctx.moveTo(posX - halfWidth, 0);
-                    ctx.lineTo(posX - doubleWidth, canvas.height);
-                    ctx.lineTo(posX + doubleWidth, canvas.height);
-                    ctx.lineTo(posX + halfWidth, 0);
-
-                    ctx.save();
-                    ctx.fillStyle = grad;
-                    ctx.shadowColor = color;
-                    ctx.shadowBlur = 40;
-                    ctx.globalCompositeOperation = 'screen';
-                    ctx.globalAlpha = alpha;
-                    ctx.fill();
-                    ctx.restore();
-                }
-
-                ctx.textAlign = 'center';
-                const growSize = baseSize * 4;
-
-                const bassEnergy = audioMotion.getEnergy('bass');
-                ctx.font = `bold ${baseSize + growSize * bassEnergy}px sans-serif`;
-                ctx.fillText('BASS', canvas.width * .15, centerY);
-                drawLight(canvas.width * .15, '#f00', bassEnergy);
-
-                drawLight(canvas.width * .325, '#f80', audioMotion.getEnergy('lowMid'));
-
-                const midEnergy = audioMotion.getEnergy('mid');
-                ctx.font = `bold ${baseSize + growSize * midEnergy}px sans-serif`;
-                ctx.fillText('MIDRANGE', centerX, centerY);
-                drawLight(centerX, '#ff0', midEnergy);
-
-                drawLight(canvas.width * .675, '#0f0', audioMotion.getEnergy('highMid'));
-
-                const trebleEnergy = audioMotion.getEnergy('treble');
-                ctx.font = `bold ${baseSize + growSize * trebleEnergy}px sans-serif`;
-                ctx.fillText('TREBLE', canvas.width * .85, centerY);
-                drawLight(canvas.width * .85, '#0ff', trebleEnergy);
-            }
-
-            if (features.showLogo) {
-                // the overall energy provides a simple way to sync a pulsating text/image to the beat
-                // it usually works best than specific frequency ranges, for a wider range of music styles
-                ctx.font = `${baseSize + audioMotion.getEnergy() * 25 * pixelRatio}px Orbitron, sans-serif`;
-
-                ctx.fillStyle = '#fff8';
-                ctx.textAlign = 'center';
-                ctx.fillText('AuralizeBlazor', canvas.width - baseSize * 8, baseSize * 2);
-            }
-
-            //if (features.songProgress) {
-            //    const lineWidth = canvas.height / 40,
-            //        posY = lineWidth >> 1;
-
-            //    ctx.beginPath();
-            //    ctx.moveTo(0, posY);
-            //    ctx.lineTo(canvas.width * audioEl.currentTime / audioEl.duration, posY);
-            //    ctx.lineCap = 'round';
-            //    ctx.lineWidth = lineWidth;
-            //    ctx.globalAlpha = audioMotion.getEnergy(); // use the song energy to control the bar opacity
-            //    ctx.stroke();
-            //}
-        }
-
+        };
+        
         options.overlay = options.overlay || options.backgroundImage;
 
         return options;
@@ -263,6 +152,9 @@
 }
 
 window.BlazorAudioVisualizer = BlazorAudioVisualizer;
+window.AuralizeBlazor = {
+    features: {}
+}
 
 export function initializeBlazorAudioVisualizer(elementRef, dotnet, options) {
     return new BlazorAudioVisualizer(elementRef, dotnet, options);
