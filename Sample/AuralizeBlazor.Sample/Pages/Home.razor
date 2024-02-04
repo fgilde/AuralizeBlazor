@@ -1,0 +1,50 @@
+﻿@page "/"
+@using System.Reflection
+
+<PageTitle>Home</PageTitle>
+
+
+<select @onchange="HandleChange">
+    <option value="@nameof(VisualizerPreset.Default)">@nameof(VisualizerPreset.Default)</option>
+    <option value="@nameof(VisualizerPreset.ClassicLedBars)">@nameof(VisualizerPreset.ClassicLedBars)</option>
+    <option value="@nameof(VisualizerPreset.MirrorWave)">@nameof(VisualizerPreset.MirrorWave)</option>
+    <option value="@nameof(VisualizerPreset.RadialSpectrum)">@nameof(VisualizerPreset.RadialSpectrum)</option>
+    <option value="@nameof(VisualizerPreset.RadialInverse)">@nameof(VisualizerPreset.RadialInverse)</option>
+    <option value="@nameof(VisualizerPreset.BarkScaleLinearAmplitude)">@nameof(VisualizerPreset.BarkScaleLinearAmplitude)</option>
+    <option value="@nameof(VisualizerPreset.DualChannelCombined)">@nameof(VisualizerPreset.DualChannelCombined)</option>
+    <option value="@nameof(VisualizerPreset.RoundBarsBarLevelColorMode)">@nameof(VisualizerPreset.RoundBarsBarLevelColorMode)</option>
+    <option value="@nameof(VisualizerPreset.ReflexMirror)">@nameof(VisualizerPreset.ReflexMirror)</option>
+    <option value="@nameof(VisualizerPreset.DualLedBars)">@nameof(VisualizerPreset.DualLedBars)</option>
+</select>
+
+<audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+<audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+<BlazorAudioVisualizer Height="700px" ConnectAllAudioSources="true" @ref=_vis Overlay="false">
+    @* <video preload="metadata" loading="lazy" controls="true" src="/video.mp4"></video> *@
+    <audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+</BlazorAudioVisualizer>
+
+@code {
+
+    BlazorAudioVisualizer _vis;
+
+
+    private void HandleChange(ChangeEventArgs e)
+    {
+        var member = typeof(VisualizerPreset).GetProperties(BindingFlags.Static | BindingFlags.Public).FirstOrDefault(m => m.Name == e.Value.ToString());
+        if (member != null)
+        {
+            if (member.GetValue(null) is VisualizerPreset preset)
+            {
+                _vis.ApplyPreset(preset);
+            }
+        }
+    }
+
+    private Task TestPreset(VisualizerPreset p)
+    {
+        _vis.ApplyPreset(p);
+        return Task.CompletedTask;
+    }
+
+}
