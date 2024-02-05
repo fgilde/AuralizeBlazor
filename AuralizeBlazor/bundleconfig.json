@@ -1,0 +1,13 @@
+[
+  {
+    "outputFileName": "wwwroot/js/auralize.min.js",
+    "inputFiles": [
+      "wwwroot/js/components/audioVisualizer.js",
+      "wwwroot/js/features/energyMeterFeature.js",
+      "wwwroot/js/features/radialRadiusFeature.js",
+      "wwwroot/js/features/showLogoFeature.js",
+      "wwwroot/js/features/switchPresetFeature.js",
+      "wwwroot/js/features/waveNodeFeature.js"
+    ]
+  }
+]

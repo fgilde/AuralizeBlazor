@@ -37,16 +37,28 @@
 <button @onclick="@(() =>ToggleFullScreen())">Fullscreen</button>
 <button @onclick="@(() =>TogglePictureInPicture())">Pip</button>
 <button @onclick="@(() =>ConnectToMicrophone())">Mic</button>
-<div @ref="ElementReference" style="@($"{(Overlay && ChildContent != null ? "" : $"{StyleStr()}")}")">
+<div @ref="ElementReference" 
+     class="@($"blazor-audio-visualizer-container {containerMouseOverCls}")"
+     style="@($"{(Overlay && ChildContent != null ? "" : $"{StyleStr()}")}")"
+     @onmouseover="@HandleContainerMouseOver"
+     @onmouseout="@HandleContainerMouseOut">
     @if (Overlay && ChildContent != null)
     {
-        <div @ref="_visualizer" class="@($"blazor-audio-visualizer {(Overlay && ChildContent != null ? "blazor-audio-visualizer-overlay-mode" : "")}")">
+        <div @ref="_visualizer"
+             class="@($"blazor-audio-visualizer blazor-audio-visualizer-overlay-mode {visualizerMouseOverCls}")"
+             @onwheel="@HandleMouseWheel"
+             @onmouseover="@HandleVisualizerMouseOver"
+             @onmouseout="@HandleVisualizerMouseOut">
             @ChildContent
         </div>
     }
     else
     {
-        <div @ref="_visualizer" class="@($"blazor-audio-visualizer {(Overlay && ChildContent != null ? "blazor-audio-visualizer-overlay-mode" : "")}")">
+        <div @ref="_visualizer"
+             class="@($"blazor-audio-visualizer {visualizerMouseOverCls}")"
+             @onwheel="@HandleMouseWheel"
+             @onmouseover="@HandleVisualizerMouseOver"
+             @onmouseout="@HandleVisualizerMouseOut">
         </div>
         @ChildContent
     }

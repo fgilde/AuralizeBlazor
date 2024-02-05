@@ -83,8 +83,8 @@
         ctx.font = `${baseSize + audioMotion.getEnergy() * 25 * pixelRatio}px Orbitron, sans-serif`;
         ctx.textAlign = pos.textAlign || 'center';
 
-        if (!featureOptions?.labelColorFromGradient) {
-            ctx.fillStyle = featureOptions.labelColor || '#fff8';
+        if (!featureOptions?.labelColor) {
+            ctx.fillStyle = featureOptions.labelColor;
         } 
 
         ctx.fillText(featureOptions?.label || 'AuralizeBlazor', pos.x, pos.y);

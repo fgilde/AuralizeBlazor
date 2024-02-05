@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using AuralizeBlazor.Features;
 using BlazorJS;
 using BlazorJS.Attributes;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Nextended.Core.Helper;
 
@@ -13,16 +15,56 @@ namespace AuralizeBlazor;
 
 public partial class BlazorAudioVisualizer
 {
-    protected override string ComponentJsFile() => "./_content/AuralizeBlazor/js/components/audioVisualizer.js";
+    protected override string ComponentJsFile() => "./_content/AuralizeBlazor/js/auralize.min.js";
     protected string AudioMotionLib() => "./_content/AuralizeBlazor/js/lib/audioMotion4.4.0.min.js";
     // protected string AudioMotionLib() => "https://cdn.skypack.dev/audiomotion-analyzer?min";
     protected override string ComponentJsInitializeMethodName() => "initializeBlazorAudioVisualizer";
 
+    private int _presetIdx = 0;
+    private string visualizerMouseOverCls;
+    private string containerMouseOverCls;
     private ElementReference _visualizer;
     private IJSObjectReference _audioMotion;
     private RenderFragment _childContent;
     private AudioMotionGradient _gradient = AudioMotionGradient.Classic;
-    private IVisualizerFeature[] _features = { new ShowLogoFeature() };
+    private IVisualizerFeature[] _features = { new SwitchPresetFeature() };
+    
+    [Parameter] public EventCallback<MouseEventArgs> OnContainerMouseOver { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnContainerMouseOut { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnVisualizerMouseOver { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnVisualizerMouseOut { get; set; }
+    [Parameter] public EventCallback<VisualizerPreset> PresetApplied { get; set; }
+
+    
+    [Parameter, ForJs("visualizerClickAction")] 
+    public VisualizerAction ClickAction { get; set; } = VisualizerAction.None;
+
+    [Parameter, ForJs("visualizerDblClickAction")]
+    public VisualizerAction DoubleClickAction { get; set; } = VisualizerAction.None;
+
+    [Parameter, ForJs("visualizerCtxMenuAction")]
+    public VisualizerAction ContextMenuAction { get; set; } = VisualizerAction.None;
+
+    [Parameter]
+    public VisualizerAction MouseWheelUpAction { get; set; } = VisualizerAction.PreviousPreset;
+
+    [Parameter]
+    public VisualizerAction MouseWheelDownAction { get; set; } = VisualizerAction.NextPreset;
+
+    /// <summary>
+    /// Sets the background image of the visualizer component.
+    /// </summary>
+    [Parameter, ForJs]
+    public string BackgroundImage { get; set; }
+
+    /// <summary>
+    /// All here added presets will be available for the user to apply to the visualizer by using mousewheel.
+    /// </summary>
+    [Parameter]
+    public VisualizerPreset[] Presets { get; set; }
+
+    [Parameter]
+    public VisualizerPreset InitialPreset { get; set; }
 
     /// <summary>
     /// The content to be rendered within the visualizer component. All here containing audio and video elements will be connected to the visualizer.
@@ -106,9 +148,12 @@ public partial class BlazorAudioVisualizer
     /// <summary>
     /// Applies the given preset to the visualizer.
     /// </summary>
-    public void ApplyPreset(VisualizerPreset preset)
+    public void ApplyPreset(VisualizerPreset preset, bool? resetFirst = null)
     {
-        preset.Apply(this);
+        if(Presets?.Contains(preset) == true)
+            _presetIdx = Array.IndexOf(Presets, preset);
+        PresetApplied.InvokeAsync(preset);
+        preset.Apply(this, resetFirst);
     }
 
 
@@ -509,6 +554,8 @@ public partial class BlazorAudioVisualizer
             _audioMotion = await JsRuntime.ImportModuleAsync(AudioMotionLib());
         await base.ImportModuleAndCreateJsAsync();
         await ImportFeatureFilesAsync();
+        if(InitialPreset != null)
+            ApplyPreset(InitialPreset);
     }
 
     private string StyleStr()
@@ -520,4 +567,49 @@ public partial class BlazorAudioVisualizer
             style.Append($"width: {Width};");
         return style.ToString();
     }
+
+    protected virtual Task HandleContainerMouseOver(MouseEventArgs arg)
+    {
+        containerMouseOverCls = "mouse-over";
+        return OnContainerMouseOver.InvokeAsync(arg);
+    }
+
+    protected virtual Task HandleContainerMouseOut(MouseEventArgs arg)
+    {
+        containerMouseOverCls = null;
+        return OnContainerMouseOut.InvokeAsync(arg);
+    }
+
+    protected virtual Task HandleVisualizerMouseOver(MouseEventArgs arg)
+    {
+        visualizerMouseOverCls = "mouse-over";
+        return OnVisualizerMouseOver.InvokeAsync(arg);
+    }
+
+    protected virtual Task HandleVisualizerMouseOut(MouseEventArgs arg)
+    {
+        visualizerMouseOverCls = null;
+        return OnVisualizerMouseOut.InvokeAsync(arg);
+    }
+
+    private Task HandleMouseWheel(WheelEventArgs arg) 
+        => JsReference.InvokeVoidAsync("handleAction", arg.DeltaY > 0 ? MouseWheelDownAction : MouseWheelUpAction, arg).AsTask();
+
+    private Task SelectPreset(int delta)
+    {
+        if (Presets == null || Presets.Length == 0)
+            return Task.CompletedTask;
+        int nextIndex = (_presetIdx + delta + Presets.Length) % Presets.Length;
+
+        ApplyPreset(Presets[_presetIdx = nextIndex]);
+        return UpdateJsOptions();
+    }
+
+    [JSInvokable]
+    public Task NextPresetAsync() => SelectPreset(1);
+
+    [JSInvokable]
+    public Task PreviousPresetAsync() => SelectPreset(-1);
+
+
 }

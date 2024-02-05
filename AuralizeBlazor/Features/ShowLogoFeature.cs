@@ -5,7 +5,6 @@ namespace AuralizeBlazor.Features;
 
 public class ShowLogoFeature: VisualizerFeatureBase
 {
-    public override string[] RequiredJsFiles => new[] { "./_content/AuralizeBlazor/js/features/showLogoFeature.js" };
     public override string FullJsNamespace => "window.AuralizeBlazor.features.showLogo";
 
     [ForJs]
@@ -15,10 +14,8 @@ public class ShowLogoFeature: VisualizerFeatureBase
     public TextPosition Position { get; set; } = TextPosition.TopRight;
 
     [ForJs]
-    public string LabelColor { get; set; } = "#ffffff";
+    public string LabelColor { get; set; } = "";
 
-    [ForJs]
-    public bool LabelColorFromGradient { get; set; } = true;
 }
 
 public enum TextPosition

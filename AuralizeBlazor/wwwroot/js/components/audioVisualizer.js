@@ -2,6 +2,8 @@
     elementRef;
     dotnet;
     audioMotion;
+    _featuresPaused = false;
+
     constructor(elementRef, dotNet, options) {
         this.elementRef = elementRef;
         this.dotnet = dotNet;
@@ -14,8 +16,57 @@
             this.visualizer = options.visualizer,
             this.options = this.prepareOptions(options)
         );
-
+        this.visualizer.addEventListener('click', this.onVisualizerClick.bind(this));
+        this.visualizer.addEventListener('dblclick', this.onVisualizerDblClick.bind(this));
+        this.visualizer.addEventListener('contextmenu', this.onVisualizerCtxMenu.bind(this));
         this.reconnectInputs();
+    }
+
+    async onVisualizerCtxMenu(e) {
+        await this.handleAction(this.options.visualizerCtxMenuAction, e);
+    }
+
+    async onVisualizerDblClick(e) {
+        await this.handleAction(this.options.visualizerDblClickAction, e);
+    }
+
+    async onVisualizerClick(e) {
+        await this.handleAction(this.options.visualizerClickAction, e);
+    }
+
+    async handleAction(action, e) {
+        if (action === 0) return;
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+        switch (action) {
+            case 1: // Pause/Resume
+                this.audioMotion.audioCtx.state === 'running' ? await this.audioMotion.audioCtx.suspend() : await this.audioMotion.audioCtx.state === 'suspended' && this.audioMotion.audioCtx.resume();
+                break;
+            case 2: // Mute/Unmute
+                // TODO: implement
+                break;
+            case 3: // Pause/Resume Features
+                this._featuresPaused = !this._featuresPaused;
+                break;
+            case 4: // Picture-in-Picture
+                this.togglePip();
+                break;
+            case 5: // Fullscreen
+                this.toggleFullscreen();
+                break;
+            case 6: // Toggle Microphone
+                this.connectToMic(!this.micStream);
+                break;
+            case 7: // Next preset
+                await this.dotnet.invokeMethodAsync('NextPresetAsync');
+                break;
+            case 8: // Previous preset
+                await this.dotnet.invokeMethodAsync('PreviousPresetAsync');
+                break;
+            default:
+                break;
+        }
     }
 
     invokeMethod(namespaceString, methodName, ...args) {
@@ -24,11 +75,11 @@
 
         for (const part of namespaceParts.slice(0, -1)) {
             context = context[part];
-            if (!context) return; 
+            if (!context) return;
         }
 
         context = context[namespaceParts[namespaceParts.length - 1]];
-        if(!context) return;
+        if (!context) return;
         const func = context[methodName];
         if (func && typeof func === 'function') {
             func.apply(context, [context].concat(args));
@@ -40,15 +91,15 @@
         options.fsElement = options.fsElement || options.visualizer;
         options.gradientLeft = options.gradientLeft || options.gradient;
         options.gradientRight = options.gradientRight || options.gradient;
-        options.backgroundImage = "https://www.pr-bild-award.de/site-prba/assets/files/1/prba-teaser.jpg";
-        const container = this.visualizer;
-        container.style.backgroundImage = `url('${options.backgroundImage}')`;
-        container.style.backgroundSize = options.backgroundSize || 'cover';
-        container.style.backgroundRepeat = options.backgroundRepeat || 'no-repeat';
-        container.style.backgroundPosition = options.backgroundPosition || 'center';
-        
+        if (options.backgroundImage) {
+            this.visualizer.style.backgroundImage = `url('${options.backgroundImage}')`;
+            this.visualizer.style.backgroundSize = options.backgroundSize || 'cover';
+            this.visualizer.style.backgroundRepeat = options.backgroundRepeat || 'no-repeat';
+            this.visualizer.style.backgroundPosition = options.backgroundPosition || 'center';
+        }
+
         options.onCanvasDraw = (instance, info) => {
-            if (options.features) {
+            if (!this._featuresPaused && options.features) {
                 options.features.forEach(feature => {
                     const methodName = feature.onCanvasDrawCallbackName;
                     const namespace = feature.jsNamespace;
@@ -56,8 +107,8 @@
                 });
             }
         };
-        
-        options.overlay = options.overlay || options.backgroundImage;
+
+        options.overlay = options.overlay || options.backgroundImage; // TODO: check if this is correct
 
         return options;
     }
@@ -68,7 +119,7 @@
             this.audioMotion.connectOutput();
             this.micStream = null;
         }
-        else if(connect && !this.micStream) {
+        else if (connect && !this.micStream) {
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(stream => {
                     this.micStream = this.audioMotion.audioCtx.createMediaStreamSource(stream);
@@ -118,7 +169,7 @@
         if (document.pictureInPictureEnabled) {
             if (!document.pictureInPictureElement) {
                 this._tmpVideoElement = document.createElement('video');
-                this._tmpVideoElement.style.display = 'none'; 
+                this._tmpVideoElement.style.display = 'none';
                 document.body.appendChild(this._tmpVideoElement);
 
                 const stream = this.audioMotion.canvas.captureStream();
@@ -146,6 +197,7 @@
     }
 
     dispose() {
+        this.visualizer.removeEventListener('click', this.onVisualizerClick.bind(this));
         this.disconnectInputs();
         this.audioMotion.destroy();
     }

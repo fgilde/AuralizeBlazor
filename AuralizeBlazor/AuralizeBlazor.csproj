@@ -15,6 +15,10 @@
     <AssemblyVersion>1.0.0</AssemblyVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Remove="bundleconfig.json" />
+  </ItemGroup>
+
   
   <ItemGroup>
     <SupportedPlatform Include="browser" />
@@ -34,6 +38,7 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include="bundleconfig.json" />
     <!--<None Include="wwwroot\avatar.jpeg">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

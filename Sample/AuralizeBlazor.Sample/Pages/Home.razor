@@ -4,49 +4,41 @@
 <PageTitle>Home</PageTitle>
 
 
-<select @onchange="HandleChange">
-    <option value="@nameof(VisualizerPreset.Default)">@nameof(VisualizerPreset.Default)</option>
-    <option value="@nameof(VisualizerPreset.ClassicLedBars)">@nameof(VisualizerPreset.ClassicLedBars)</option>
-    <option value="@nameof(VisualizerPreset.MirrorWave)">@nameof(VisualizerPreset.MirrorWave)</option>
-    <option value="@nameof(VisualizerPreset.RadialSpectrum)">@nameof(VisualizerPreset.RadialSpectrum)</option>
-    <option value="@nameof(VisualizerPreset.RadialSpectrumScale)">@nameof(VisualizerPreset.RadialSpectrumScale)</option>
-    <option value="@nameof(VisualizerPreset.RadialInverse)">@nameof(VisualizerPreset.RadialInverse)</option>
-    <option value="@nameof(VisualizerPreset.BarkScaleLinearAmplitude)">@nameof(VisualizerPreset.BarkScaleLinearAmplitude)</option>
-    <option value="@nameof(VisualizerPreset.BarkScaleLinearAmplitudeWithWaveNode)">@nameof(VisualizerPreset.BarkScaleLinearAmplitudeWithWaveNode)</option>
-    <option value="@nameof(VisualizerPreset.DualChannelCombined)">@nameof(VisualizerPreset.DualChannelCombined)</option>
-    <option value="@nameof(VisualizerPreset.RoundBarsBarLevelColorMode)">@nameof(VisualizerPreset.RoundBarsBarLevelColorMode)</option>
-    <option value="@nameof(VisualizerPreset.ReflexMirror)">@nameof(VisualizerPreset.ReflexMirror)</option>
-    <option value="@nameof(VisualizerPreset.DualLedBars)">@nameof(VisualizerPreset.DualLedBars)</option>
+<select @onchange="HandleChange" value="@(_preset ?? VisualizerPreset.ReflexMirror.Name)">
+    @foreach (var preset in VisualizerPreset.All)
+    {
+        <option value="@preset.Name">@preset.Name</option>
+    }
 </select>
 
 <audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
 <audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
-<BlazorAudioVisualizer Height="700px" ConnectAllAudioSources="true" @ref=_vis Overlay="false">
+<BlazorAudioVisualizer @ref=_vis
+                       InitialPreset="VisualizerPreset.ReflexMirror" 
+                       Presets="@VisualizerPreset.All" 
+                       PresetApplied="OnPresetApplied" 
+                       Height="700px" 
+                       BackgroundImage="https://www.pr-bild-award.de/site-prba/assets/files/1/prba-teaser.jpg"
+                       ConnectAllAudioSources="true"
+                       ClickAction="VisualizerAction.TogglePlayPause"
+                       ContextMenuAction="VisualizerAction.ToggleMicrophone"
+                       Overlay="false">
     @* <video preload="metadata" loading="lazy" controls="true" src="/video.mp4"></video> *@
-    <audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+    @* <audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio> *@
 </BlazorAudioVisualizer>
 
 @code {
 
     BlazorAudioVisualizer _vis;
-
+    private string _preset;
 
     private void HandleChange(ChangeEventArgs e)
     {
-        var member = typeof(VisualizerPreset).GetProperties(BindingFlags.Static | BindingFlags.Public).FirstOrDefault(m => m.Name == e.Value.ToString());
-        if (member != null)
-        {
-            if (member.GetValue(null) is VisualizerPreset preset)
-            {
-                _vis.ApplyPreset(preset);
-            }
-        }
+        if (typeof(VisualizerPreset).GetProperties(BindingFlags.Static | BindingFlags.Public).FirstOrDefault(m => m.Name == e.Value.ToString())?.GetValue(null) is VisualizerPreset preset)
+            _vis.ApplyPreset(preset);
     }
 
-    private Task TestPreset(VisualizerPreset p)
-    {
-        _vis.ApplyPreset(p);
-        return Task.CompletedTask;
-    }
+
+    private void OnPresetApplied(VisualizerPreset obj) => _preset = obj.Name;
 
 }

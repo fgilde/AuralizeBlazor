@@ -1,11 +1,9 @@
 ﻿using BlazorJS.Attributes;
-using System.ComponentModel;
 
 namespace AuralizeBlazor.Features;
 
 public class EnergyMeterFeature : VisualizerFeatureBase
 {
-    public override string[] RequiredJsFiles => new[] { "./_content/AuralizeBlazor/js/features/energyMeterFeature.js" };
     public override string FullJsNamespace => "window.AuralizeBlazor.features.energyMeter";
 
     [ForJs] public bool ShowPeakEnergyBar { get; set; } = true;
