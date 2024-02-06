@@ -27,7 +27,11 @@ public partial class BlazorAudioVisualizer
     private IJSObjectReference _audioMotion;
     private RenderFragment _childContent;
     private AudioMotionGradient _gradient = AudioMotionGradient.Classic;
-    private IVisualizerFeature[] _features = { new SwitchPresetFeature() };
+    private IVisualizerFeature[] _features =
+    {
+        new ShowLogoFeature(), 
+     //   new SwitchPresetFeature()
+    };
     
     [Parameter] public EventCallback<MouseEventArgs> OnContainerMouseOver { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnContainerMouseOut { get; set; }
@@ -114,6 +118,12 @@ public partial class BlazorAudioVisualizer
     /// </summary>
     [Parameter]
     public string Class { get; set; }
+
+    /// <summary>
+    ///  CSS class for the visualizer component.
+    /// </summary>
+    [Parameter]
+    public string Style { get; set; }
 
     /// <summary>
     /// Opacity of the visualizer component.
@@ -554,8 +564,11 @@ public partial class BlazorAudioVisualizer
             _audioMotion = await JsRuntime.ImportModuleAsync(AudioMotionLib());
         await base.ImportModuleAndCreateJsAsync();
         await ImportFeatureFilesAsync();
-        if(InitialPreset != null)
+        if (InitialPreset != null)
+        {
             ApplyPreset(InitialPreset);
+            await UpdateJsOptions();
+        }
     }
 
     private string StyleStr()

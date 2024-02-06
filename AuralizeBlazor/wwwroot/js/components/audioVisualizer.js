@@ -41,7 +41,13 @@
         }
         switch (action) {
             case 1: // Pause/Resume
-                this.audioMotion.audioCtx.state === 'running' ? await this.audioMotion.audioCtx.suspend() : await this.audioMotion.audioCtx.state === 'suspended' && this.audioMotion.audioCtx.resume();
+                if (this.audioMotion.audioCtx.state === 'running') {
+                    await this.audioMotion.audioCtx.suspend();
+                    this.audioMotion.stop();
+                } else {
+                    this.audioMotion.audioCtx.resume();
+                    this.audioMotion.start();
+                }
                 break;
             case 2: // Mute/Unmute
                 // TODO: implement
@@ -109,6 +115,7 @@
         };
 
         options.overlay = options.overlay || options.backgroundImage; // TODO: check if this is correct
+
 
         return options;
     }

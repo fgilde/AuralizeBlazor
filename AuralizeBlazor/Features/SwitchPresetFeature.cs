@@ -16,5 +16,5 @@ public class SwitchPresetFeature : VisualizerFeatureBase
     /// The minimum energy level required to trigger a switch event.
     /// </summary>
     [ForJs]
-    public double MinEnergy { get; set; } = 0.25;
+    public double MinEnergy { get; set; } = .35;
 }

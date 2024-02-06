@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System.Reflection
+@using MudBlazor.Extensions.Helper
 
 <PageTitle>Home</PageTitle>
 
@@ -21,16 +22,18 @@
                        BackgroundImage="https://www.pr-bild-award.de/site-prba/assets/files/1/prba-teaser.jpg"
                        ConnectAllAudioSources="true"
                        ClickAction="VisualizerAction.TogglePlayPause"
-                       ContextMenuAction="VisualizerAction.ToggleMicrophone"
+                       ContextMenuAction="VisualizerAction.TogglePictureInPicture"
                        Overlay="false">
     @* <video preload="metadata" loading="lazy" controls="true" src="/video.mp4"></video> *@
     @* <audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio> *@
 </BlazorAudioVisualizer>
 
+@* <MudExObjectEdit Value="@_vis"></MudExObjectEdit> *@
+
 @code {
 
     BlazorAudioVisualizer _vis;
-    private string _preset;
+    private string? _preset;
 
     private void HandleChange(ChangeEventArgs e)
     {
