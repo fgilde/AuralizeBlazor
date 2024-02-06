@@ -34,15 +34,12 @@
 </style>
 
 
-<button @onclick="@(() =>ToggleFullScreen())">Fullscreen</button>
-<button @onclick="@(() =>TogglePictureInPicture())">Pip</button>
-<button @onclick="@(() =>ConnectToMicrophone())">Mic</button>
 <div @ref="ElementReference" 
      class="@($"blazor-audio-visualizer-container {containerMouseOverCls}")"
-     style="@($"{(Overlay && ChildContent != null ? "" : $"{StyleStr()}")}")"
+     style="@($"{(OverlayChildContent && ChildContent != null ? "" : $"{StyleStr()}")}")"
      @onmouseover="@HandleContainerMouseOver"
      @onmouseout="@HandleContainerMouseOut">
-    @if (Overlay && ChildContent != null)
+    @if (OverlayChildContent && ChildContent != null)
     {
         <div @ref="_visualizer"
              class="@($"blazor-audio-visualizer blazor-audio-visualizer-overlay-mode {visualizerMouseOverCls}")"

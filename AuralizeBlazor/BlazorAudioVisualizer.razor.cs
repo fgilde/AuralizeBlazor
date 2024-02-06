@@ -40,7 +40,9 @@ public partial class BlazorAudioVisualizer
     [Parameter] public EventCallback<MouseEventArgs> OnVisualizerMouseOver { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnVisualizerMouseOut { get; set; }
     [Parameter] public EventCallback<VisualizerPreset> PresetApplied { get; set; }
+    [Parameter] public EventCallback<AudioMotionGradient> GradientChanged { get; set; }
 
+    [Parameter] public bool OverlayChildContent { get; set; }
     
     [Parameter, ForJs("visualizerClickAction")] 
     public VisualizerAction ClickAction { get; set; } = VisualizerAction.None;
@@ -349,7 +351,14 @@ public partial class BlazorAudioVisualizer
     public AudioMotionGradient Gradient
     {
         get => _gradient;
-        set => GradientLeft = GradientRight = (_gradient = value);
+        set => GradientLeft = GradientRight = (_gradient = CheckGradientChange(value));
+    }
+
+    private AudioMotionGradient CheckGradientChange(AudioMotionGradient value)
+    {
+        if(!value.Equals(_gradient))
+            GradientChanged.InvokeAsync(value);
+        return value;
     }
 
     /// <summary>
@@ -607,8 +616,13 @@ public partial class BlazorAudioVisualizer
         return OnVisualizerMouseOut.InvokeAsync(arg);
     }
 
-    private Task HandleMouseWheel(WheelEventArgs arg) 
-        => JsReference.InvokeVoidAsync("handleAction", arg.DeltaY > 0 ? MouseWheelDownAction : MouseWheelUpAction, arg).AsTask();
+    private Task HandleMouseWheel(WheelEventArgs arg)
+    {
+        //MaxFrequency = Math.Max(20, MaxFrequency + (int)arg.DeltaY);
+        //return UpdateJsOptions();
+        return JsReference
+            .InvokeVoidAsync("handleAction", arg.DeltaY > 0 ? MouseWheelDownAction : MouseWheelUpAction, arg).AsTask();
+    }
 
     private Task SelectPreset(int delta)
     {

@@ -5,44 +5,39 @@
 
 <PageTitle>Home</PageTitle>
 
+<MudExSelect Virtualize="true" Class="mt-1 mb-1" T="VisualizerPreset" Variant="Variant.Filled" ValueChanged="@HandleChange" Value="_preset" ItemCollection="@(_presets)"></MudExSelect>
 
-<select @onchange="HandleChange" value="@(_preset ?? VisualizerPreset.ReflexMirror.Name)">
-    @foreach (var preset in VisualizerPreset.All)
-    {
-        <option value="@preset.Name">@preset.Name</option>
-    }
-</select>
-
-<audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
-<audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
 <BlazorAudioVisualizer @ref=_vis
-                       InitialPreset="VisualizerPreset.ReflexMirror" 
-                       Presets="@VisualizerPreset.All" 
-                       PresetApplied="OnPresetApplied" 
-                       Height="700px" 
+                       InitialPreset="VisualizerPreset.ReflexMirror"
+                       GradientChanged="@MainLayout.Instance.ColorsChanged"
+                       Presets="@VisualizerPreset.All"
+                       PresetApplied="OnPresetApplied"
+                       Height="700px"
                        BackgroundImage="https://www.pr-bild-award.de/site-prba/assets/files/1/prba-teaser.jpg"
                        ConnectAllAudioSources="true"
                        ClickAction="VisualizerAction.TogglePlayPause"
                        ContextMenuAction="VisualizerAction.TogglePictureInPicture"
+                       OverlayChildContent="false"
                        Overlay="false">
-    @* <video preload="metadata" loading="lazy" controls="true" src="/video.mp4"></video> *@
-    @* <audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio> *@
+    <center>
+        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+    </center>
 </BlazorAudioVisualizer>
+
+<MudExpansionPanel Text="Show / Hide Code">
+    <MudExCodeView RenderChildContent="false" Code="Hallo"/>
+</MudExpansionPanel>
+
 
 @* <MudExObjectEdit Value="@_vis"></MudExObjectEdit> *@
 
 @code {
 
     BlazorAudioVisualizer _vis;
-    private string? _preset;
+    private VisualizerPreset? _preset;
+    private readonly VisualizerPreset[] _presets = VisualizerPreset.All;//.Select(p => p.Name).ToList();
 
-    private void HandleChange(ChangeEventArgs e)
-    {
-        if (typeof(VisualizerPreset).GetProperties(BindingFlags.Static | BindingFlags.Public).FirstOrDefault(m => m.Name == e.Value.ToString())?.GetValue(null) is VisualizerPreset preset)
-            _vis.ApplyPreset(preset);
-    }
-
-
-    private void OnPresetApplied(VisualizerPreset obj) => _preset = obj.Name;
+    private void HandleChange(VisualizerPreset value) => _vis.ApplyPreset(value);
+    private void OnPresetApplied(VisualizerPreset obj) => _preset = obj;
 
 }

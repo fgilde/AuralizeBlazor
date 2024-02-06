@@ -1,21 +1,25 @@
-﻿@inherits LayoutComponentBase
+﻿@using MudBlazor.Extensions.Core
+@inherits LayoutComponentBase
 
-<MudThemeProvider/>
+<MudThemeProvider Theme="@_currentTheme" IsDarkMode="true"/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
 
-    <main>
-        <center>
-            <MudExGradientText Animate="false" Style="font-weight: bold" Class="mt-1" Typo="Typo.h4">AuralizeBlazor</MudExGradientText>
-        </center>
-        
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Secondary" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
+        <MudExGradientText Style="font-weight: bold" Typo="Typo.h5" AnimationDuration="@TimeSpan.FromSeconds(20)" Palette="@(_palette)" Class="ml-3">AuralizeBlazor</MudExGradientText>
+        <MudSpacer />
+        <MudTooltip Text="Nuget Package">
+            <MudIconButton Href="nuget" Target="_blank" Icon="@MudExIcons.Custom.Brands.Nuget" Color="Color.Primary" Edge="Edge.End" />
+        </MudTooltip>
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Temporary" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <NavMenu></NavMenu>
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>

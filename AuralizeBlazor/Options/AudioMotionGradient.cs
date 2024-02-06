@@ -1,6 +1,9 @@
-﻿namespace AuralizeBlazor.Options;
+﻿using System;
+using System.Linq;
 
-public class AudioMotionGradient
+namespace AuralizeBlazor.Options;
+
+public class AudioMotionGradient : IEquatable<AudioMotionGradient>
 {
     public string Name { get; set; }
     public string BgColor { get; set; }
@@ -241,7 +244,26 @@ public class AudioMotionGradient
         new() { Color = "rgb(35, 210, 255)", Position = 1 }
         }
     };
-    
+
+    public bool Equals(AudioMotionGradient other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return Name == other.Name && BgColor == other.BgColor && (Equals(ColorStops, other.ColorStops) || ColorStops.SequenceEqual(other.ColorStops));
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((AudioMotionGradient)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Name, BgColor, ColorStops);
+    }
 }
 
 public class ColorStop
