@@ -6,7 +6,7 @@
         if (currentTime - lastChangeTime > featureOptions.minDebounceTimeInMs) {
             const energy = instance.getEnergy('bass');
             if (energy > featureOptions.minEnergy) {
-                blazorAudioVisualizer.dotnet.invokeMethodAsync('NextPresetAsync');
+                blazorAudioVisualizer.dotnet.invokeMethodAsync(featureOptions.pickRandom ? 'RandomPreset' : 'NextPresetAsync');
                 lastChangeTime = currentTime; 
             }
         }

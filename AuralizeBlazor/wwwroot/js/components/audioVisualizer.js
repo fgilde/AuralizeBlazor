@@ -104,6 +104,14 @@
             this.visualizer.style.backgroundPosition = options.backgroundPosition || 'center';
         }
 
+        if (options.features) { // TODO: Currently not helpful
+            options.features.forEach(feature => this._ensureNamespace(feature.jsNamespace));
+        }
+
+        options.gradient = this.registerGradientIfRequired(options.gradient);
+        options.gradientLeft = this.registerGradientIfRequired(options.gradientLeft);
+        options.gradientRight = this.registerGradientIfRequired(options.gradientRight);
+
         options.onCanvasDraw = (instance, info) => {
             if (!this._featuresPaused && options.features) {
                 options.features.forEach(feature => {
@@ -115,9 +123,17 @@
         };
 
         options.overlay = options.overlay || options.backgroundImage; // TODO: check if this is correct
-
-
+        
         return options;
+    }
+
+    registerGradientIfRequired(gradient) {
+        if (!gradient) return 'classic';
+        if (typeof gradient === 'string') return gradient;
+        const name = gradient.name.toLowerCase();
+        if (this.audioMotion?._gradients?.[name] || !gradient.colorStops) return name;
+        this.audioMotion.registerGradient(name, gradient);
+        return name;
     }
 
     connectToMic(connect) {
@@ -195,6 +211,20 @@
         } else {
             console.warn('Picture-in-Picture-Mode not supported by browser');
             return false;
+        }
+    }
+
+    _ensureNamespace(ns) {
+        var parts = ns.split('.');
+        var parent = window;
+        for (var i = 0; i < parts.length; i++) {
+            var part = parts[i];
+
+            if (!parent[part] || typeof parent[part] === 'undefined') {
+                parent[part] = {};
+            }
+
+            parent = parent[part];
         }
     }
 

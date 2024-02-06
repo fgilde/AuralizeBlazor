@@ -17,4 +17,10 @@ public class SwitchPresetFeature : VisualizerFeatureBase
     /// </summary>
     [ForJs]
     public double MinEnergy { get; set; } = .35;
+
+    /// <summary>
+    /// If true the preset will be picked randomly, otherwise the next preset will be selected.
+    /// </summary>
+    [ForJs]
+    public bool PickRandom { get; set; } = true;
 }

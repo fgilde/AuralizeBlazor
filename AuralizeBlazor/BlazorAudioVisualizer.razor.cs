@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AuralizeBlazor.Features;
+using AuralizeBlazor.Options;
 using BlazorJS;
 using BlazorJS.Attributes;
 using Microsoft.AspNetCore.Components;
@@ -15,6 +16,7 @@ namespace AuralizeBlazor;
 
 public partial class BlazorAudioVisualizer
 {
+    // protected override string ComponentJsFile() => "./_content/AuralizeBlazor/js/components/audioVisualizer.js";
     protected override string ComponentJsFile() => "./_content/AuralizeBlazor/js/auralize.min.js";
     protected string AudioMotionLib() => "./_content/AuralizeBlazor/js/lib/audioMotion4.4.0.min.js";
     // protected string AudioMotionLib() => "https://cdn.skypack.dev/audiomotion-analyzer?min";
@@ -30,7 +32,7 @@ public partial class BlazorAudioVisualizer
     private IVisualizerFeature[] _features =
     {
         new ShowLogoFeature(), 
-     //   new SwitchPresetFeature()
+        new SwitchPresetFeature()
     };
     
     [Parameter] public EventCallback<MouseEventArgs> OnContainerMouseOver { get; set; }
@@ -537,8 +539,8 @@ public partial class BlazorAudioVisualizer
     {
         return this.AsJsObject(new
         {
-            gradientLeft = GradientLeft.HasValue ? GradientLeft.Value.ToDescriptionString() : Gradient.ToDescriptionString(),
-            gradientRight = GradientRight.HasValue ? GradientRight.Value.ToDescriptionString() : Gradient.ToDescriptionString(),
+            gradientLeft = GradientLeft ?? Gradient,
+            gradientRight = GradientRight ?? Gradient,
             connectAll = ConnectAllAudioSources || ChildContent != null,
             queryOwner = ChildContent != null && !ConnectAllAudioSources ? _visualizer : default,
             audioMotion = _audioMotion,
@@ -616,6 +618,17 @@ public partial class BlazorAudioVisualizer
 
         ApplyPreset(Presets[_presetIdx = nextIndex]);
         return UpdateJsOptions();
+    }
+
+    [JSInvokable]
+    public Task RandomPreset()
+    {
+        if (Presets?.Any() == true)
+        {
+            ApplyPreset(Presets.MinBy(p => Guid.NewGuid()));
+            return UpdateJsOptions();
+        }
+        return Task.CompletedTask;
     }
 
     [JSInvokable]

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AuralizeBlazor.Features;
+using AuralizeBlazor.Options;
 using BlazorJS.Attributes;
 using Nextended.Core.Types;
 
@@ -163,7 +164,7 @@ public class VisualizerPreset : SuperType<VisualizerPreset>
         visualizer.ChannelLayout = ChannelLayout.DualCombined;
         visualizer.FillAlpha = 0.25;
         visualizer.FrequencyScale = FrequencyScale.Bark;
-        visualizer.GradientLeft = AudioMotionGradient.SteelBlue;
+        visualizer.GradientLeft = AudioMotionGradient.Steelblue;
         visualizer.GradientRight = AudioMotionGradient.OrangeRed;
         visualizer.LinearAmplitude = true;
         visualizer.LinearBoost = 1.8;
@@ -228,7 +229,7 @@ public class VisualizerPreset : SuperType<VisualizerPreset>
         visualizer.AnsiBands = false;
         visualizer.BarSpacing = 0.1;
         visualizer.ChannelLayout = ChannelLayout.DualVertical;
-        visualizer.GradientLeft = AudioMotionGradient.SteelBlue;
+        visualizer.GradientLeft = AudioMotionGradient.Steelblue;
         visualizer.GradientRight = AudioMotionGradient.OrangeRed;
         visualizer.LedBars = true;
         visualizer.LumiBars = false;
@@ -269,7 +270,7 @@ public class VisualizerPreset : SuperType<VisualizerPreset>
     {
         visualizer.Mode = VisualizationMode.LineAreaGraph;
         //visualizer.Gradient = AudioMotionGradient.Aurora;
-        visualizer.Gradient = AudioMotionGradient.Prism;
+        visualizer.Gradient = AudioMotionGradient.Aurora;
         visualizer.MaxFrequency = 18000;
         visualizer.MinFrequency = 40;
         visualizer.LinearAmplitude = false;
@@ -286,7 +287,7 @@ public class VisualizerPreset : SuperType<VisualizerPreset>
     public static VisualizerPreset DeepSeaDive => new(15, nameof(DeepSeaDive), visualizer =>
     {
         visualizer.Mode = VisualizationMode.DiscreteFrequencies;
-        visualizer.Gradient = AudioMotionGradient.SteelBlue;
+        visualizer.Gradient = AudioMotionGradient.DeepSea;
         visualizer.MaxFrequency = 16000;
         visualizer.MinFrequency = 30;
         visualizer.LumiBars = true;
@@ -300,7 +301,7 @@ public class VisualizerPreset : SuperType<VisualizerPreset>
     public static VisualizerPreset RetroVinyl => new(16, nameof(RetroVinyl), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneThirdOctaveBands;
-        visualizer.Gradient = AudioMotionGradient.OrangeRed;
+        visualizer.Gradient = AudioMotionGradient.Sunset;
         visualizer.Radial = true;
         visualizer.SpinSpeed = 0.2;
         visualizer.MaxFrequency = 14000;
@@ -314,7 +315,7 @@ public class VisualizerPreset : SuperType<VisualizerPreset>
     public static VisualizerPreset ElectricPulse => new(17, nameof(ElectricPulse), visualizer =>
     {
         visualizer.Mode = VisualizationMode.LineAreaGraph;
-        visualizer.Gradient = AudioMotionGradient.Rainbow;
+        visualizer.Gradient = AudioMotionGradient.Electric;
         visualizer.LineWidth = 2;
         visualizer.ShowPeaks = false;
         visualizer.LinearAmplitude = true;
@@ -329,15 +330,71 @@ public class VisualizerPreset : SuperType<VisualizerPreset>
     public static VisualizerPreset AuroraDreams => new(18, nameof(AuroraDreams), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneFourthOctaveBands;
-        visualizer.Gradient = AudioMotionGradient.Rainbow;
+        visualizer.Gradient = AudioMotionGradient.Aurora;
         visualizer.MaxFrequency = 15000;
         visualizer.MinFrequency = 20;
         visualizer.Smoothing = 0.6;
         visualizer.FillAlpha = 0.3;
         visualizer.AlphaBars = true;
         visualizer.LineWidth = 0.8;
-        visualizer.LumiBars = true; // Optional, for a glowing effect
-        visualizer.ShowScaleX = false; // Focus on the visuals
+        visualizer.LumiBars = true; 
+        visualizer.LedBars = true; 
+        visualizer.ShowScaleX = false; 
+    });
+
+    public static VisualizerPreset NeonPulse => new(19, nameof(NeonPulse), visualizer =>
+    {
+        visualizer.Mode = VisualizationMode.LineAreaGraph;
+        visualizer.Gradient = AudioMotionGradient.NeonGlow;
+        visualizer.LineWidth = 2;
+        visualizer.FillAlpha = 0.5;
+        visualizer.LinearAmplitude = true;
+        visualizer.MaxFrequency = 12000;
+        visualizer.MinFrequency = 60;
+        visualizer.Mirror = MirrorMode.None;
+        visualizer.ReflexRatio = 0.5;
+        visualizer.ReflexAlpha = 0.75;
+    });
+
+    public static VisualizerPreset CosmicJourney => new(20, nameof(CosmicJourney), visualizer =>
+    {
+        visualizer.Mode = VisualizationMode.OneFourthOctaveBands;
+        visualizer.Gradient = AudioMotionGradient.CosmicPulse;
+        visualizer.MaxFrequency = 18000;
+        visualizer.MinFrequency = 20;
+        visualizer.Smoothing = 0.5;
+        visualizer.FillAlpha = 0.3;
+        visualizer.AlphaBars = true;
+        visualizer.Radial = true;
+        visualizer.SpinSpeed = 0.2;
+    });
+
+    public static VisualizerPreset MorningRise => new(21, nameof(MorningRise), visualizer =>
+    {
+        visualizer.Mode = VisualizationMode.OneThirdOctaveBands;
+        visualizer.Gradient = AudioMotionGradient.Sunrise;
+        visualizer.MaxFrequency = 16000;
+        visualizer.MinFrequency = 40;
+        visualizer.LumiBars = true;
+        visualizer.BarSpacing = 0.2;
+        visualizer.FillAlpha = 0.7;
+        visualizer.Smoothing = 0.8;
+        visualizer.Radial = false;
+    });
+
+    public static VisualizerPreset MiamiSpectrumOutline => new(22, nameof(MiamiSpectrumOutline), visualizer =>
+    {
+        visualizer.Mode = VisualizationMode.OneEighthOctaveBands;
+        visualizer.Gradient = AudioMotionGradient.Miami;
+        visualizer.MaxFrequency = 20000;
+        visualizer.MinFrequency = 20;
+        visualizer.BarSpacing = 0.1;
+        visualizer.OutlineBars = true;
+        visualizer.LineWidth = 2; 
+        visualizer.FillAlpha = 0; 
+        visualizer.LinearAmplitude = false;
+        visualizer.Smoothing = 0.6;
+        visualizer.ShowScaleX = true;
     });
 
 
