@@ -1,4 +1,9 @@
-# AuralizeBlazor 
+
+<center>
+<h1 style="background: linear-gradient(to right, #0bc, #2cb, #0bc, #09c, #36b, #2cb); background-clip: text; color: transparent;">
+  AuralizeBlazor
+</h1>
+</center>
 
 AuralizeBlazor provides a component named `BlazorAudioVisualizer`.
 This a Blazor component that integrates the powerful features of the audioMotion.js library, enabling developers to incorporate real-time audio visualization into Blazor applications with ease. This document provides an overview of how to use the component, including its properties and methods.

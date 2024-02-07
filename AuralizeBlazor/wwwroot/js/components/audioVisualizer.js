@@ -122,6 +122,7 @@
             }
         };
 
+        options.overlay = true;
         options.overlay = options.overlay || options.backgroundImage; // TODO: check if this is correct
         
         return options;

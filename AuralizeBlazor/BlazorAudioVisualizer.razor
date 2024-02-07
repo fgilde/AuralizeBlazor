@@ -16,11 +16,14 @@
         touch-action: none; /* ditto for touch events */
     }
 
-    .blazor-audio-visualizer canvas {
+    #@(_id).blazor-audio-visualizer canvas {
+        transition-property:opacity!important;
+        transition-duration:.3s;
+        transition-timing-function:ease;
         opacity: @Opacity.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)
     }
 
-    .blazor-audio-visualizer:not(:fullscreen):hover canvas {
+    #@(_id).blazor-audio-visualizer:not(:fullscreen):hover canvas {
         opacity: @HoverOpacity.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)
     }
     audio {
@@ -35,13 +38,14 @@
 
 
 <div @ref="ElementReference" 
-     class="@($"blazor-audio-visualizer-container {containerMouseOverCls}")"
-     style="@($"{(OverlayChildContent && ChildContent != null ? "" : $"{StyleStr()}")}")"
+     class="@($"blazor-audio-visualizer-container {containerMouseOverCls} {Class}")"
+     style="@($"{(OverlayChildContent && ChildContent != null ? "" : $"{StyleStr()}")} {Style}")"
      @onmouseover="@HandleContainerMouseOver"
      @onmouseout="@HandleContainerMouseOut">
     @if (OverlayChildContent && ChildContent != null)
     {
         <div @ref="_visualizer"
+             id="@_id"
              class="@($"blazor-audio-visualizer blazor-audio-visualizer-overlay-mode {visualizerMouseOverCls}")"
              @onwheel="@HandleMouseWheel"
              @onmouseover="@HandleVisualizerMouseOver"
@@ -52,6 +56,7 @@
     else
     {
         <div @ref="_visualizer"
+             id="@_id"
              class="@($"blazor-audio-visualizer {visualizerMouseOverCls}")"
              @onwheel="@HandleMouseWheel"
              @onmouseover="@HandleVisualizerMouseOver"

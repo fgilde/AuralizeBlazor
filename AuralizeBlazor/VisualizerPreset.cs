@@ -60,11 +60,13 @@ public class VisualizerPreset : SuperType<VisualizerPreset>
             visualizer.Features = (visualizer.Features ?? Array.Empty<IVisualizerFeature>()).Where(f => !f.AppliedFromPreset).ToArray();
             
             var defaultVisualizer = new BlazorAudioVisualizer(); // Instance with default values
-            var properties = typeof(BlazorAudioVisualizer).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            var properties = typeof(BlazorAudioVisualizer)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
             foreach (var prop in properties)
             {
-                if (!prop.CanRead || !prop.CanWrite || ignore.Contains(prop.Name) || prop.GetCustomAttribute(typeof(ForJs)) == null) continue;
+                if (!prop.CanRead || !prop.CanWrite || ignore.Contains(prop.Name) || prop.GetCustomAttribute(typeof(ForJs)) == null || visualizer?.IgnoredPropertiesForReset?.Contains(prop.Name) == true) 
+                    continue;
                 var defaultValue = prop.GetValue(defaultVisualizer);
                 prop.SetValue(visualizer, defaultValue);
             }

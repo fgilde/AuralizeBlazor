@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System.Reflection
+@using AuralizeBlazor.Features
 @using AuralizeBlazor.Options
 @using MudBlazor.Extensions.Helper
 
@@ -8,6 +9,7 @@
 <MudExSelect Virtualize="true" Class="mt-1 mb-1" T="VisualizerPreset" Variant="Variant.Filled" ValueChanged="@HandleChange" Value="_preset" ItemCollection="@(_presets)"></MudExSelect>
 
 <BlazorAudioVisualizer @ref=_vis
+                       Features="@(new IVisualizerFeature[]{ new ShowLogoFeature {Label = Const.AppName, Position = TextPosition.CenterCenter}, new SwitchPresetFeature() })"
                        InitialPreset="VisualizerPreset.ReflexMirror"
                        GradientChanged="@MainLayout.Instance.ColorsChanged"
                        Presets="@VisualizerPreset.All"

@@ -10,7 +10,7 @@
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Secondary" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
-        <MudExGradientText Style="font-weight: bold" Typo="Typo.h5" AnimationDuration="@TimeSpan.FromSeconds(20)" Palette="@(_palette)" Class="ml-3">AuralizeBlazor</MudExGradientText>
+        <MudExGradientText Style="font-weight: bold" Typo="Typo.h5" AnimationDuration="@TimeSpan.FromSeconds(20)" Palette="@(_palette)" Class="ml-3">@Const.AppName</MudExGradientText>
         <MudSpacer />
         <MudTooltip Text="Nuget Package">
             <MudIconButton Href="nuget" Target="_blank" Icon="@MudExIcons.Custom.Brands.Nuget" Color="Color.Primary" Edge="Edge.End" />

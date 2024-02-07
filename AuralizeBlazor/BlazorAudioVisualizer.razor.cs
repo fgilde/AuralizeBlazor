@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using AuralizeBlazor.Features;
@@ -10,12 +11,14 @@ using BlazorJS.Attributes;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Nextended.Core.Extensions;
 using Nextended.Core.Helper;
 
 namespace AuralizeBlazor;
 
 public partial class BlazorAudioVisualizer
 {
+    private string _id = Guid.NewGuid().ToFormattedId();
     // protected override string ComponentJsFile() => "./_content/AuralizeBlazor/js/components/audioVisualizer.js";
     protected override string ComponentJsFile() => "./_content/AuralizeBlazor/js/auralize.min.js";
     protected string AudioMotionLib() => "./_content/AuralizeBlazor/js/lib/audioMotion4.4.0.min.js";
@@ -32,7 +35,7 @@ public partial class BlazorAudioVisualizer
     private IVisualizerFeature[] _features =
     {
         new ShowLogoFeature(), 
-        new SwitchPresetFeature()
+      //  new SwitchPresetFeature()
     };
     
     [Parameter] public EventCallback<MouseEventArgs> OnContainerMouseOver { get; set; }
@@ -43,6 +46,12 @@ public partial class BlazorAudioVisualizer
     [Parameter] public EventCallback<AudioMotionGradient> GradientChanged { get; set; }
 
     [Parameter] public bool OverlayChildContent { get; set; }
+
+    /// <summary>
+    /// If a preset is applied this properties will be ignored when the preset is applied and a reset is triggered from the preset.
+    /// </summary>
+    [Parameter]
+    public string[] IgnoredPropertiesForReset { get; set; }
     
     [Parameter, ForJs("visualizerClickAction")] 
     public VisualizerAction ClickAction { get; set; } = VisualizerAction.None;
@@ -551,7 +560,7 @@ public partial class BlazorAudioVisualizer
             gradientLeft = GradientLeft ?? Gradient,
             gradientRight = GradientRight ?? Gradient,
             connectAll = ConnectAllAudioSources || ChildContent != null,
-            queryOwner = ChildContent != null && !ConnectAllAudioSources ? _visualizer : default,
+            queryOwner = ChildContent != null && !ConnectAllAudioSources ? ElementReference : default,
             audioMotion = _audioMotion,
             visualizer = _visualizer,
             features = Features.Select(f => new
