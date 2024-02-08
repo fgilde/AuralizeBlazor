@@ -7,14 +7,86 @@ public class AudioMotionGradient : IEquatable<AudioMotionGradient>
 {
     public string Name { get; set; }
     public string BgColor { get; set; }
+    public bool IsPredefined { get; set; }
     public ColorStop[] ColorStops { get; set; }
+    
+    // PREDEFINED GRADIENTS
+    public static AudioMotionGradient Classic => new()
+    {
+        Name = nameof(Classic),
+        IsPredefined = true,
+        ColorStops = new[]
+        {
+            new ColorStop { Color = "red" },
+            new ColorStop { Color = "yellow"}, 
+            new ColorStop { Color = "lime" } 
+        }
+    };
 
-    public static AudioMotionGradient Classic => new() { Name = "Classic" };
-    public static AudioMotionGradient Prism => new() { Name = "Prism" };
-    public static AudioMotionGradient Rainbow => new() { Name = "Rainbow" };
-    public static AudioMotionGradient OrangeRed => new() { Name = "Orangered" };
-    public static AudioMotionGradient Steelblue => new() { Name = "Steelblue" };
+    public static AudioMotionGradient Prism => new()
+    {
+        Name = nameof(Prism),
+        IsPredefined = true,
+        ColorStops = new[]
+        {
+            new ColorStop { Color = "#a35" },
+            new ColorStop { Color = "#c66" },
+            new ColorStop { Color = "#e94" },
+            new ColorStop { Color = "#ed0" },
+            new ColorStop { Color = "#9d5" },
+            new ColorStop { Color = "#4d8" },
+            new ColorStop { Color = "#2cb" },
+            new ColorStop { Color = "#0bc" },
+            new ColorStop { Color = "#09c" },
+            new ColorStop { Color = "#36b" }
+        }
+    };
 
+    public static AudioMotionGradient OrangeRed => new()
+    {
+        Name = "Orangered",
+        IsPredefined = true,
+        BgColor = "#3e2f29",
+        ColorStops = new[]
+        {
+            new ColorStop { Color = "OrangeRed" }
+        }
+    };
+
+    public static AudioMotionGradient Rainbow => new()
+    {
+        Name = nameof(Rainbow),
+        IsPredefined = true,
+        ColorStops = new[]
+        {
+            new ColorStop { Color = "#817" },
+            new ColorStop { Color = "#a35" },
+            new ColorStop { Color = "#c66" },
+            new ColorStop { Color = "#e94" },
+            new ColorStop { Color = "#ed0" },
+            new ColorStop { Color = "#9d5" },
+            new ColorStop { Color = "#4d8" },
+            new ColorStop { Color = "#2cb" },
+            new ColorStop { Color = "#0bc" },
+            new ColorStop { Color = "#09c" },
+            new ColorStop { Color = "#36b" },
+            new ColorStop { Color = "#639" }
+        }
+    };
+    
+    public static AudioMotionGradient Steelblue => new()
+    {
+        Name = nameof(Steelblue),
+        IsPredefined = true,
+        BgColor = "#222c35",
+        ColorStops = new[]
+        {
+            new ColorStop { Color = "SteelBlue" }
+        }
+    };
+    
+
+    // CUSTOM GRADIENTS
     public static AudioMotionGradient Greyscale => new()
     {
         Name = nameof(Greyscale),

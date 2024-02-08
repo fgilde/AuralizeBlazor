@@ -132,7 +132,7 @@
         if (!gradient) return 'classic';
         if (typeof gradient === 'string') return gradient;
         const name = gradient.name.toLowerCase();
-        if (this.audioMotion?._gradients?.[name] || !gradient.colorStops) return name;
+        if (this.audioMotion?._gradients?.[name] || !gradient.colorStops || gradient.isPredefined) return name;
         this.audioMotion.registerGradient(name, gradient);
         return name;
     }

@@ -37,13 +37,14 @@ public partial class BlazorAudioVisualizer
         new ShowLogoFeature(), 
       //  new SwitchPresetFeature()
     };
-    
+
     [Parameter] public EventCallback<MouseEventArgs> OnContainerMouseOver { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnContainerMouseOut { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnVisualizerMouseOver { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnVisualizerMouseOut { get; set; }
     [Parameter] public EventCallback<VisualizerPreset> PresetApplied { get; set; }
     [Parameter] public EventCallback<AudioMotionGradient> GradientChanged { get; set; }
+    [Parameter] public EventCallback<IVisualizerFeature[]> FeaturesChanged { get; set; }
 
     [Parameter] public bool OverlayChildContent { get; set; }
 
@@ -52,8 +53,8 @@ public partial class BlazorAudioVisualizer
     /// </summary>
     [Parameter]
     public string[] IgnoredPropertiesForReset { get; set; }
-    
-    [Parameter, ForJs("visualizerClickAction")] 
+
+    [Parameter, ForJs("visualizerClickAction")]
     public VisualizerAction ClickAction { get; set; } = VisualizerAction.None;
 
     [Parameter, ForJs("visualizerDblClickAction")]
@@ -109,7 +110,10 @@ public partial class BlazorAudioVisualizer
         get => _features;
         set
         {
+            if (_features == value || (_features != null && value != null && _features.SequenceEqual(value) ))
+                return;
             _features = value;
+            FeaturesChanged.InvokeAsync(Features);
             _ = ImportFeatureFilesAsync();
         }
     }
@@ -149,7 +153,7 @@ public partial class BlazorAudioVisualizer
     /// </summary>
     [Parameter]
     public double HoverOpacity { get; set; } = 1;
-    
+
     /// <summary>
     /// Connects the microphone to the visualizer.
     /// </summary>
@@ -171,12 +175,30 @@ public partial class BlazorAudioVisualizer
     /// <summary>
     /// Applies the given preset to the visualizer.
     /// </summary>
-    public void ApplyPreset(VisualizerPreset preset, bool? resetFirst = null)
+    public BlazorAudioVisualizer ApplyPreset(VisualizerPreset preset, bool? resetFirst = null)
     {
-        if(Presets?.Contains(preset) == true)
+        if (Presets?.Contains(preset) == true)
             _presetIdx = Array.IndexOf(Presets, preset);
         PresetApplied.InvokeAsync(preset);
         preset.Apply(this, resetFirst);
+        return this;
+    }
+
+    public BlazorAudioVisualizer RemoveFeature<T>() where T : IVisualizerFeature => RemoveFeature(typeof(T));
+
+    public BlazorAudioVisualizer RemoveFeature(Type featureType) => RemoveFeature(_features.Where(f => f.GetType() == featureType).ToArray());
+
+    public BlazorAudioVisualizer RemoveFeature(params IVisualizerFeature[] feature)
+    {
+        _features = _features.Except(feature).ToArray();
+        FeaturesChanged.InvokeAsync(Features);
+        return this;
+    }
+
+    public BlazorAudioVisualizer AddFeature<T>(T feature) where T : IVisualizerFeature
+    {
+        Features = _features.Concat(new IVisualizerFeature[] { feature }).ToArray();
+        return this;
     }
 
 
@@ -365,7 +387,7 @@ public partial class BlazorAudioVisualizer
 
     private AudioMotionGradient CheckGradientChange(AudioMotionGradient value)
     {
-        if(!value.Equals(_gradient))
+        if (!value.Equals(_gradient))
             GradientChanged.InvokeAsync(value);
         return value;
     }
