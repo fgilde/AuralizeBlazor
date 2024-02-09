@@ -17,6 +17,11 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height: 100% !important;
+}
+
+#app{
+    height: 100% !important;
 }
 
 h1:focus {

@@ -1,6 +1,6 @@
 ﻿window.AuralizeBlazor.features.energyMeter = {
 
-    onCanvasDraw: (scope, blazorAudioVisualizer, featureOptions, instance, info) => {
+    onCanvasDraw: (scope, auralizer, featureOptions, instance, info) => {
         const audioMotion = instance,
             canvas = audioMotion.canvas,
             ctx = audioMotion.canvasCtx,

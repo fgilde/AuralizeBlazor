@@ -70,8 +70,8 @@
         }
     },
 
-    onCanvasDraw: (scope, blazorAudioVisualizer, featureOptions, instance, info) => {
-        const audioMotion = blazorAudioVisualizer.audioMotion;
+    onCanvasDraw: (scope, auralizer, featureOptions, instance, info) => {
+        const audioMotion = auralizer.audioMotion;
         const canvas = audioMotion.canvas,
             ctx = audioMotion.canvasCtx,
             pixelRatio = audioMotion.pixelRatio,

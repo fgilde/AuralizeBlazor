@@ -1,0 +1,56 @@
+<div class="mud-codeblock">
+<div class="html"><pre>
+<span class="atSign">&#64;</span>using AuralizeBlazor.Features
+<span class="atSign">&#64;</span>using AuralizeBlazor.Options
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudToolBar</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudSwitch</span> <span class="htmlAttributeName">Color</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">Color</span><span class="enumValue">.Primary</span><span class="quot">&quot;</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>bind-Value</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_connectToAll</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>Connect To all sources<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudSwitch</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudSwitch</span> <span class="htmlAttributeName">Color</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">Color</span><span class="enumValue">.Primary</span><span class="quot">&quot;</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>bind-Value</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_connectToMic</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>Connect To Microphone<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudSwitch</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudToolBar</span><span class="htmlTagDelimiter">&gt;</span>
+
+<span class="atSign">&#64;</span>for (int i = 0; i &lt; _sampleSounds.Length; i++)
+{
+    var idx = i;
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudPaper</span> <span class="htmlAttributeName">Elevation</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">1</span><span class="quot">&quot;</span> <span class="htmlAttributeName">Style</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">display: flex</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="atSign">&#64;</span>if (!_connectToAll)
+        {
+            <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudCheckBox</span> <span class="htmlAttributeName">T</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">bool</span><span class="quot">&quot;</span> <span class="htmlAttributeName">ValueChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>(connect =&gt; AddOrRemove(connect, idx))</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudCheckBox</span><span class="htmlTagDelimiter">&gt;</span>
+        }
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>ref</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_audio</span><span class="quot">&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">metadata</span><span class="quot">&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">lazy</span><span class="quot">&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>_sampleSounds[idx]</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudPaper</span><span class="htmlTagDelimiter">&gt;</span>
+}
+
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>ref</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">_vis</span>
+           <span class="htmlAttributeName">InitialPreset</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">AuralizerPreset</span><span class="enumValue">.RadialSpectrumScale</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">GradientChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>MainLayout.Instance.ColorsChanged</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">Presets</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>AuralizerPreset.All</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">700px</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">AudioElements</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>_audioElements.Where(r =&gt; _checkedAudioIndexes.Contains(_audioElements.IndexOf(r))).ToArray()</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">ConnectAllAudioSources</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>_connectToAll</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">ConnectMicrophone</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>_connectToMic</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">ContextMenuAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.TogglePictureInPicture</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">DoubleClickAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.ToggleFullscreen</span><span class="quot">&quot;</span> <span class="htmlTagDelimiter">/&gt;</span>
+</pre></div>
+<div class="csharp"><pre>
+<span class="atSign">&#64;</span>code {
+    <span class="keyword">private</span> <span class="keyword">string</span>[] _sampleSounds = [<span class="string">&quot;/sample.mp3&quot;</span>, <span class="string">&quot;/sample2.mp3&quot;</span>, <span class="string">&quot;/sample3.mp3&quot;</span>, <span class="string">&quot;/sample4.mp3&quot;</span>];
+    <span class="keyword">private</span> Auralizer _vis;
+    <span class="keyword">private</span> ElementReference _audio { <span class="keyword">set</span> =&gt; _audioElements.Add(value); }
+    <span class="keyword">private</span> List&lt;ElementReference&gt; _audioElements = <span class="keyword">new</span>();
+    <span class="keyword">private</span> <span class="keyword">bool</span> _connectToAll = <span class="keyword">false</span>;
+    <span class="keyword">private</span> <span class="keyword">bool</span> _connectToMic = <span class="keyword">false</span>;
+    <span class="keyword">private</span> List&lt;<span class="keyword">int</span>&gt; _checkedAudioIndexes = <span class="keyword">new</span>();
+
+    <span class="keyword">private</span> <span class="keyword">void</span> AddOrRemove(<span class="keyword">bool</span> add, <span class="keyword">int</span> idx)
+    {
+        <span class="keyword">if</span> (add &amp;&amp; !_checkedAudioIndexes.Contains(idx))
+            _checkedAudioIndexes.Add(idx);
+        <span class="keyword">else</span> <span class="keyword">if</span> (!add &amp;&amp; _checkedAudioIndexes.Contains(idx))
+            _checkedAudioIndexes.Remove(idx);
+
+        StateHasChanged();
+    }
+}
+</pre></div>
+</div>

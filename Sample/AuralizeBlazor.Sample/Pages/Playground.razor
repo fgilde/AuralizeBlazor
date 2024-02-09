@@ -1,0 +1,80 @@
+﻿@page "/playground"
+@using AuralizeBlazor.Options
+@using AuralizeBlazor.Features
+@using MudBlazor.Extensions.Components.ObjectEdit.Options
+@using Nextended.Core.Extensions
+
+<PageTitle>Playground</PageTitle>
+
+
+<MudPaper Height="100%" Style="overflow:hidden; position:relative;">
+    <MudDrawerContainer Class="mud-height-full">
+        <MudDrawer Width="450px" @bind-Open="@_editOpen" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Persistent">
+            @if (_rendered)
+            {
+                <MudExObjectEdit MetaConfiguration="@Configure()" Value="@_vis"></MudExObjectEdit>
+            }
+        </MudDrawer>
+        <MudToolBar>
+            <MudSpacer />
+            <MudIconButton Title="Edit" Icon="@Icons.Material.Filled.Settings" Variant="Variant.Filled" Color="Color.Secondary" OnClick="@ToggleDrawer">Edit</MudIconButton>
+        </MudToolBar>
+        <audio class="m-2" style="width: 300px;" src="/sample.mp3" controls="true"></audio>
+        <Auralizer @ref=_vis
+                   Presets="AuralizerPreset.All"
+                   PresetApplied="PresetsApplied"
+                   GradientChanged="@MainLayout.Instance.ColorsChanged"
+                   Height="90%"
+                   ConnectAllAudioSources="true"
+                   ContextMenuAction="VisualizerAction.TogglePictureInPicture"
+                   DoubleClickAction="VisualizerAction.ToggleFullscreen"
+                   Overlay="true">
+        </Auralizer>
+    </MudDrawerContainer>
+</MudPaper>
+
+
+@code {
+    private Auralizer _vis;
+    private bool _rendered;
+    private bool _editOpen;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            _rendered = true;
+        }
+    }
+    private void ToggleDrawer() => _editOpen = !_editOpen;
+
+    private Action<ObjectEditMeta<Auralizer>> Configure()
+    {
+        return meta =>
+        {
+            meta.Properties(
+                a => a.ConnectAllAudioSources,
+                a => a.Features,
+                a => a.OverlayChildContent,
+                a => a.AudioElements,
+                a => a.IgnoredPropertiesForReset,
+                a => a.Class,
+                a => a.Style,
+                a => a.Presets,
+                a => a.InitialPreset,
+                a => a.Gradient,
+                a => a.GradientLeft,
+                a => a.GradientRight
+            ).Ignore().SelectMany(of => of.Children ?? Array.Empty<ObjectEditPropertyMeta>().ToList()).Recursive(m => m.Children).Ignore();
+            meta.GroupByTypes();
+        };
+    }
+
+    private void PresetsApplied()
+    {
+        if(_editOpen)
+            StateHasChanged(); // update properties in the edit drawer
+    }
+
+}

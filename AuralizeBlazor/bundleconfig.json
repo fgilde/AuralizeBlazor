@@ -2,7 +2,7 @@
   {
     "outputFileName": "wwwroot/js/auralize.min.js",
     "inputFiles": [
-      "wwwroot/js/components/audioVisualizer.js",
+      "wwwroot/js/components/auralizer.js",
       "wwwroot/js/features/energyMeterFeature.js",
       "wwwroot/js/features/radialRadiusFeature.js",
       "wwwroot/js/features/showLogoFeature.js",

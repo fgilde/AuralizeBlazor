@@ -1,6 +1,6 @@
 ﻿window.AuralizeBlazor.features.waveNode = {
 
-    onCanvasDraw: (scope, blazorAudioVisualizer, featureOptions, instance, info) => {
+    onCanvasDraw: (scope, auralizer, featureOptions, instance, info) => {
         if (!instance.audioCtx) {
             return;
         }

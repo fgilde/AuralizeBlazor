@@ -1,32 +1,31 @@
 ﻿@using AuralizeBlazor.Features
 @using AuralizeBlazor.Options
 <MudExSelect HelperText="If you manually select a preset here, auto-toggling will be disabled"
-             Virtualize="true" Class="mt-1 mb-1" T="VisualizerPreset" Variant="Variant.Filled" ValueChanged="@HandleChange" Value="_preset" ItemCollection="@(_presets)"></MudExSelect>
+             Virtualize="true" Class="mt-1 mb-1" T="AuralizerPreset" Variant="Variant.Filled" ValueChanged="@HandleChange" Value="_preset" ItemCollection="@(_presets)"></MudExSelect>
 
 
-<BlazorAudioVisualizer @ref=_vis
-                       @bind-Features="_features"
-                       InitialPreset="VisualizerPreset.ReflexMirror"
-                       GradientChanged="@MainLayout.Instance.ColorsChanged"
-                       Presets="@VisualizerPreset.All"
-                       PresetApplied="OnPresetApplied"
-                       Height="700px"
-                       BackgroundImage="/bg1.jpg"
-                       ConnectAllAudioSources="true"
-                       ContextMenuAction="VisualizerAction.TogglePictureInPicture"
-                       DoubleClickAction="VisualizerAction.ToggleFullscreen"
-                       Overlay="true">
+<Auralizer @ref=_vis
+           @bind-Features="_features"
+           InitialPreset="AuralizerPreset.ReflexMirror"
+           GradientChanged="@MainLayout.Instance.ColorsChanged"
+           Presets="@AuralizerPreset.All"
+           PresetApplied="OnPresetApplied"
+           Height="700px"
+           BackgroundImage="/bg1.jpg"
+           ContextMenuAction="VisualizerAction.TogglePictureInPicture"
+           DoubleClickAction="VisualizerAction.ToggleFullscreen"
+           Overlay="true">
     <center>
         <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
     </center>
-</BlazorAudioVisualizer>
+</Auralizer>
 
 @code {
+    private Auralizer _vis;
     private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, new SwitchPresetFeature()];
-    BlazorAudioVisualizer _vis;
-    private VisualizerPreset? _preset;
-    private readonly VisualizerPreset[] _presets = VisualizerPreset.All;//.Select(p => p.Name).ToList();
+    private AuralizerPreset? _preset;
+    private readonly AuralizerPreset[] _presets = AuralizerPreset.All;
 
-    private void HandleChange(VisualizerPreset value) => _vis.RemoveFeature<SwitchPresetFeature>().ApplyPreset(value);
-    private void OnPresetApplied(VisualizerPreset obj) => _preset = obj;
+    private void HandleChange(AuralizerPreset value) => _vis.RemoveFeature<SwitchPresetFeature>().ApplyPreset(value);
+    private void OnPresetApplied(AuralizerPreset obj) => _preset = obj;
 }

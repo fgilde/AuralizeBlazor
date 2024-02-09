@@ -1,0 +1,22 @@
+﻿@page "/connect"
+@using AuralizeBlazor.Options
+
+<PageTitle>Connect Elements</PageTitle>
+
+
+<DocsPageSection>
+    <SectionHeader Title="Connect Elements">
+        <Description>
+            By default, the <CodeInline>Auralizer</CodeInline> component will connect the child elements you use.<br/>
+            But you can change this behaviour by manually passing the elements as <CodeInline>ElementReference</CodeInline> to the property <CodeInline>AudioElements</CodeInline> 
+            or by setting the <CodeInline>ConnectAllAudioSources</CodeInline> property to <CodeInline>true</CodeInline> to automatically connect to all possible elements.<br />
+            Additionally, you can use the <CodeInline>ConnectMicrophone</CodeInline> property or the <CodeInline>ConnectToMicrophone</CodeInline> method to connect the visualizer to the Microphone.
+            This example shows how to connect the elements manually.
+        </Description>
+    </SectionHeader>
+    <SectionContent Outlined="true" FullWidth="true">
+        <ConnectElementsExample />
+    </SectionContent>
+    <SectionSource Code="@nameof(ConnectElementsExample)" />
+</DocsPageSection>
+
