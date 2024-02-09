@@ -1,11 +1,6 @@
 
-<center>
-<h1 style="background: linear-gradient(to right, #0bc, #2cb, #0bc, #09c, #36b, #2cb); background-clip: text; color: transparent;">
-  AuralizeBlazor
-</h1>
-</center>
 
-<!--## AuralizeBlazor-->
+## AuralizeBlazor
 
 [Live Demo](https://auralizeblazor.azurewebsites.net/)
 
