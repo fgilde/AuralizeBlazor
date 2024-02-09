@@ -1,0 +1,39 @@
+﻿@using AuralizeBlazor.Features
+@using VisualizationMode = AuralizeBlazor.Options.VisualizationMode
+
+
+<BlazorAudioVisualizer GradientChanged="@MainLayout.Instance.ColorsChanged"
+                       Presets="@VisualizerPreset.All"
+                       IgnoredPropertiesForReset="@(new [] {nameof(BlazorAudioVisualizer.Overlay), nameof(BlazorAudioVisualizer.ShowBgColor)})"
+                       OverlayChildContent="true"
+                       HoverOpacity=".1"
+                       ShowBgColor="false">
+    <video height="800px;" preload="metadata" loading="lazy" controls="true" src="/sample.mp4"></video>
+</BlazorAudioVisualizer>
+<br/>
+
+<MudDivider Class="mt-5 mb-5"></MudDivider>
+
+<p>Audio sample</p>
+<BlazorAudioVisualizer IgnoredPropertiesForReset="@(new [] {nameof(BlazorAudioVisualizer.Overlay), nameof(BlazorAudioVisualizer.ShowBgColor)})"
+                       ShowScaleX="false"
+                       ShowScaleY="false"
+                       Mode="VisualizationMode.LineAreaGraph"
+                       OverlayChildContent="true"
+                       HoverOpacity=".2"
+                       Opacity="1"
+                       BgAlpha="1"
+                       Overlay="false"
+                       ShowBgColor="true">
+    <audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+</BlazorAudioVisualizer>
+
+@code {
+    private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, new SwitchPresetFeature()];
+    BlazorAudioVisualizer _vis;
+    private VisualizerPreset? _preset;
+    private readonly VisualizerPreset[] _presets = VisualizerPreset.All;//.Select(p => p.Name).ToList();
+
+    private void HandleChange(VisualizerPreset value) => _vis.RemoveFeature<SwitchPresetFeature>().ApplyPreset(value);
+    private void OnPresetApplied(VisualizerPreset obj) => _preset = obj;
+}

@@ -47,6 +47,7 @@ public class VisualizerPreset : SuperType<VisualizerPreset>
             var ignore = new[] // This properties are not reset to default
             {
                 nameof(BlazorAudioVisualizer.Features), 
+                nameof(BlazorAudioVisualizer.OverlayChildContent), 
                 nameof(BlazorAudioVisualizer.ChildContent), 
                 nameof(BlazorAudioVisualizer.AudioElements),
                 nameof(BlazorAudioVisualizer.ClickAction),

@@ -32,11 +32,7 @@ public partial class BlazorAudioVisualizer
     private IJSObjectReference _audioMotion;
     private RenderFragment _childContent;
     private AudioMotionGradient _gradient = AudioMotionGradient.Classic;
-    private IVisualizerFeature[] _features =
-    {
-        new ShowLogoFeature(), 
-      //  new SwitchPresetFeature()
-    };
+    private IVisualizerFeature[] _features = Array.Empty<IVisualizerFeature>();
 
     [Parameter] public EventCallback<MouseEventArgs> OnContainerMouseOver { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnContainerMouseOut { get; set; }
@@ -46,7 +42,7 @@ public partial class BlazorAudioVisualizer
     [Parameter] public EventCallback<AudioMotionGradient> GradientChanged { get; set; }
     [Parameter] public EventCallback<IVisualizerFeature[]> FeaturesChanged { get; set; }
 
-    [Parameter] public bool OverlayChildContent { get; set; }
+    [Parameter, ForJs] public bool OverlayChildContent { get; set; }
 
     /// <summary>
     /// If a preset is applied this properties will be ignored when the preset is applied and a reset is triggered from the preset.

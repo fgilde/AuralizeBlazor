@@ -1,0 +1,80 @@
+﻿@page "/api/{TypeName?}/{Search?}"
+
+@if (_loaded)
+{
+    @if (type != null && !string.IsNullOrEmpty(TypeName))
+    {
+        <MudExApiView ApiLinkPath="api" Search="@Search" ShowHeader="false" IsInitiallyExpanded="true" Type="@type"></MudExApiView>
+    }
+}
+else
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+
+@code
+{
+
+    bool _loaded;
+
+    [Parameter]
+    public string? File { get; set; }
+
+    [Parameter]
+    public string? TypeName
+    {
+        get => _typeName;
+        set
+        {
+            _typeName = value;
+            Update();
+        }
+    }
+
+    [Parameter]
+    public string? Search { get; set; }
+
+    private Type? type;
+    private string? _typeName;
+
+    private void Update()
+    {
+        if (TypeName != null && (type == null || type.Name != TypeName))
+        {
+            _loaded = false;
+            InvokeAsync(StateHasChanged);
+            type = GetTypeByName(TypeName);
+            Task.Delay(50).ContinueWith(task =>
+            {
+                _loaded = true;
+                InvokeAsync(StateHasChanged);
+            });
+        }
+    }
+
+    internal static Type? GetTypeByName(string typeName)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(typeName))
+                return null;
+
+            var result = Type.GetType(typeName);
+            if (result != null)
+                return result;
+            var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).ToArray();
+            result = types.FirstOrDefault(t => t.Name == typeName || t.FullName == typeName);
+            if (result != null)
+                return result;
+            result = types.FirstOrDefault(t => t.IsGenericType && t.Name.StartsWith($"{typeName}`"));
+            if (result != null)
+                return result;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+        return null;
+    }
+}
+

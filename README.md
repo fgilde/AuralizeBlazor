@@ -5,7 +5,7 @@
 </h1>
 </center>
 
-![alt text](https://raw.githubusercontent.com/fgilde/AuralizeBlazor/master/AuralizeBlazor/screenshot1.png?token=GHSAT0AAAAAACLDQ3BY6ARLFUVSKIVVPTOIZOEE7NQ)
+![alt text](https://raw.githubusercontent.com/fgilde/AuralizeBlazor/master/AuralizeBlazor/screenshot1.png)
 
 AuralizeBlazor provides a component named `BlazorAudioVisualizer`.
 This a Blazor component that integrates the powerful features of the audioMotion.js library, enabling developers to incorporate real-time audio visualization into Blazor applications with ease. This document provides an overview of how to use the component, including its properties and methods.

@@ -1,0 +1,32 @@
+﻿@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+<MudExSelect HelperText="If you manually select a preset here, auto-toggling will be disabled"
+             Virtualize="true" Class="mt-1 mb-1" T="VisualizerPreset" Variant="Variant.Filled" ValueChanged="@HandleChange" Value="_preset" ItemCollection="@(_presets)"></MudExSelect>
+
+
+<BlazorAudioVisualizer @ref=_vis
+                       @bind-Features="_features"
+                       InitialPreset="VisualizerPreset.ReflexMirror"
+                       GradientChanged="@MainLayout.Instance.ColorsChanged"
+                       Presets="@VisualizerPreset.All"
+                       PresetApplied="OnPresetApplied"
+                       Height="700px"
+                       BackgroundImage="/bg1.jpg"
+                       ConnectAllAudioSources="true"
+                       ContextMenuAction="VisualizerAction.TogglePictureInPicture"
+                       DoubleClickAction="VisualizerAction.ToggleFullscreen"
+                       Overlay="true">
+    <center>
+        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+    </center>
+</BlazorAudioVisualizer>
+
+@code {
+    private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, new SwitchPresetFeature()];
+    BlazorAudioVisualizer _vis;
+    private VisualizerPreset? _preset;
+    private readonly VisualizerPreset[] _presets = VisualizerPreset.All;//.Select(p => p.Name).ToList();
+
+    private void HandleChange(VisualizerPreset value) => _vis.RemoveFeature<SwitchPresetFeature>().ApplyPreset(value);
+    private void OnPresetApplied(VisualizerPreset obj) => _preset = obj;
+}

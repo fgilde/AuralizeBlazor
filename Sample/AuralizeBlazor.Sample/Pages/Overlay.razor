@@ -4,39 +4,16 @@
 <PageTitle>Overlay</PageTitle>
 
 
-<BlazorAudioVisualizer GradientChanged="@MainLayout.Instance.ColorsChanged"
-                       Presets="@VisualizerPreset.All"
-                       IgnoredPropertiesForReset="@(new [] {nameof(BlazorAudioVisualizer.Overlay), nameof(BlazorAudioVisualizer.ShowBgColor)})"
-                       Class="mb-5"
-                       Height="400px"
-                       OverlayChildContent="true"
-                       HoverOpacity=".1"
-                       ShowBgColor="false"
-                       Overlay="true">
-    <video preload="metadata" loading="lazy" controls="true" src="/sample.mp4"></video>
-</BlazorAudioVisualizer>
+<DocsPageSection>
+    <SectionHeader Title="Overlay Sample">
+        <Description>
+            You can set  <CodeInline>OverlayChildContent</CodeInline> overlay the child element with the same size. Please have in mind that this not setting the <CodeInline>Overlay</CodeInline> property from AudioMotion config<br />
+            Additionally, you can set the <CodeInline>HoverOpacity</CodeInline> and <CodeInline>Opacity</CodeInline> properties to control the overlay behaviour.<br />
+        </Description>
+    </SectionHeader>
+    <SectionContent Outlined="true" FullWidth="true">
+        <OverlayChildExample />
+    </SectionContent>
+    <SectionSource Code="@nameof(OverlayChildExample)" />
+</DocsPageSection>
 
-<BlazorAudioVisualizer GradientChanged="@MainLayout.Instance.ColorsChanged"
-                       Class="mt-5"
-                       Presets="@VisualizerPreset.All"
-                       IgnoredPropertiesForReset="@(new [] {nameof(BlazorAudioVisualizer.Overlay)})"
-                       OverlayChildContent="false"
-                       Opacity=".9"
-                       ShowBgColor="false"
-                       HoverOpacity=".5"
-                       BgAlpha="0"
-                       Overlay="true">
-    <audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
-</BlazorAudioVisualizer>
-
-<MudExpansionPanel Text="Show / Hide Code">
-    <MudExCodeView RenderChildContent="false" Code="Hallo" />
-</MudExpansionPanel>
-
-
-@* <MudExObjectEdit Value="@_vis"></MudExObjectEdit> *@
-
-@code {
-
-
-}

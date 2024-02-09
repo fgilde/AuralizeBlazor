@@ -1,42 +1,19 @@
 ﻿@page "/"
 
-@using AuralizeBlazor.Features
-@using AuralizeBlazor.Options
-
 <PageTitle>Home</PageTitle>
 
-<MudExSelect HelperText="If you manually select a preset here, auto-toggling will be disabled"
-    Virtualize="true" Class="mt-1 mb-1" T="VisualizerPreset" Variant="Variant.Filled" ValueChanged="@HandleChange" Value="_preset" ItemCollection="@(_presets)"></MudExSelect>
 
-<BlazorAudioVisualizer @ref=_vis
-                       @bind-Features="_features"
-                       InitialPreset="VisualizerPreset.ReflexMirror"
-                       GradientChanged="@MainLayout.Instance.ColorsChanged"
-                       Presets="@VisualizerPreset.All"
-                       PresetApplied="OnPresetApplied"
-                       Height="700px"
-                       BackgroundImage="https://www.pr-bild-award.de/site-prba/assets/files/1/prba-teaser.jpg"
-                       ConnectAllAudioSources="true"
-                       ContextMenuAction="VisualizerAction.TogglePictureInPicture"
-                       OverlayChildContent="false"
-                       Overlay="false">
-    <center>
-        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
-    </center>
-</BlazorAudioVisualizer>
-
-<MudExpansionPanel Text="Show / Hide Code">
-    <MudExCodeView RenderChildContent="false" Code="Hallo"/>
-</MudExpansionPanel>
-
-
-@code {
-    private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, new SwitchPresetFeature()];
-    BlazorAudioVisualizer _vis;
-    private VisualizerPreset? _preset;
-    private readonly VisualizerPreset[] _presets = VisualizerPreset.All;//.Select(p => p.Name).ToList();
-
-    private void HandleChange(VisualizerPreset value) => _vis.RemoveFeature<SwitchPresetFeature>().ApplyPreset(value);
-    private void OnPresetApplied(VisualizerPreset obj) => _preset = obj;
-
-}
+<DocsPageSection>
+    <SectionHeader Title="Main Sample">
+        <Description>
+            This sample uses the property Feature <CodeInline>SwitchPresetFeature</CodeInline> to toggle the active <CodeInline>VisualizerPreset</CodeInline> based on audio energy. <br />
+            You can also manually select a preset from the dropdown or using the mousewheel while over the visualizer.<br/>
+            Use right mouse click to toggle the picture in picture mode and double click to toggle the fullscreen mode.<br/>
+            Play the demo sound to see the result:
+        </Description>
+    </SectionHeader>
+    <SectionContent Outlined="true" FullWidth="true">
+        <MainExample/>
+    </SectionContent>
+    <SectionSource Code="@nameof(MainExample)" />
+</DocsPageSection>

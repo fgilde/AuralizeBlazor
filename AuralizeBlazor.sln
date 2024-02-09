@@ -10,7 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuralizeBlazor.Sample", "Sample\AuralizeBlazor.Sample\AuralizeBlazor.Sample.csproj", "{454E25E7-A8BE-49B2-B2B2-07D2B41F12E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuralizeBlazor.Sample", "Sample\AuralizeBlazor.Sample\AuralizeBlazor.Sample.csproj", "{454E25E7-A8BE-49B2-B2B2-07D2B41F12E8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocsCompiler", "DocsCompiler\DocsCompiler.csproj", "{E973F05D-0EA9-49A6-84D5-25B3EECA7037}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +28,10 @@ Global
 		{454E25E7-A8BE-49B2-B2B2-07D2B41F12E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{454E25E7-A8BE-49B2-B2B2-07D2B41F12E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{454E25E7-A8BE-49B2-B2B2-07D2B41F12E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E973F05D-0EA9-49A6-84D5-25B3EECA7037}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E973F05D-0EA9-49A6-84D5-25B3EECA7037}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E973F05D-0EA9-49A6-84D5-25B3EECA7037}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E973F05D-0EA9-49A6-84D5-25B3EECA7037}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
