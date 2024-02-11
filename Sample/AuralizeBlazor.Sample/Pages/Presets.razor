@@ -1,0 +1,21 @@
+﻿@page "/presets"
+@using AuralizeBlazor.Options
+
+<PageTitle>Presets</PageTitle>
+
+
+<DocsPageSection>
+    <SectionHeader Title="Presets">
+        <Description>
+            For all properties you can set Presets with class <CodeInline>AuralizerPreset</CodeInline><br />
+            Some preconfigured presets are static available in the <CodeInline>AuralizerPreset</CodeInline> class and a list of all can be retrieved by <CodeInline>AuralizerPreset.All</CodeInline>.<br />
+            You can also create your own presets by creating a new instance of <CodeInline>AuralizerPreset</CodeInline> and set the properties you want to change.<br/>
+            In the auralizer component you can set the <CodeInline>InitialPreset</CodeInline> property to set the initial preset. Also you can set the <CodeInline>Presets</CodeInline> property to pass presets the user is able to change with mousewheel or other custom action.
+        </Description>
+    </SectionHeader>
+    <SectionContent Outlined="true" FullWidth="true">
+        <PresetsExample />
+    </SectionContent>
+    <SectionSource Code="@nameof(PresetsExample)" />
+</DocsPageSection>
+

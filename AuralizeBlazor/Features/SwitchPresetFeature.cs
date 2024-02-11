@@ -2,8 +2,12 @@
 
 namespace AuralizeBlazor.Features;
 
+/// <summary>
+/// This feature allows to switch between different presets based on bass energy.
+/// </summary>
 public class SwitchPresetFeature : VisualizerFeatureBase
 {
+    /// <inheritdoc />
     public override string FullJsNamespace => "window.AuralizeBlazor.features.switchPresetFeature";
 
     /// <summary>

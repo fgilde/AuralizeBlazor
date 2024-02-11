@@ -1,0 +1,43 @@
+<div class="mud-codeblock">
+<div class="html"><pre>
+<span class="atSign">&#64;</span>using AuralizeBlazor.Features
+<span class="atSign">&#64;</span>using AuralizeBlazor.Options
+<span class="atSign">&#64;</span>using BlazorJS.Attributes
+<span class="atSign">&#64;</span>using VisualizationMode = AuralizeBlazor.Options.VisualizationMode
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudIconButton</span> <span class="htmlAttributeName">Title</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">Fullscreen</span><span class="quot">&quot;</span> <span class="htmlAttributeName">OnClick</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>(() =&gt; _vis.ToggleFullScreen())</span><span class="quot">&quot;</span> <span class="htmlAttributeName">Icon</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>Icons.Material.Filled.Fullscreen</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">/&gt;</span>
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudIconButton</span> <span class="htmlAttributeName">Title</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">Picture in picture</span><span class="quot">&quot;</span> <span class="htmlAttributeName">OnClick</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>(() =&gt; _vis.TogglePictureInPicture())</span><span class="quot">&quot;</span> <span class="htmlAttributeName">Icon</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>Icons.Material.Filled.PictureInPicture</span><span class="quot">&quot;</span> <span class="htmlTagDelimiter">/&gt;</span>
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>ref</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">_vis</span>
+           <span class="htmlAttributeName">InitialPreset</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">AuralizerPreset</span><span class="enumValue">.NeonPulse</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">GradientChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>MainLayout.Instance.ColorsChanged</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">Features</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_myFeatrues</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">700px</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">audio-main mud-ex-animate-all-properties</span><span class="quot">&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">metadata</span><span class="quot">&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">lazy</span><span class="quot">&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">/sample.mp3</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+</pre></div>
+<div class="csharp"><pre>
+<span class="atSign">&#64;</span>code {
+    Auralizer _vis;
+    <span class="keyword">private</span> IVisualizerFeature[] _myFeatrues = <span class="keyword">new</span> IVisualizerFeature[]
+    {
+        <span class="keyword">new</span> ShowLogoFeature() {Label = <span class="string">&quot;Hello&quot;</span>},
+        <span class="keyword">new</span> MyCustomFeature() {NumDots = <span class="number">10</span>}
+    };
+
+    <span class="xmlDocTag">///</span> <span class="xmlDocTag">&lt;summary&gt;</span>
+    <span class="xmlDocTag">///</span><span class="xmlDocComment"> Sample implementation of a custom feature that displays a dot on the canvas</span>
+    <span class="xmlDocTag">///</span> <span class="xmlDocTag">&lt;/summary&gt;</span>
+    <span class="keyword">public</span> <span class="keyword">class</span> MyCustomFeature : VisualizerFeatureBase
+    {
+        <span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">string</span> FullJsNamespace =&gt; <span class="string">&quot;window.myCustomFeature&quot;</span>; 
+        <span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">string</span> OnCanvasDrawCallbackName =&gt; <span class="string">&quot;onCanvasDraw&quot;</span>;
+        <span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">string</span>[] RequiredJsFiles =&gt; [<span class="string">&quot;/js/myCustomFeature.js&quot;</span>];
+        [ForJs]
+        <span class="keyword">public</span> <span class="keyword">int</span> NumDots { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">5</span>;
+    }
+
+}
+</pre></div>
+</div>

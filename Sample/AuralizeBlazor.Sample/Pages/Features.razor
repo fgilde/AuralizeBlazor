@@ -1,0 +1,43 @@
+﻿@page "/features"
+@using AuralizeBlazor.Options
+@using AuralizeBlazor.Features
+@using MudBlazor.Extensions.Options
+
+<PageTitle>Custom Features</PageTitle>
+
+
+<DocsPageSection>
+    <SectionHeader Title="Custom Features">
+        <Description>
+            The <CodeInline>@nameof(Auralizer)</CodeInline> has a property called <CodeInline>@nameof(Auralizer.Features)</CodeInline> <br />
+                Here you can add custom features like plugins to the visualizer. <br />
+                We are providing basic feature classes like <CodeInline>@nameof(ShowLogoFeature)</CodeInline>, <CodeInline>@nameof(SwitchPresetFeature)</CodeInline>, <CodeInline>@nameof(EnergyMeterFeature)</CodeInline>, <CodeInline>@nameof(RadialRadiusFeature)</CodeInline> and the <CodeInline>@nameof(WaveNodeFeature)</CodeInline> <br />
+                You can also create your own features by implementing the <CodeInline>@nameof(IVisualizerFeature)</CodeInline> interface or better inherit from <CodeInline>@nameof(VisualizerFeatureBase)</CodeInline>. <br />
+                A Feature can then have their own properties and if these are flagged with the <CodeInline>ForJsAttribute</CodeInline> they will be automatically passed to your js method <br />
+
+                <br /><br />
+                The c# class then needs to specify the <CodeInline>@nameof(IVisualizerFeature.FullJsNamespace)</CodeInline> the <CodeInline>@nameof(IVisualizerFeature.OnCanvasDrawCallbackName)</CodeInline> (Js canvas draw callback where you can implement your feature. And also optional you can specify the <CodeInline>@nameof(IVisualizerFeature.RequiredJsFiles)</CodeInline> (this files will then be loaded automatically) <br />
+                <br />
+                This sample has a custom feature that displays a dot on the canvas with positions changing and size based on energy level. <br />
+            </Description>
+        </SectionHeader>
+        <SectionContent Outlined="true" FullWidth="true">
+            <FeaturesExample />
+        </SectionContent>
+        <SectionSource Code="@nameof(FeaturesExample)" />
+        <MudExpansionPanel Text="JS Code myCustomFeature.js">
+            <MudExCodeView Language="MudExCodeLanguage.JavaScript" Code="@_jsCode" />
+        </MudExpansionPanel>
+    </DocsPageSection>
+
+    @code
+    {
+    [Inject] NavigationManager _navigationManager { get; set; }
+    string _jsCode;
+    protected override async Task OnInitializedAsync()
+    {
+        var res = await new HttpClient() { BaseAddress = new Uri(_navigationManager.BaseUri) }.GetAsync(new FeaturesExample.MyCustomFeature().RequiredJsFiles.First());
+        _jsCode = await res.Content.ReadAsStringAsync();
+        await base.OnInitializedAsync();
+    }
+}

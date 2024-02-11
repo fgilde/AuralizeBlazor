@@ -1,0 +1,773 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AuralizeBlazor</name>
+    </assembly>
+    <members>
+        <member name="T:AuralizeBlazor.Auralizer">
+            <summary>
+            Blazor component for visualizing audio data.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.OnContainerMouseOver">
+            <summary>
+            Invoked when the mouse pointer enters the container area.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.OnContainerMouseOut">
+            <summary>
+            Invoked when the mouse pointer leaves the container area.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.OnVisualizerMouseOver">
+            <summary>
+            Invoked when the mouse pointer enters the visualizer area.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.OnVisualizerMouseOut">
+            <summary>
+            Invoked when the mouse pointer leaves the visualizer area.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.PresetApplied">
+            <summary>
+            Invoked when a preset is applied to the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.GradientChanged">
+            <summary>
+            Invoked when the gradient used by the visualizer is changed.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.FeaturesChanged">
+            <summary>
+            Invoked when the features of the visualizer change.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.OnInputConnected">
+            <summary>
+            Invoked when an input source is connected to the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.OnCreated">
+            <summary>
+            Invoked when the visualizer component is created.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.OnReady">
+            <summary>
+            Invoked when the visualizer component is ready for interaction.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.OverlayChildContent">
+            <summary>
+            Indicates whether child content should be overlaid on the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ClickAction">
+            <summary>
+            Defines the action taken when the visualizer is clicked.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.DoubleClickAction">
+            <summary>
+            Defines the action taken when the visualizer is double-clicked.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ContextMenuAction">
+            <summary>
+            Defines the action taken when the context menu is invoked on the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.MouseWheelUpAction">
+            <summary>
+            Defines the action taken when the mouse wheel is scrolled up over the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.MouseWheelDownAction">
+            <summary>
+            Defines the action taken when the mouse wheel is scrolled down over the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ShowPresetNameOnChange">
+            <summary>
+            Determines whether the name of the preset is shown when it is changed.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.InitialPreset">
+            <summary>
+            Specifies the initial preset to be applied to the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Presets">
+            <summary>
+            All here added presets will be available for the user to apply to the visualizer by using mousewheel.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.BackgroundImage">
+            <summary>
+            Sets the background image of the visualizer component.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.IgnoredPropertiesForReset">
+            <summary>
+            If a preset is applied this properties will be ignored when the preset is applied and a reset is triggered from the preset.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ChildContent">
+            <summary>
+            The content to be rendered within the visualizer component. All here containing audio and video elements will be connected to the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Features">
+            <summary>
+            Array of visualizer features to be applied to the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.AudioElements">
+            <summary>
+            An array of audio elements (e.g., audio or video tags) to be visualized.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ConnectAllAudioSources">
+            <summary>
+            A flag indicating whether all audio sources should be connected to the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Class">
+            <summary>
+             CSS class for the visualizer component.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Style">
+            <summary>
+             CSS class for the visualizer component.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Opacity">
+            <summary>
+            Opacity of the visualizer component.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.HoverOpacity">
+            <summary>
+            Opacity of the visualizer component when hovered.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ConnectMicrophone">
+            <summary>
+            Connects the microphone to the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Height">
+            <summary>
+            Height of the visualizer component.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Width">
+            <summary>
+            Width of the visualizer component.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.ApplyPreset(AuralizeBlazor.AuralizerPreset,System.Nullable{System.Boolean})">
+            <summary>
+            Applies the given preset to the visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.ShowMessage(System.String,System.TimeSpan)">
+            <summary>
+            Displays a message on the visualizer for the specified duration.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.RemoveFeature``1">
+            <summary>
+            Removes a visualizer feature from the visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.RemoveFeature(System.Type)">
+            <summary>
+            Removes a visualizer feature from the visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.RemoveFeature(AuralizeBlazor.Features.IVisualizerFeature[])">
+            <summary>
+            Removes a visualizer feature from the visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.AddFeature``1(``0)">
+            <summary>
+            Adds a visualizer feature to the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Radius">
+            <summary>
+            Defines the internal radius of the radial spectrum. Must be between 0 and 1.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Sensitivity">
+            <summary>
+            Sets the sensitivity of the visualizer. Higher values make it more sensitive to sound.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ChannelLayout">
+            <summary>
+            Specifies the channel layout for the visualizer (e.g., single, dual-vertical).
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Stereo">
+            <summary>
+            Determines whether to use stereo mode, changing the channel layout accordingly.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.FrequencyScale">
+            <summary>
+            Specifies the frequency scale used by the visualizer (e.g., logarithmic, linear).
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.FFTSize">
+            <summary>
+            Sets the FFT size for the audio processing. Higher values provide more detail.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.MaxDecibels">
+            <summary>
+            Sets the maximum decibel level for the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.MinDecibels">
+            <summary>
+            Sets the minimum decibel level for the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.MaxFrequency">
+            <summary>
+            Specifies the maximum frequency displayed by the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.MinFrequency">
+            <summary>
+            Specifies the minimum frequency displayed by the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Smoothing">
+            <summary>
+            Controls the smoothing time constant for the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Volume">
+            <summary>
+            Adjusts the volume for the audio processing.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.WeightingFilter">
+            <summary>
+            Applies a weighting filter for the frequency data visualization.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Mode">
+            <summary>
+            Sets the visualization mode for the audio spectrum (e.g., discrete frequencies).
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.MaxFPS">
+            <summary>
+            Limits the maximum frames per second (FPS) for the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ReflexRatio">
+            <summary>
+            Adjusts the ratio of the reflex effect in the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.RoundBars">
+            <summary>
+            Enables or disables round bars in the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ShowBgColor">
+            <summary>
+            Controls the background color visibility of the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ShowFPS">
+            <summary>
+            Toggles the display of frames per second (FPS) on the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ShowPeaks">
+            <summary>
+            Determines whether amplitude peaks are shown in the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ShowScaleX">
+            <summary>
+            Controls the visibility of the scale on the X-axis.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ShowScaleY">
+            <summary>
+            Controls the visibility of the scale on the Y-axis.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.SpinSpeed">
+            <summary>
+            Sets the rotation speed for the radial visualization mode.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.SplitGradient">
+            <summary>
+            Splits the color gradient between left and right channels in dual layouts.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.IsActive">
+            <summary>
+            Controls whether the visualizer is active and starts processing audio immediately.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.TrueLeds">
+            <summary>
+            When true, renders LED bars with individual colors from the current gradient.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.UseCanvas">
+            <summary>
+            Determines whether the visualizer uses a canvas for rendering.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ColorMode">
+            <summary>
+            Selects the color mode for the visualizer bars.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Gradient">
+            <summary>
+            Specifies the color gradient used for the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.GradientLeft">
+            <summary>
+            Specifies the color gradient for the left channel (dual layouts only).
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.GradientRight">
+            <summary>
+            Specifies the color gradient for the right channel (dual layouts only).
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.AlphaBars">
+            <summary>
+            Enables or disables alpha transparency for the bars based on their amplitude.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.AnsiBands">
+            <summary>
+            Uses ANSI/IEC preferred frequencies for octave bands (affects visualization modes).
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.BarSpacing">
+            <summary>
+            Adjusts the spacing between bars in the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.BgAlpha">
+            <summary>
+            Controls the background opacity of the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.FillAlpha">
+            <summary>
+            Sets the fill opacity for bars or the graph area in the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.LedBars">
+            <summary>
+            Toggles the LED bars effect for the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.LinearAmplitude">
+            <summary>
+            Switches the amplitude scale from decibels to a linear representation.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.LinearBoost">
+            <summary>
+            Boosts low-energy frequencies in linear amplitude mode.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.LineWidth">
+            <summary>
+            Sets the line width for graph mode or the outline of bars.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.LoRes">
+            <summary>
+            Enables low-resolution mode to improve performance on high-DPI displays.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.LumiBars">
+            <summary>
+            Enables luminance bars effect, displaying bars at full height with varying opacity.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Mirror">
+            <summary>
+            Configures the mirroring effect for the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.NoteLabels">
+            <summary>
+            Displays musical note labels instead of frequency values on the X-axis.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.OutlineBars">
+            <summary>
+            Renders analyzer bars with an outline.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Overlay">
+            <summary>
+            Enables the overlay mode, allowing the visualizer to be displayed over other content.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.PeakLine">
+            <summary>
+            Connects peak values with a line in graph mode.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Radial">
+            <summary>
+            Enables the radial visualization mode.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.RadialInvert">
+            <summary>
+            Inverts the direction of radial bars towards the center.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ReflexAlpha">
+            <summary>
+            Sets the opacity for the reflex effect in the visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ReflexBright">
+            <summary>
+            Adjusts the brightness for the reflex effect.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ReflexFit">
+            <summary>
+            Determines whether the reflex effect should fit the canvas height.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.AddAudioElement(Microsoft.AspNetCore.Components.ElementReference)">
+            <summary>
+            Adds an audio element to the visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.RemoveAudioElement(Microsoft.AspNetCore.Components.ElementReference)">
+            <summary>
+            Removes an audio element from the visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.SetAudioElements(Microsoft.AspNetCore.Components.ElementReference[])">
+            <summary>
+            Sets the audio elements to be visualized.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.ConnectToMicrophone">
+            <summary>
+            Connects the microphone to the visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.DisconnectFromMicrophone">
+            <summary>
+            Disconnects the microphone from the visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.ToggleFullScreen">
+            <summary>
+            Toggles the full screen mode and returns true if the current state is full screen otherwise false.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.TogglePictureInPicture">
+            <summary>
+            Toggles the picture in picture mode and returns true if the current state is picture in picture otherwise false.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.GetJsArguments">
+            <summary>
+            Gets the JavaScript arguments to pass to the component.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.ImportModuleAndCreateJsAsync">
+            <inheritdoc />
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.RandomPreset">
+            <summary>
+            Applies a random preset from the Presets to the visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.NextPresetAsync">
+            <summary>
+            Applies the next preset from the Presets to the visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.PreviousPresetAsync">
+            <summary>
+            Applies the previous preset from the Presets to the visualizer.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:AuralizeBlazor.AuralizerPreset">
+            <summary>
+            The AuralizerPreset class is used to define a set of properties that can be applied to an Auralizer instance.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.AuralizerPreset.ResetToDefaultFirst">
+            <summary>
+            This is true by default.
+            If this value is false, the default values are not applied before applying the preset.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Features.EnergyMeterFeature">
+            <summary>
+            Energy meter feature.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.EnergyMeterFeature.FullJsNamespace">
+            <inheritdoc />
+        </member>
+        <member name="P:AuralizeBlazor.Features.EnergyMeterFeature.ShowPeakEnergyBar">
+            <summary>
+            Show the peak energy bar.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.EnergyMeterFeature.ShowBassLight">
+            <summary>
+            If true the peak energy bar will be shown, otherwise it will be hidden.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.EnergyMeterFeature.ShowMidrangeLight">
+            <summary>
+            If true the midrange energy bar will be shown, otherwise it will be hidden.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.EnergyMeterFeature.ShowTrebleLight">
+            <summary>
+            If true the treble energy bar will be shown, otherwise it will be hidden.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.EnergyMeterFeature.BassText">
+            <summary>
+            The text to show for the bass energy bar.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.EnergyMeterFeature.MidrangeText">
+            <summary>
+            The text to show for the midrange energy bar.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.EnergyMeterFeature.TrebleText">
+            <summary>
+            The text to show for the treble energy bar.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Features.RadialRadiusFeature">
+            <summary>
+            Radial radius feature.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.RadialRadiusFeature.FullJsNamespace">
+            <inheritdoc />
+        </member>
+        <member name="T:AuralizeBlazor.Features.ShowLogoFeature">
+            <summary>
+            Show logo feature to display a custom Text.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.ShowLogoFeature.FullJsNamespace">
+            <inheritdoc />
+        </member>
+        <member name="P:AuralizeBlazor.Features.ShowLogoFeature.Label">
+            <summary>
+            Label to display.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.ShowLogoFeature.Position">
+            <summary>
+            Position of the label.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.ShowLogoFeature.LabelColor">
+            <summary>
+            Color of the label, if not set the default color from gradient will be used.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Features.TextPosition">
+            <summary>
+            Text position.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.TextPosition.TopLeft">
+            <summary>
+            Text will be displayed Top left.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.TextPosition.TopCenter">
+            <summary>
+            Text will be displayed Top center.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.TextPosition.TopRight">
+            <summary>
+            Text will be displayed Top right.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.TextPosition.CenterLeft">
+            <summary>
+            Text will be displayed Center left.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.TextPosition.CenterCenter">
+            <summary>
+            Text will be displayed in center.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.TextPosition.CenterRight">
+            <summary>
+            Text will be displayed Center right.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.TextPosition.BottomLeft">
+            <summary>
+            Text will be displayed bottom left.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.TextPosition.BottomCenter">
+            <summary>
+            Text will be displayed bottom center.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.TextPosition.BottomRight">
+            <summary>
+            Text will be displayed bottom right.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Features.SwitchPresetFeature">
+            <summary>
+            This feature allows to switch between different presets based on bass energy.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.SwitchPresetFeature.FullJsNamespace">
+            <inheritdoc />
+        </member>
+        <member name="P:AuralizeBlazor.Features.SwitchPresetFeature.MinDebounceTimeInMs">
+            <summary>
+            The minimum time in milliseconds between two consecutive switch events.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.SwitchPresetFeature.MinEnergy">
+            <summary>
+            The minimum energy level required to trigger a switch event.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.SwitchPresetFeature.PickRandom">
+            <summary>
+            If true the preset will be picked randomly, otherwise the next preset will be selected.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Features.VisualizerFeatureBase">
+            <summary>
+            Base class for visualizer features.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.VisualizerFeatureBase.AppliedFromPreset">
+            <summary>
+            Will be set to true if the feature is applied from a preset.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.VisualizerFeatureBase.OnCanvasDrawCallbackName">
+            <summary>
+            Method name to be called when the canvas is drawn.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.VisualizerFeatureBase.FullJsNamespace">
+            <summary>
+            Namespace for the feature in the JavaScript world.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.VisualizerFeatureBase.RequiredJsFiles">
+            <summary>
+            Files required for the feature to work.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Features.VisualizerFeatureBase.GetJsOptions">
+            <summary>
+            Returns the JavaScript options for the feature.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Features.IVisualizerFeature">
+            <summary>
+            Interface for visualizer features.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.IVisualizerFeature.AppliedFromPreset">
+            <summary>
+            Will be set to true if the feature is applied from a preset.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.IVisualizerFeature.OnCanvasDrawCallbackName">
+            <summary>
+            Method name to be called when the canvas is drawn.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.IVisualizerFeature.FullJsNamespace">
+            <summary>
+            Namespace for the feature in the JavaScript world.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.IVisualizerFeature.RequiredJsFiles">
+            <summary>
+            Files required for the feature to work.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Features.IVisualizerFeature.GetJsOptions">
+            <summary>
+            JavaScript options for the feature.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Features.WaveNodeFeature">
+            <summary>
+            This feature allows to visualize the wave node as a separate line.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.WaveNodeFeature.FullJsNamespace">
+            <inheritdoc />
+        </member>
+        <member name="T:AuralizeBlazor.Options.AudioMotionGradient">
+            <summary>
+            Gradient for the audio motion visualizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Options.AudioMotionGradient.Name">
+            <summary>
+            Name of the gradient.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Options.AudioMotionGradient.BgColor">
+            <summary>
+            Background color of the gradient.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Options.AudioMotionGradient.IsPredefined">
+            <summary>
+            Is this is true, the gradient is predefined and will not force the register call for audioMotion.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Options.AudioMotionGradient.ColorStops">
+            <summary>
+            Color stops for the gradient.
+            </summary>
+        </member>
+    </members>
+</doc>

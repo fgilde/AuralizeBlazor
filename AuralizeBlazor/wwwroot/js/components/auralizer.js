@@ -20,6 +20,7 @@
         this.visualizer.addEventListener('dblclick', this.onVisualizerDblClick.bind(this));
         this.visualizer.addEventListener('contextmenu', this.onVisualizerCtxMenu.bind(this));
         this.reconnectInputs();
+        this.dotnet.invokeMethodAsync('HandleOnCreated');
     }
 
     async onVisualizerCtxMenu(e) {
@@ -179,7 +180,7 @@
                     gainNode.connect(audioCtx.destination);
                 }
                 this.audioMotion.connectInput(el.audioSourceNode);
-                //this.audioMotion.connectInput(el);
+                this.dotnet.invokeMethodAsync('HandleOnInputConnected');
             }
         });
     }

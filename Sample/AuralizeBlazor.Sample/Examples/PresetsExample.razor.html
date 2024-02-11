@@ -1,0 +1,60 @@
+<div class="mud-codeblock">
+<div class="html"><pre>
+<span class="atSign">&#64;</span>using AuralizeBlazor.Features
+<span class="atSign">&#64;</span>using AuralizeBlazor.Options
+<span class="atSign">&#64;</span>using VisualizationMode = AuralizeBlazor.Options.VisualizationMode
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudIconButton</span> <span class="htmlAttributeName">Title</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">Fullscreen</span><span class="quot">&quot;</span> <span class="htmlAttributeName">OnClick</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>(() =&gt; _vis.ToggleFullScreen())</span><span class="quot">&quot;</span> <span class="htmlAttributeName">Icon</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>Icons.Material.Filled.Fullscreen</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">/&gt;</span>
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudIconButton</span> <span class="htmlAttributeName">Title</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">Picture in picture</span><span class="quot">&quot;</span> <span class="htmlAttributeName">OnClick</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>(() =&gt; _vis.TogglePictureInPicture())</span><span class="quot">&quot;</span> <span class="htmlAttributeName">Icon</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>Icons.Material.Filled.PictureInPicture</span><span class="quot">&quot;</span> <span class="htmlTagDelimiter">/&gt;</span>
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>ref</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">_vis</span>
+           <span class="htmlAttributeName">InitialPreset</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_myPresets[0]</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">GradientChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>MainLayout.Instance.ColorsChanged</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">ShowPresetNameOnChange</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">Presets</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>_myPresets</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">700px</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">MouseWheelDownAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.NextPreset</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">MouseWheelUpAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.PreviousPreset</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">ContextMenuAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.TogglePictureInPicture</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">DoubleClickAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.ToggleFullscreen</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">audio-main mud-ex-animate-all-properties</span><span class="quot">&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">metadata</span><span class="quot">&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">lazy</span><span class="quot">&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">/sample.mp3</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+</pre></div>
+<div class="csharp"><pre>
+<span class="atSign">&#64;</span>code {
+    Auralizer _vis;
+    <span class="keyword">private</span> AuralizerPreset[] _myPresets = <span class="keyword">new</span>[]
+    {
+        <span class="keyword">new</span> AuralizerPreset(<span class="number">1</span>, <span class="string">&quot;Simple Bar&quot;</span>, auralizer =&gt;
+        {
+            auralizer.Mode = VisualizationMode.OneEighthOctaveBands;
+            auralizer.Gradient = <span class="keyword">new</span> Options.AudioMotionGradient()
+            {
+                Name = <span class="string">&quot;MyCustomGradient&quot;</span>,
+                ColorStops = <span class="keyword">new</span> ColorStop[]
+                {
+                    <span class="keyword">new</span>() { Color = <span class="string">&quot;pink&quot;</span>, Position = <span class="number">0</span> },
+                    <span class="keyword">new</span>() { Color = <span class="string">&quot;azure&quot;</span>, Position = <span class="number">0</span>.<span class="number">166</span> },
+                    <span class="keyword">new</span>() { Color = <span class="string">&quot;purple&quot;</span>, Position = <span class="number">0</span>.<span class="number">333</span> },
+                    <span class="keyword">new</span>() { Color = <span class="string">&quot;#C0C0C0&quot;</span>, Position = <span class="number">0</span>.<span class="number">5</span> },
+                    <span class="keyword">new</span>() { Color = <span class="string">&quot;#cec000&quot;</span>, Position = <span class="number">0</span>.<span class="number">666</span> }
+                }
+            };
+        }),
+        <span class="keyword">new</span> AuralizerPreset(<span class="number">2</span>, <span class="string">&quot;Simple Wave&quot;</span>, auralizer =&gt;
+        {
+            auralizer.Mode = VisualizationMode.LineAreaGraph;
+            auralizer.Gradient = Options.AudioMotionGradient.Apple;
+        }),
+        <span class="keyword">new</span> AuralizerPreset(<span class="number">3</span>, <span class="string">&quot;Simple Led Bar&quot;</span>, auralizer =&gt;
+        {
+            auralizer.Mode = VisualizationMode.OneEighthOctaveBands;
+            auralizer.LedBars = <span class="keyword">true</span>;
+            auralizer.LumiBars = <span class="keyword">true</span>;
+            auralizer.Gradient = Options.AudioMotionGradient.Prism;
+        }),
+    };
+}
+</pre></div>
+</div>

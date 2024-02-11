@@ -12,6 +12,7 @@
            PresetApplied="OnPresetApplied"
            Height="700px"
            BackgroundImage="/bg1.jpg"
+           OnReady="@(() => _vis.ShowMessage("Welcome to Auralizer, press play !", TimeSpan.FromSeconds(2)))"
            ContextMenuAction="VisualizerAction.TogglePictureInPicture"
            DoubleClickAction="VisualizerAction.ToggleFullscreen"
            Overlay="true">

@@ -6,19 +6,33 @@
     <PackageIconUrl />
     <RepositoryUrl>https://github.com/fgilde/AuralizeBlazor</RepositoryUrl>
     <PackageProjectUrl>https://github.com/fgilde/AuralizeBlazor</PackageProjectUrl>
-    <PackageTags>blazor, audioMotion, visualizer, audio, analyzer, blazor-component, blazor-webassembly, blazor-server</PackageTags>
+    <PackageTags>blazor, audioMotion, visualizer, audio, analyzer, audio visualizer, audio analyzer, blazor-component, blazor-webassembly, blazor-server</PackageTags>
     <Description>AuralizeBlazor is a wrapper component for audioMotion-analyzer.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <AssemblyVersion>0.0.2</AssemblyVersion>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <AssemblyVersion>0.0.3</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Remove="bundleconfig.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\docs\AuralizeBlazor.xml" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <PropertyGroup>
+      <DocumentationDestination>$(SolutionDir)AuralizeBlazor/wwwroot/docs/</DocumentationDestination>
+    </PropertyGroup>
+    <ItemGroup>
+      <DocumentationFile Include="$(TargetDir)$(TargetName).xml" />
+    </ItemGroup>
+    <Copy ContinueOnError="true" SourceFiles="@(DocumentationFile)" DestinationFolder="$(DocumentationDestination)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
+  </Target>
   
   <ItemGroup>
     <SupportedPlatform Include="browser" />

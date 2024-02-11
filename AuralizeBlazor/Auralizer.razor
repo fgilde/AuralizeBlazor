@@ -1,5 +1,31 @@
 ﻿@inherits BlazorJs.BlazorJsBaseComponent<Auralizer>
 <style>
+    @@keyframes __slideFadeIn {
+        0% {
+            opacity: 0;
+            transform: translateY(-20px); /* Start 20px oberhalb der endgültigen Position */
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .blazor-audio-visualizer-container > .message {
+        position: absolute;
+        margin-top: 10px;
+        font-size: 20pt;
+        text-align: center;
+        opacity: 1;
+        width: 100%;
+        animation: __slideFadeIn 0.5s ease forwards; 
+        transition-property: all !important;
+        transition-duration: 0.3s;
+        transition-timing-function: ease;
+    }
+    .message-fade-out {
+        opacity: 0;
+        animation: __slideFadeIn 0.5s ease reverse;
+    }
     .blazor-audio-visualizer {
         height: 100%;
         width: 100%;
@@ -37,11 +63,15 @@
 </style>
 
 
-<div @ref="ElementReference" 
+<div @ref="ElementReference"
      class="@($"blazor-audio-visualizer-container {containerMouseOverCls} {Class}")"
      style="@($"{(OverlayChildContent && ChildContent != null ? "" : $"{StyleStr()}")} {Style}")"
      @onmouseover="@HandleContainerMouseOver"
      @onmouseout="@HandleContainerMouseOut">
+    @if (!string.IsNullOrEmpty(_message))
+    {
+        <p class="@(_isMessageVisible ? "message" : "message message-fade-out")">@_message</p>
+    }
     @if (OverlayChildContent && ChildContent != null)
     {
         <div @ref="_visualizer"

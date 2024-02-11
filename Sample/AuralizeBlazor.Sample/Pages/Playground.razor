@@ -1,6 +1,5 @@
 ﻿@page "/playground"
 @using AuralizeBlazor.Options
-@using AuralizeBlazor.Features
 @using MudBlazor.Extensions.Components.ObjectEdit.Options
 @using Nextended.Core.Extensions
 
@@ -22,6 +21,7 @@
         <audio class="m-2" style="width: 300px;" src="/sample.mp3" controls="true"></audio>
         <Auralizer @ref=_vis
                    Presets="AuralizerPreset.All"
+                   ShowPresetNameOnChange="true"
                    PresetApplied="PresetsApplied"
                    GradientChanged="@MainLayout.Instance.ColorsChanged"
                    Height="90%"
@@ -74,7 +74,7 @@
     private void PresetsApplied()
     {
         if(_editOpen)
-            StateHasChanged(); // update properties in the edit drawer
+            InvokeAsync(StateHasChanged);
     }
 
 }

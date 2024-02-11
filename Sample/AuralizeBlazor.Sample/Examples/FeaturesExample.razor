@@ -1,0 +1,39 @@
+﻿@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+@using BlazorJS.Attributes
+@using VisualizationMode = AuralizeBlazor.Options.VisualizationMode
+
+<MudIconButton Title="Fullscreen" OnClick="@(() => _vis.ToggleFullScreen())" Icon="@Icons.Material.Filled.Fullscreen"/>
+<MudIconButton Title="Picture in picture" OnClick="@(() => _vis.TogglePictureInPicture())" Icon="@Icons.Material.Filled.PictureInPicture" />
+<Auralizer @ref=_vis
+           InitialPreset="AuralizerPreset.NeonPulse"
+           GradientChanged="@MainLayout.Instance.ColorsChanged"
+           Features="_myFeatrues"
+           Height="700px">
+    <center>
+        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+    </center>
+</Auralizer>
+
+@code {
+    Auralizer _vis;
+    private IVisualizerFeature[] _myFeatrues = new IVisualizerFeature[]
+    {
+        new ShowLogoFeature() {Label = "Hello"},
+        new MyCustomFeature() {NumDots = 10}
+    };
+
+    /// <summary>
+    /// Sample implementation of a custom feature that displays a dot on the canvas
+    /// </summary>
+    public class MyCustomFeature : VisualizerFeatureBase
+    {
+        public override string FullJsNamespace => "window.myCustomFeature"; 
+        public override string OnCanvasDrawCallbackName => "onCanvasDraw";
+        public override string[] RequiredJsFiles => ["/js/myCustomFeature.js"];
+        [ForJs]
+        public int NumDots { get; set; } = 5;
+    }
+
+}
+

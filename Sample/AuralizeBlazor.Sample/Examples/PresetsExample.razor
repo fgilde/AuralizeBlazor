@@ -1,0 +1,56 @@
+﻿@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+@using VisualizationMode = AuralizeBlazor.Options.VisualizationMode
+
+<MudIconButton Title="Fullscreen" OnClick="@(() => _vis.ToggleFullScreen())" Icon="@Icons.Material.Filled.Fullscreen"/>
+<MudIconButton Title="Picture in picture" OnClick="@(() => _vis.TogglePictureInPicture())" Icon="@Icons.Material.Filled.PictureInPicture" />
+<Auralizer @ref=_vis
+           InitialPreset="_myPresets[0]"
+           GradientChanged="@MainLayout.Instance.ColorsChanged"
+           ShowPresetNameOnChange="true"
+           Presets="@_myPresets"
+           Height="700px"
+           MouseWheelDownAction="VisualizerAction.NextPreset"
+           MouseWheelUpAction="VisualizerAction.PreviousPreset"
+           ContextMenuAction="VisualizerAction.TogglePictureInPicture"
+           DoubleClickAction="VisualizerAction.ToggleFullscreen">
+    <center>
+        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+    </center>
+</Auralizer>
+
+@code {
+    Auralizer _vis;
+    private AuralizerPreset[] _myPresets = new[]
+    {
+        new AuralizerPreset(1, "Simple Bar", auralizer =>
+        {
+            auralizer.Mode = VisualizationMode.OneEighthOctaveBands;
+            auralizer.Gradient = new Options.AudioMotionGradient()
+            {
+                Name = "MyCustomGradient",
+                ColorStops = new ColorStop[]
+                {
+                    new() { Color = "pink", Position = 0 },
+                    new() { Color = "azure", Position = 0.166 },
+                    new() { Color = "purple", Position = 0.333 },
+                    new() { Color = "#C0C0C0", Position = 0.5 },
+                    new() { Color = "#cec000", Position = 0.666 }
+                }
+            };
+        }),
+        new AuralizerPreset(2, "Simple Wave", auralizer =>
+        {
+            auralizer.Mode = VisualizationMode.LineAreaGraph;
+            auralizer.Gradient = Options.AudioMotionGradient.Apple;
+        }),
+        new AuralizerPreset(3, "Simple Led Bar", auralizer =>
+        {
+            auralizer.Mode = VisualizationMode.OneEighthOctaveBands;
+            auralizer.LedBars = true;
+            auralizer.LumiBars = true;
+            auralizer.Gradient = Options.AudioMotionGradient.Prism;
+        }),
+    };
+}
+

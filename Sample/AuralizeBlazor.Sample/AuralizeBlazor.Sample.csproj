@@ -61,7 +61,9 @@
     <Content Remove="compilerconfig.json" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Examples\ConnectElementsExample - Copy.razor.html" />
     <None Remove="Examples\MainExample - Copy.razor.html" />
+    <None Remove="Examples\PresetsExample - Copy.razor.html" />
   </ItemGroup>
   <ItemGroup>
     <None Include="compilerconfig.json" />

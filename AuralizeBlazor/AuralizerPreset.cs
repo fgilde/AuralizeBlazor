@@ -9,6 +9,9 @@ using Nextended.Core.Types;
 
 namespace AuralizeBlazor;
 
+/// <summary>
+/// The AuralizerPreset class is used to define a set of properties that can be applied to an Auralizer instance.
+/// </summary>
 public class AuralizerPreset : SuperType<AuralizerPreset>
 {
     private readonly Action<Auralizer> _action;

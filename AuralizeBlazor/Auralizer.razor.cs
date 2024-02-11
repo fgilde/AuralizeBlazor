@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using AuralizeBlazor.Features;
 using AuralizeBlazor.Options;
@@ -13,6 +14,9 @@ using Nextended.Core.Extensions;
 
 namespace AuralizeBlazor;
 
+/// <summary>
+/// Blazor component for visualizing audio data.
+/// </summary>
 public partial class Auralizer
 {
     private string _id = Guid.NewGuid().ToFormattedId();
@@ -21,7 +25,10 @@ public partial class Auralizer
     protected string AudioMotionLib() => "./_content/AuralizeBlazor/js/lib/audioMotion4.4.0.min.js";
     // protected string AudioMotionLib() => "https://cdn.skypack.dev/audiomotion-analyzer?min";
     protected override string ComponentJsInitializeMethodName() => "initializeAuralizer";
-
+    private string _message;
+    private bool _isMessageVisible;
+    private bool _created;
+    private bool _minOneInputConnected;
     private int _presetIdx = 0;
     private string visualizerMouseOverCls;
     private string containerMouseOverCls;
@@ -31,36 +38,101 @@ public partial class Auralizer
     private AudioMotionGradient _gradient = AudioMotionGradient.Classic;
     private IVisualizerFeature[] _features = Array.Empty<IVisualizerFeature>();
 
+    /// <summary>
+    /// Invoked when the mouse pointer enters the container area.
+    /// </summary>
     [Parameter] public EventCallback<MouseEventArgs> OnContainerMouseOver { get; set; }
+
+    /// <summary>
+    /// Invoked when the mouse pointer leaves the container area.
+    /// </summary>
     [Parameter] public EventCallback<MouseEventArgs> OnContainerMouseOut { get; set; }
+
+    /// <summary>
+    /// Invoked when the mouse pointer enters the visualizer area.
+    /// </summary>
     [Parameter] public EventCallback<MouseEventArgs> OnVisualizerMouseOver { get; set; }
+
+    /// <summary>
+    /// Invoked when the mouse pointer leaves the visualizer area.
+    /// </summary>
     [Parameter] public EventCallback<MouseEventArgs> OnVisualizerMouseOut { get; set; }
+
+    /// <summary>
+    /// Invoked when a preset is applied to the visualizer.
+    /// </summary>
     [Parameter] public EventCallback<AuralizerPreset> PresetApplied { get; set; }
+
+    /// <summary>
+    /// Invoked when the gradient used by the visualizer is changed.
+    /// </summary>
     [Parameter] public EventCallback<AudioMotionGradient> GradientChanged { get; set; }
+
+    /// <summary>
+    /// Invoked when the features of the visualizer change.
+    /// </summary>
     [Parameter] public EventCallback<IVisualizerFeature[]> FeaturesChanged { get; set; }
 
+    /// <summary>
+    /// Invoked when an input source is connected to the visualizer.
+    /// </summary>
+    [Parameter] public EventCallback OnInputConnected { get; set; }
+
+    /// <summary>
+    /// Invoked when the visualizer component is created.
+    /// </summary>
+    [Parameter] public EventCallback OnCreated { get; set; }
+
+    /// <summary>
+    /// Invoked when the visualizer component is ready for interaction.
+    /// </summary>
+    [Parameter] public EventCallback OnReady { get; set; }
+
+    /// <summary>
+    /// Indicates whether child content should be overlaid on the visualizer.
+    /// </summary>
     [Parameter, ForJs] public bool OverlayChildContent { get; set; }
 
     /// <summary>
-    /// If a preset is applied this properties will be ignored when the preset is applied and a reset is triggered from the preset.
+    /// Defines the action taken when the visualizer is clicked.
+    /// </summary>
+    [Parameter, ForJs("visualizerClickAction")] public VisualizerAction ClickAction { get; set; } = VisualizerAction.None;
+
+    /// <summary>
+    /// Defines the action taken when the visualizer is double-clicked.
+    /// </summary>
+    [Parameter, ForJs("visualizerDblClickAction")] public VisualizerAction DoubleClickAction { get; set; } = VisualizerAction.None;
+
+    /// <summary>
+    /// Defines the action taken when the context menu is invoked on the visualizer.
+    /// </summary>
+    [Parameter, ForJs("visualizerCtxMenuAction")] public VisualizerAction ContextMenuAction { get; set; } = VisualizerAction.None;
+
+    /// <summary>
+    /// Defines the action taken when the mouse wheel is scrolled up over the visualizer.
+    /// </summary>
+    [Parameter] public VisualizerAction MouseWheelUpAction { get; set; } = VisualizerAction.PreviousPreset;
+
+    /// <summary>
+    /// Defines the action taken when the mouse wheel is scrolled down over the visualizer.
+    /// </summary>
+    [Parameter] public VisualizerAction MouseWheelDownAction { get; set; } = VisualizerAction.NextPreset;
+
+    /// <summary>
+    /// Determines whether the name of the preset is shown when it is changed.
+    /// </summary>
+    [Parameter] public bool ShowPresetNameOnChange { get; set; }
+
+    /// <summary>
+    /// Specifies the initial preset to be applied to the visualizer.
+    /// </summary>
+    [Parameter] public AuralizerPreset InitialPreset { get; set; }
+
+    /// <summary>
+    /// All here added presets will be available for the user to apply to the visualizer by using mousewheel.
     /// </summary>
     [Parameter]
-    public string[] IgnoredPropertiesForReset { get; set; }
-
-    [Parameter, ForJs("visualizerClickAction")]
-    public VisualizerAction ClickAction { get; set; } = VisualizerAction.None;
-
-    [Parameter, ForJs("visualizerDblClickAction")]
-    public VisualizerAction DoubleClickAction { get; set; } = VisualizerAction.None;
-
-    [Parameter, ForJs("visualizerCtxMenuAction")]
-    public VisualizerAction ContextMenuAction { get; set; } = VisualizerAction.None;
-
-    [Parameter]
-    public VisualizerAction MouseWheelUpAction { get; set; } = VisualizerAction.PreviousPreset;
-
-    [Parameter]
-    public VisualizerAction MouseWheelDownAction { get; set; } = VisualizerAction.NextPreset;
+    public AuralizerPreset[] Presets { get; set; }
 
     /// <summary>
     /// Sets the background image of the visualizer component.
@@ -69,13 +141,10 @@ public partial class Auralizer
     public string BackgroundImage { get; set; }
 
     /// <summary>
-    /// All here added presets will be available for the user to apply to the visualizer by using mousewheel.
+    /// If a preset is applied this properties will be ignored when the preset is applied and a reset is triggered from the preset.
     /// </summary>
     [Parameter]
-    public AuralizerPreset[] Presets { get; set; }
-
-    [Parameter]
-    public AuralizerPreset InitialPreset { get; set; }
+    public string[] IgnoredPropertiesForReset { get; set; }
 
     /// <summary>
     /// The content to be rendered within the visualizer component. All here containing audio and video elements will be connected to the visualizer.
@@ -168,19 +237,68 @@ public partial class Auralizer
     /// <summary>
     /// Applies the given preset to the visualizer.
     /// </summary>
-    public Auralizer ApplyPreset(AuralizerPreset preset, bool? resetFirst = null)
+    public Auralizer ApplyPreset(AuralizerPreset preset, bool? resetFirst = null) => ExecuteApplyPreset(preset, resetFirst);
+
+    private Auralizer ExecuteApplyPreset(AuralizerPreset preset, bool? resetFirst = null, bool messageIf = true)
     {
         if (Presets?.Contains(preset) == true)
             _presetIdx = Array.IndexOf(Presets, preset);
-        PresetApplied.InvokeAsync(preset);
+        if (messageIf && ShowPresetNameOnChange)
+            ShowMessage(preset.Name, TimeSpan.FromSeconds(2));
         preset.Apply(this, resetFirst);
+        PresetApplied.InvokeAsync(preset);
         return this;
     }
 
+    private CancellationTokenSource _messageHideCts;
+
+    /// <summary>
+    /// Displays a message on the visualizer for the specified duration.
+    /// </summary>
+    public void ShowMessage(string message, TimeSpan hideAfter)
+    {
+        _messageHideCts?.Cancel();
+        _messageHideCts = new CancellationTokenSource();
+
+        _message = message;
+        _isMessageVisible = true;
+        InvokeAsync(StateHasChanged); 
+
+        var currentCts = _messageHideCts;
+        Task.Delay(hideAfter, currentCts.Token).ContinueWith(task =>
+        {
+            if (!task.IsCanceled)
+            {
+                _isMessageVisible = false;
+                InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                    Task.Delay(500, currentCts.Token).ContinueWith(_ => 
+                    {
+                        if (!currentCts.Token.IsCancellationRequested)
+                        {
+                            _message = null;
+                            InvokeAsync(StateHasChanged);
+                        }
+                    }, currentCts.Token);
+                });
+            }
+        }, currentCts.Token);
+    }
+
+    /// <summary>
+    /// Removes a visualizer feature from the visualizer.
+    /// </summary>
     public Auralizer RemoveFeature<T>() where T : IVisualizerFeature => RemoveFeature(typeof(T));
 
+    /// <summary>
+    /// Removes a visualizer feature from the visualizer.
+    /// </summary>
     public Auralizer RemoveFeature(Type featureType) => RemoveFeature(_features.Where(f => f.GetType() == featureType).ToArray());
 
+    /// <summary>
+    /// Removes a visualizer feature from the visualizer.
+    /// </summary>
     public Auralizer RemoveFeature(params IVisualizerFeature[] feature)
     {
         _features = _features.Except(feature).ToArray();
@@ -188,6 +306,9 @@ public partial class Auralizer
         return this;
     }
 
+    /// <summary>
+    /// Adds a visualizer feature to the visualizer.
+    /// </summary>
     public Auralizer AddFeature<T>(T feature) where T : IVisualizerFeature
     {
         Features = _features.Concat(new IVisualizerFeature[] { feature }).ToArray();
@@ -524,17 +645,33 @@ public partial class Auralizer
 
     #endregion
 
+    /// <summary>
+    /// Adds an audio element to the visualizer.
+    /// </summary>
     public void AddAudioElement(ElementReference audioElement) => AudioElements = AudioElements == null ? new[] { audioElement } : AudioElements.Concat(new[] { audioElement }).ToArray();
+    
+    /// <summary>
+    /// Removes an audio element from the visualizer.
+    /// </summary>
     public void RemoveAudioElement(ElementReference audioElement) => AudioElements = AudioElements?.Where(e => e.Id != audioElement.Id).ToArray();
+    
+    /// <summary>
+    /// Sets the audio elements to be visualized.
+    /// </summary>
     public void SetAudioElements(params ElementReference[] audioElements) => AudioElements = audioElements;
 
-
+    /// <summary>
+    /// Connects the microphone to the visualizer.
+    /// </summary>
     public Task ConnectToMicrophone()
     {
         ConnectMicrophone = true;
         return UpdateJsOptions();
     }
 
+    /// <summary>
+    /// Disconnects the microphone from the visualizer.
+    /// </summary>
     public Task DisconnectFromMicrophone()
     {
         ConnectMicrophone = false;
@@ -565,11 +702,14 @@ public partial class Auralizer
         await ImportFeatureFilesAsync();
         if (InitialPreset != null)
         {
-            ApplyPreset(InitialPreset);
+            ExecuteApplyPreset(InitialPreset, null, false);
             await UpdateJsOptions();
         }
     }
 
+    /// <summary>
+    /// Applies a random preset from the Presets to the visualizer.
+    /// </summary>
     [JSInvokable]
     public Task RandomPreset()
     {
@@ -581,11 +721,41 @@ public partial class Auralizer
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Applies the next preset from the Presets to the visualizer.
+    /// </summary>
     [JSInvokable]
     public Task NextPresetAsync() => SelectPreset(1);
 
+    /// <summary>
+    /// Applies the previous preset from the Presets to the visualizer.
+    /// </summary>
+    /// <returns></returns>
     [JSInvokable]
     public Task PreviousPresetAsync() => SelectPreset(-1);
+
+
+    [JSInvokable]
+    public void HandleOnInputConnected()
+    {
+        if(_minOneInputConnected)
+            return;
+        _minOneInputConnected = true;
+        OnInputConnected.InvokeAsync();
+        if (_created)
+            OnReady.InvokeAsync();
+    }    
+    
+    [JSInvokable]
+    public void HandleOnCreated()
+    {
+        if(_created)
+            return;
+        _created = true;
+        OnCreated.InvokeAsync();
+        if(_minOneInputConnected)
+            OnReady.InvokeAsync();
+    }
 
     protected override async Task OnJsOptionsChanged()
     {

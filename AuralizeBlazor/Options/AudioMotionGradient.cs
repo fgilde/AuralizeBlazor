@@ -3,11 +3,29 @@ using System.Linq;
 
 namespace AuralizeBlazor.Options;
 
+/// <summary>
+/// Gradient for the audio motion visualizer.
+/// </summary>
 public class AudioMotionGradient : IEquatable<AudioMotionGradient>
 {
+    /// <summary>
+    /// Name of the gradient.
+    /// </summary>
     public string Name { get; set; }
+    
+    /// <summary>
+    /// Background color of the gradient.
+    /// </summary>
     public string BgColor { get; set; }
+    
+    /// <summary>
+    /// Is this is true, the gradient is predefined and will not force the register call for audioMotion.
+    /// </summary>
     public bool IsPredefined { get; set; }
+    
+    /// <summary>
+    /// Color stops for the gradient.
+    /// </summary>
     public ColorStop[] ColorStops { get; set; }
     
     // PREDEFINED GRADIENTS
