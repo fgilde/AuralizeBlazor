@@ -248,7 +248,7 @@ public partial class Auralizer
     /// <summary>
     /// Applies the given preset to the visualizer.
     /// </summary>
-    public Auralizer ApplyPreset(AuralizerPreset preset, bool? resetFirst = null) => ExecuteApplyPreset(preset, resetFirst);
+    public virtual Auralizer ApplyPreset(AuralizerPreset preset, bool? resetFirst = null) => ExecuteApplyPreset(preset, resetFirst);
 
     private Auralizer ExecuteApplyPreset(AuralizerPreset preset, bool? resetFirst = null, bool messageIf = true)
     {
@@ -257,7 +257,7 @@ public partial class Auralizer
         if (messageIf && ShowPresetNameOnChange)
             ShowMessage(preset.Name, TimeSpan.FromSeconds(2));
         preset.Apply(this, resetFirst);
-        OnPresetApplied.InvokeAsync(preset);
+        HandleOnPresetApplied(preset);
         return this;
     }
 
@@ -817,6 +817,11 @@ public partial class Auralizer
     protected override async Task OnJsOptionsChanged()
     {
         await UpdateJsOptions();
+    }
+
+    protected virtual void HandleOnPresetApplied(AuralizerPreset preset)
+    {
+        OnPresetApplied.InvokeAsync(preset);
     }
 
     /// <summary>
