@@ -21,6 +21,9 @@
         this.visualizer.addEventListener('contextmenu', this.onVisualizerCtxMenu.bind(this));
         this.reconnectInputs();
         this.dotnet.invokeMethodAsync('HandleOnCreated');
+
+        this.clickTimeout = null;
+        this.preventSingleClick = false;
     }
 
     async onVisualizerCtxMenu(e) {
@@ -28,12 +31,22 @@
     }
 
     async onVisualizerDblClick(e) {
+        this.preventSingleClick = true;
+        if (this.clickTimeout) {
+            clearTimeout(this.clickTimeout);
+        }
         await this.handleAction(this.options.visualizerDblClickAction, e);
     }
 
     async onVisualizerClick(e) {
-        await this.handleAction(this.options.visualizerClickAction, e);
+        this.clickTimeout = setTimeout(async () => {
+            if (!this.preventSingleClick) {
+                await this.handleAction(this.options.visualizerClickAction, e);
+            }
+            this.preventSingleClick = false;
+        }, 300); 
     }
+
 
     async handleAction(action, e) {
         if (action === 0) return;
@@ -42,12 +55,10 @@
         }
         switch (action) {
             case 1: // Pause/Resume
-                if (this.audioMotion.audioCtx.state === 'running') {
-                    await this.audioMotion.audioCtx.suspend();
-                    this.audioMotion.stop();
-                } else {
-                    this.audioMotion.audioCtx.resume();
-                    this.audioMotion.start();
+                if (!this.pauseAllActive()) {
+                    if(!this.playAllActive(true)) {
+                        this.playAllActive();
+                    }
                 }
                 break;
             case 2: // Mute/Unmute
@@ -125,7 +136,7 @@
 
         options.overlay = true;
         options.overlay = options.overlay || options.backgroundImage;
-        
+
         return options;
     }
 
@@ -156,11 +167,48 @@
         }
     }
 
+    playAllActive(autoPausedOnly) {
+        let hasPlayed = false;
+        this.audioMotion?.connectedSources?.forEach(source => {
+            if (source.mediaElement && source.mediaElement.paused) {
+                if (autoPausedOnly && !source.mediaElement.__autoPaused) return;
+                source.mediaElement.play();
+                delete source.mediaElement.__autoPaused;
+                hasPlayed = true;
+            }
+        });
+        return hasPlayed;
+    }
+
+    pauseAllActive() {
+        let hasPaused = false;
+        this.audioMotion?.connectedSources?.forEach(source => {
+            if (source.mediaElement && !source.mediaElement.paused) {
+                source.mediaElement.__autoPaused = true;
+                source.mediaElement.pause();
+                hasPaused = true;
+            }
+        });
+        return hasPaused;
+    }
+
     disconnectInputs() {
         this.audioMotion?.connectedSources?.forEach(source => {
             this.audioMotion.disconnectInput(source.gain);
+            // Assuming you have stored references to listeners in source object
+            if (source.mediaElement && source.mediaElement.listeners) {
+                Object.keys(source.mediaElement.listeners).forEach(event => {
+                    source.mediaElement.removeEventListener(event, source.mediaElement.listeners[event]);
+                });
+                source.mediaElement.listeners = null;
+                if (!source.mediaElement.paused) {
+                    this.dotnet.invokeMethodAsync('HandleOnPause');
+                }
+                this.dotnet.invokeMethodAsync('HandleOnInputDisconnected');
+            }
         });
     }
+
 
     reconnectInputs() {
         const audioCtx = this.audioMotion.audioCtx;
@@ -180,10 +228,38 @@
                     gainNode.connect(audioCtx.destination);
                 }
                 this.audioMotion.connectInput(el.audioSourceNode);
+                if (!el.listeners) {
+                    el.listeners = {
+                        play: () => this.dotnet.invokeMethodAsync('HandleOnPlay'),
+                        pause: () => this.dotnet.invokeMethodAsync('HandleOnPause'),
+                        ended: () => this.dotnet.invokeMethodAsync('HandleOnEnded')
+                    };
+                    Object.keys(el.listeners).forEach(event => {
+                        el.addEventListener(event, el.listeners[event]);
+                    });
+                }
+                if (!el.paused) {
+                    this.dotnet.invokeMethodAsync('HandleOnPlay');
+                }
                 this.dotnet.invokeMethodAsync('HandleOnInputConnected');
             }
         });
     }
+
+
+    removeAllMediaElementListeners() {
+        const owner = this.options?.queryOwner?.querySelectorAll ? this.options.queryOwner : document;
+        const mediaElements = Array.from(owner.querySelectorAll('audio, video'));
+        mediaElements.forEach(el => {
+            if (el.listeners) {
+                Object.keys(el.listeners).forEach(event => {
+                    el.removeEventListener(event, el.listeners[event]);
+                });
+                el.listeners = null;
+            }
+        });
+    }
+
 
 
     setOptions(options) {

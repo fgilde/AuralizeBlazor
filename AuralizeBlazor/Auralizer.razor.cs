@@ -19,17 +19,20 @@ namespace AuralizeBlazor;
 /// </summary>
 public partial class Auralizer
 {
+    private const bool Minify = true;
+    
     private string _id = Guid.NewGuid().ToFormattedId();
-    //protected override string ComponentJsFile() => "./_content/AuralizeBlazor/js/components/auralizer.js";
-    protected override string ComponentJsFile() => "./_content/AuralizeBlazor/js/auralize.min.js";
-    protected string AudioMotionLib() => "./_content/AuralizeBlazor/js/lib/audioMotion4.4.0.min.js";
-    // protected string AudioMotionLib() => "https://cdn.skypack.dev/audiomotion-analyzer?min";
+    protected override string ComponentJsFile() => Minify ? "./_content/AuralizeBlazor/js/auralize.min.js" : "./_content/AuralizeBlazor/js/components/auralizer.js";
+    protected string AudioMotionLib() => "./_content/AuralizeBlazor/js/lib/audioMotion4.4.0.min.js"; // => "https://cdn.skypack.dev/audiomotion-analyzer?min";
     protected override string ComponentJsInitializeMethodName() => "initializeAuralizer";
-    private string _message;
+    
     private bool _isMessageVisible;
     private bool _created;
     private bool _minOneInputConnected;
+    private bool _isPlaying;
+    private int _playingElements = 0;
     private int _presetIdx = 0;
+    private string _message;
     private string visualizerMouseOverCls;
     private string containerMouseOverCls;
     private ElementReference _visualizer;
@@ -38,6 +41,9 @@ public partial class Auralizer
     private AudioMotionGradient _gradient = AudioMotionGradient.Classic;
     private IVisualizerFeature[] _features = Array.Empty<IVisualizerFeature>();
 
+    
+    public bool IsPlaying => _isPlaying;
+    
     /// <summary>
     /// Invoked when the mouse pointer enters the container area.
     /// </summary>
@@ -61,7 +67,7 @@ public partial class Auralizer
     /// <summary>
     /// Invoked when a preset is applied to the visualizer.
     /// </summary>
-    [Parameter] public EventCallback<AuralizerPreset> PresetApplied { get; set; }
+    [Parameter] public EventCallback<AuralizerPreset> OnPresetApplied { get; set; }
 
     /// <summary>
     /// Invoked when the gradient used by the visualizer is changed.
@@ -72,6 +78,11 @@ public partial class Auralizer
     /// Invoked when the features of the visualizer change.
     /// </summary>
     [Parameter] public EventCallback<IVisualizerFeature[]> FeaturesChanged { get; set; }
+
+    /// <summary>
+    /// Invoked when playing status changed
+    /// </summary>
+    [Parameter] public EventCallback<bool> IsPlayingChanged { get; set; }
 
     /// <summary>
     /// Invoked when an input source is connected to the visualizer.
@@ -246,11 +257,12 @@ public partial class Auralizer
         if (messageIf && ShowPresetNameOnChange)
             ShowMessage(preset.Name, TimeSpan.FromSeconds(2));
         preset.Apply(this, resetFirst);
-        PresetApplied.InvokeAsync(preset);
+        OnPresetApplied.InvokeAsync(preset);
         return this;
     }
 
     private CancellationTokenSource _messageHideCts;
+    private bool _isActive = true;
 
     /// <summary>
     /// Displays a message on the visualizer for the specified duration.
@@ -469,7 +481,18 @@ public partial class Auralizer
     /// Controls whether the visualizer is active and starts processing audio immediately.
     /// </summary>
     [Parameter, ForJs("start")]
-    public bool IsActive { get; set; } = true;
+    public bool IsActive
+    {
+        get => _isActive;
+        set
+        {
+            if (_isActive != value)
+            {
+                _isActive = value;
+                UpdateIsPlaying(0);
+            }
+        }
+    }
 
     /// <summary>
     /// When true, renders LED bars with individual colors from the current gradient.
@@ -502,7 +525,7 @@ public partial class Auralizer
     private AudioMotionGradient CheckGradientChange(AudioMotionGradient value)
     {
         if (!value.Equals(_gradient))
-            GradientChanged.InvokeAsync(value);
+            HandleOnGradientChanged(value);
         return value;
     }
 
@@ -734,6 +757,40 @@ public partial class Auralizer
     [JSInvokable]
     public Task PreviousPresetAsync() => SelectPreset(-1);
 
+    [JSInvokable]
+    public void HandleOnPlay()
+    {
+        UpdateIsPlaying(1);
+    }
+
+    [JSInvokable]
+    public void HandleOnPause()
+    {
+        UpdateIsPlaying(-1);
+    }    
+    
+    [JSInvokable]
+    public void HandleOnEnded()
+    {
+        UpdateIsPlaying(-1);
+    }
+
+    private void UpdateIsPlaying(int c)
+    {
+        _playingElements += c;
+        var isPlaying = _playingElements > 0 && IsActive;
+        if (_isPlaying != isPlaying)
+        {
+            _isPlaying = isPlaying;
+            HandleIsPlayingChanged(_isPlaying);
+        }
+    }
+
+    [JSInvokable]
+    public void HandleOnInputDisconnected()
+    {
+        
+    }
 
     [JSInvokable]
     public void HandleOnInputConnected()
@@ -761,7 +818,23 @@ public partial class Auralizer
     {
         await UpdateJsOptions();
     }
-    
+
+    /// <summary>
+    /// Called playing status changed
+    /// </summary>
+    protected virtual void HandleIsPlayingChanged(bool value)
+    {
+        IsPlayingChanged.InvokeAsync(value);
+    }
+
+    /// <summary>
+    /// Called when the gradient is changed.
+    /// </summary>
+    protected virtual void HandleOnGradientChanged(AudioMotionGradient value)
+    {
+        GradientChanged.InvokeAsync(value);
+    }
+
     protected virtual Task HandleContainerMouseOver(MouseEventArgs arg)
     {
         containerMouseOverCls = "mouse-over";

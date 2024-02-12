@@ -9,12 +9,13 @@
            InitialPreset="AuralizerPreset.ReflexMirror"
            GradientChanged="@MainLayout.Instance.ColorsChanged"
            Presets="@AuralizerPreset.All"
-           PresetApplied="OnPresetApplied"
+           OnPresetApplied="OnPresetApplied"
            Height="700px"
            BackgroundImage="/bg1.jpg"
            OnReady="@(() => _vis.ShowMessage("Welcome to Auralizer, press play !", TimeSpan.FromSeconds(2)))"
            ContextMenuAction="VisualizerAction.TogglePictureInPicture"
            DoubleClickAction="VisualizerAction.ToggleFullscreen"
+           ClickAction="VisualizerAction.TogglePlayPause"
            Overlay="true">
     <center>
         <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>

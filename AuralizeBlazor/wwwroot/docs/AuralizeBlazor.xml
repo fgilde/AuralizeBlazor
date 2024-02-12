@@ -29,7 +29,7 @@
             Invoked when the mouse pointer leaves the visualizer area.
             </summary>
         </member>
-        <member name="P:AuralizeBlazor.Auralizer.PresetApplied">
+        <member name="P:AuralizeBlazor.Auralizer.OnPresetApplied">
             <summary>
             Invoked when a preset is applied to the visualizer.
             </summary>
@@ -42,6 +42,11 @@
         <member name="P:AuralizeBlazor.Auralizer.FeaturesChanged">
             <summary>
             Invoked when the features of the visualizer change.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.IsPlayingChanged">
+            <summary>
+            Invoked when playing status changed
             </summary>
         </member>
         <member name="P:AuralizeBlazor.Auralizer.OnInputConnected">
@@ -517,6 +522,16 @@
             Applies the previous preset from the Presets to the visualizer.
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.HandleIsPlayingChanged(System.Boolean)">
+            <summary>
+            Called playing status changed
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.HandleOnGradientChanged(AuralizeBlazor.Options.AudioMotionGradient)">
+            <summary>
+            Called when the gradient is changed.
+            </summary>
         </member>
         <member name="T:AuralizeBlazor.AuralizerPreset">
             <summary>

@@ -27,6 +27,7 @@
            AudioElements="@_audioElements.Where(r => _checkedAudioIndexes.Contains(_audioElements.IndexOf(r))).ToArray()"
            ConnectAllAudioSources="@_connectToAll"
            ConnectMicrophone="@_connectToMic"
+           ClickAction="VisualizerAction.TogglePlayPause"
            ContextMenuAction="VisualizerAction.TogglePictureInPicture"
            DoubleClickAction="VisualizerAction.ToggleFullscreen" />
 
