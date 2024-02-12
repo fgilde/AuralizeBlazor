@@ -43,6 +43,9 @@ public partial class Auralizer
 
     
     public bool IsPlaying => _isPlaying;
+    public bool ModulesReady { get; private set; }
+    public bool IsRendered { get; private set; }
+    public bool IsCreatedAndConnected { get; private set; }
     
     /// <summary>
     /// Invoked when the mouse pointer enters the container area.
@@ -267,17 +270,20 @@ public partial class Auralizer
     /// <summary>
     /// Displays a message on the visualizer for the specified duration.
     /// </summary>
-    public void ShowMessage(string message, TimeSpan hideAfter)
+    public void ShowMessage(string message, TimeSpan? hideAfter = null)
     {
         _messageHideCts?.Cancel();
-        _messageHideCts = new CancellationTokenSource();
-
+        
         _message = message;
         _isMessageVisible = true;
         InvokeAsync(StateHasChanged); 
 
+        if(hideAfter == null)
+            return;
+        
+        _messageHideCts = new CancellationTokenSource();
         var currentCts = _messageHideCts;
-        Task.Delay(hideAfter, currentCts.Token).ContinueWith(task =>
+        Task.Delay(hideAfter.Value, currentCts.Token).ContinueWith(task =>
         {
             if (!task.IsCanceled)
             {
@@ -728,6 +734,8 @@ public partial class Auralizer
             ExecuteApplyPreset(InitialPreset, null, false);
             await UpdateJsOptions();
         }
+
+        ModulesReady = true;
     }
 
     /// <summary>
@@ -800,7 +808,7 @@ public partial class Auralizer
         _minOneInputConnected = true;
         OnInputConnected.InvokeAsync();
         if (_created)
-            OnReady.InvokeAsync();
+            HandleOnReady();
     }    
     
     [JSInvokable]
@@ -810,8 +818,14 @@ public partial class Auralizer
             return;
         _created = true;
         OnCreated.InvokeAsync();
-        if(_minOneInputConnected)
-            OnReady.InvokeAsync();
+        if (_minOneInputConnected)
+            HandleOnReady();
+    }
+
+    protected virtual void HandleOnReady()
+    {
+        IsCreatedAndConnected = true;
+        OnReady.InvokeAsync();
     }
 
     protected override async Task OnJsOptionsChanged()
@@ -862,6 +876,14 @@ public partial class Auralizer
     {
         visualizerMouseOverCls = null;
         return OnVisualizerMouseOut.InvokeAsync(arg);
+    }
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+            IsRendered = true;
     }
 
     private async Task UpdateJsOptions()

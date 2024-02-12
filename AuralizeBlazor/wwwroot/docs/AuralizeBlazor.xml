@@ -179,7 +179,7 @@
             Applies the given preset to the visualizer.
             </summary>
         </member>
-        <member name="M:AuralizeBlazor.Auralizer.ShowMessage(System.String,System.TimeSpan)">
+        <member name="M:AuralizeBlazor.Auralizer.ShowMessage(System.String,System.Nullable{System.TimeSpan})">
             <summary>
             Displays a message on the visualizer for the specified duration.
             </summary>
@@ -532,6 +532,9 @@
             <summary>
             Called when the gradient is changed.
             </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.OnAfterRender(System.Boolean)">
+            <inheritdoc />
         </member>
         <member name="T:AuralizeBlazor.AuralizerPreset">
             <summary>

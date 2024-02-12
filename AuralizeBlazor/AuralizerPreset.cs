@@ -58,6 +58,8 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
                 nameof(Auralizer.DoubleClickAction),
                 nameof(Auralizer.ConnectAllAudioSources),
                 nameof(Auralizer.BackgroundImage),
+                nameof(Auralizer.Height),
+                nameof(Auralizer.Width),
                 nameof(Auralizer.ConnectMicrophone)
             };
             
