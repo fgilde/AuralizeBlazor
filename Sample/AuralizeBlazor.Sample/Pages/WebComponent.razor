@@ -1,0 +1,18 @@
+﻿@page "/web-component"
+@using AuralizeBlazor.Options
+
+<PageTitle>Connect Elements</PageTitle>
+
+
+<DocsPageSection>
+    <SectionHeader Title="Connect Elements">
+        <Description>
+            If you want you can use the Auralizer independent of blazor in any app/page as web component also known as custom element by using this tag <CodeInline>@(Auralizer.SuggestedWebComponentName)</CodeInline> <br />
+        </Description>
+    </SectionHeader>
+    <SectionContent Outlined="true" FullWidth="true">
+        <WebComponentExample />
+    </SectionContent>
+    <SectionSource Code="@nameof(WebComponentExample)" />
+</DocsPageSection>
+

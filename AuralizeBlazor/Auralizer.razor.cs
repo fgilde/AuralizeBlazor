@@ -19,6 +19,8 @@ namespace AuralizeBlazor;
 /// </summary>
 public partial class Auralizer
 {
+    public static string SuggestedWebComponentName => string.Join("-", typeof(Auralizer).FullName.Replace(".", "").SplitByUpperCase()).ToLower();
+    
     private const bool Minify = true;
     
     private string _id = Guid.NewGuid().ToFormattedId();
