@@ -30,6 +30,8 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
 
     internal void Apply(Auralizer visualizer, bool? resetFirst = null)
     {
+        if(visualizer == null)
+            return;
         if (resetFirst ?? ResetToDefaultFirst)
             Default._action(visualizer);
         var currentFeatures = visualizer.Features?.ToList() ?? new List<IVisualizerFeature>();

@@ -257,6 +257,8 @@ public partial class Auralizer
 
     private Auralizer ExecuteApplyPreset(AuralizerPreset preset, bool? resetFirst = null, bool messageIf = true)
     {
+        if (preset == null)
+            return this;
         if (Presets?.Contains(preset) == true)
             _presetIdx = Array.IndexOf(Presets, preset);
         if (messageIf && ShowPresetNameOnChange)
@@ -929,7 +931,7 @@ public partial class Auralizer
         return style.ToString();
     }
 
-    private Task HandleMouseWheel(WheelEventArgs arg)
+    protected virtual Task HandleMouseWheel(WheelEventArgs arg)
     {
         //MaxFrequency = Math.Max(20, MaxFrequency + (int)arg.DeltaY);
         //return UpdateJsOptions();
