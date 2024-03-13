@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.CustomElements" Version="8.0.2" />
-    <PackageReference Include="MudBlazor.Extensions" Version="1.7.84-prev-2402091223-main" />
+    <PackageReference Include="MudBlazor.Extensions" Version="1.7.85" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.1" PrivateAssets="all" />
   </ItemGroup>
@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Remove="compilerconfig.json" />
+    <Content Remove="wwwroot\web.config" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Examples\ConnectElementsExample - Copy.razor.html" />
@@ -67,6 +68,10 @@
     <None Remove="Examples\PresetsExample - Copy.razor.html" />
   </ItemGroup>
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\web.config" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="compilerconfig.json" />
+    <None Include="wwwroot\web.config" />
   </ItemGroup>
 </Project>
