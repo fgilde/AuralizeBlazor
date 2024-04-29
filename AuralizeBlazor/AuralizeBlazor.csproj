@@ -13,7 +13,7 @@
     <Version>0.0.8</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <AssemblyVersion>0.0.8</AssemblyVersion>
+    <AssemblyVersion>0.0.9</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

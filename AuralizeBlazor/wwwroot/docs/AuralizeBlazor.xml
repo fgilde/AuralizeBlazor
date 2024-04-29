@@ -164,6 +164,11 @@
             Connects the microphone to the visualizer.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Auralizer.MicrophoneDeviceId">
+            <summary>
+            Device ID of the microphone to connect to the visualizer.
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.Height">
             <summary>
             Height of the visualizer component.

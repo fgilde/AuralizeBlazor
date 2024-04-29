@@ -239,6 +239,12 @@ public partial class Auralizer
     public bool ConnectMicrophone { get; set; }
 
     /// <summary>
+    /// Device ID of the microphone to connect to the visualizer.
+    /// </summary>
+    [Parameter, ForJs]
+    public string MicrophoneDeviceId { get; set; }
+
+    /// <summary>
     /// Height of the visualizer component.
     /// </summary>
     [Parameter]

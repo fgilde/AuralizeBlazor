@@ -157,7 +157,10 @@
             this.micStream = null;
         }
         else if (connect && !this.micStream) {
-            navigator.mediaDevices.getUserMedia({ audio: true })
+            const deviceId = this.options.microphoneDeviceId;
+            console.log(deviceId);
+            const audioOptions = deviceId ? { audio: { deviceId: { exact: deviceId } } } : { audio: true };
+            navigator.mediaDevices.getUserMedia(audioOptions)
                 .then(stream => {
                     this.micStream = this.audioMotion.audioCtx.createMediaStreamSource(stream);
                     this.audioMotion.disconnectOutput();
