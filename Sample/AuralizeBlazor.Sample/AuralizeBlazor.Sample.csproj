@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.CustomElements" Version="8.0.2" />
-    <PackageReference Include="MudBlazor.Extensions" Version="1.7.85" />
+    <PackageReference Include="MudBlazor.Extensions" Version="1.7.87" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.1" PrivateAssets="all" />
   </ItemGroup>
@@ -72,6 +72,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="compilerconfig.json" />
+    <None Include="wwwroot\Auralizer%27s Beat.mp3" />
+    <None Include="wwwroot\Digital Serenade.mp3" />
     <None Include="wwwroot\web.config" />
   </ItemGroup>
 </Project>

@@ -9,6 +9,36 @@
             Blazor component for visualizing audio data.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Auralizer.IsAnyToggleableListOpen">
+            <summary>
+            Returns true if any toggleable list is open.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.IsPlaying">
+            <summary>
+            is true when the visualizer is playing.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ModulesReady">
+            <summary>
+            Is true when all the modules are ready.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.IsRendered">
+            <summary>
+            Is true when the visualizer is rendered.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.IsCreatedAndConnected">
+            <summary>
+            Is true when the visualizer is created and connected to an input source.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.TrackList">
+            <summary>
+            Optional track list to be displayed in the visualizer where the user can change a track.
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.OnContainerMouseOver">
             <summary>
             Invoked when the mouse pointer enters the container area.
@@ -180,6 +210,11 @@
             </summary>
         </member>
         <member name="M:AuralizeBlazor.Auralizer.ApplyPreset(AuralizeBlazor.AuralizerPreset,System.Nullable{System.Boolean})">
+            <summary>
+            Applies the given preset to the visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.ApplyPresetAsync(AuralizeBlazor.AuralizerPreset,System.Nullable{System.Boolean})">
             <summary>
             Applies the given preset to the visualizer.
             </summary>
@@ -512,6 +547,11 @@
         <member name="M:AuralizeBlazor.Auralizer.ImportModuleAndCreateJsAsync">
             <inheritdoc />
         </member>
+        <member name="M:AuralizeBlazor.Auralizer.HideAllOpenToggleableLists">
+            <summary>
+            Hides all currently open toggable lists.
+            </summary>
+        </member>
         <member name="M:AuralizeBlazor.Auralizer.RandomPreset">
             <summary>
             Applies a random preset from the Presets to the visualizer.
@@ -766,6 +806,46 @@
         </member>
         <member name="P:AuralizeBlazor.Features.WaveNodeFeature.FullJsNamespace">
             <inheritdoc />
+        </member>
+        <member name="T:AuralizeBlazor.IAuralizerTrack">
+            <summary>
+            Track interface for track selection in the Auralizer component.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.IAuralizerTrack.Label">
+            <summary>
+            Label to display for the track.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.IAuralizerTrack.Url">
+            <summary>
+            The URL of the track to play.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.IAuralizerTrack.Image">
+            <summary>
+            The URL of the image to display for the track.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.AuralizerTrack">
+            <summary>
+            Track class for track selection in the Auralizer component.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.AuralizerTrack.Label">
+            <summary>
+            Label to display for the track.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.AuralizerTrack.Url">
+            <summary>
+            The URL of the track to play.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.AuralizerTrack.Image">
+            <summary>
+            The URL of the image to display for the track.
+            </summary>
         </member>
         <member name="T:AuralizeBlazor.Options.AudioMotionGradient">
             <summary>

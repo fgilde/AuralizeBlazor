@@ -1,0 +1,147 @@
+﻿.top {
+    top: 0;
+    animation: __slideFadeInTop 0.5s ease forwards;
+}
+
+.bottom {
+    bottom: 0;
+    animation: __slideFadeInBottom 0.5s ease forwards;
+}
+
+.left {
+    left: 0;
+    animation: __slideFadeInLeft 0.5s ease forwards;
+}
+
+.right {
+    right: 0;
+    animation: __slideFadeInRight 0.5s ease forwards;
+}
+
+.inner-list {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    position: absolute;
+}
+
+.selection-list-toggle-btn {
+    margin: 10px;
+    font-size: 12pt;
+    position: absolute;
+    cursor: pointer;
+    color: white;
+    z-index: 2;
+}
+
+.selection-list {
+    z-index: 1;
+    position: absolute;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #00000099;
+    max-width: 20%;
+    transition-property: all !important;
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
+}
+
+    .selection-list.default {
+        height: 100%;
+        min-width: 190px;
+    }
+
+    .selection-list.compact {
+        height: 15%;
+        margin: 10px;
+        font-size: 9pt;
+        min-width: 190px;
+    }
+
+        .selection-list.compact > .inner-list {
+            height: 100%;
+        }
+
+.selectable-list-item {
+    cursor: pointer;
+    margin: 8px;
+    width: 100%;
+}
+
+    .selectable-list-item:hover {
+        background: #00000033;
+    }
+
+@keyframes __slideFadeInTop {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes __slideFadeInLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes __slideFadeInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes __slideFadeInBottom {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.blazor-audio-visualizer-container {
+    position: relative;
+}
+
+.blazor-audio-visualizer-container > .message {
+    position: absolute;
+    margin-top: 10px;
+    font-size: 20pt;
+    text-align: center;
+    opacity: 1;
+    width: 100%;
+    animation: __slideFadeInTop 0.5s ease forwards;
+    transition-property: all !important;
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
+}
+
+.message-fade-out {
+    opacity: 0;
+    animation: __slideFadeInTop 0.5s ease reverse;
+}
+
+.blazor-audio-visualizer {
+    height: 100%;
+    width: 100%;
+}

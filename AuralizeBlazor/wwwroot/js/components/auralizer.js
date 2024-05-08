@@ -3,7 +3,7 @@
     dotnet;
     audioMotion;
     _featuresPaused = false;
-
+    _createdAudioElements = [];
     constructor(elementRef, dotNet, options) {
         this.elementRef = elementRef;
         this.dotnet = dotNet;
@@ -41,10 +41,12 @@
     async onVisualizerClick(e) {
         this.clickTimeout = setTimeout(async () => {
             if (!this.preventSingleClick) {
-                await this.handleAction(this.options.visualizerClickAction, e);
+                if (!(await this.dotnet.invokeMethodAsync('ClickInAlreadyHandled'))) {
+                    await this.handleAction(this.options.visualizerClickAction, e);
+                }
             }
             this.preventSingleClick = false;
-        }, 300); 
+        }, 300);
     }
 
 
@@ -56,7 +58,7 @@
         switch (action) {
             case 1: // Pause/Resume
                 if (!this.pauseAllActive()) {
-                    if(!this.playAllActive(true)) {
+                    if (!this.playAllActive(true)) {
                         this.playAllActive();
                     }
                 }
@@ -82,9 +84,20 @@
             case 8: // Previous preset
                 await this.dotnet.invokeMethodAsync('PreviousPresetAsync');
                 break;
+            case 9: // Next track
+                await this.dotnet.invokeMethodAsync('NextTrackAsync', this.currentTrack());
+                break;
+            case 10: // Previous track
+                await this.dotnet.invokeMethodAsync('PreviousTrackAsync', this.currentTrack());
+                break;
             default:
                 break;
         }
+    }
+
+    currentTrack() {
+        const mediaEl = (this.audioMotion?.connectedSources ?? [])[0]?.mediaElement ?? (this.getAudioElements() ?? [])[0];
+        return mediaEl?.src;
     }
 
     invokeMethod(namespaceString, methodName, ...args) {
@@ -212,11 +225,18 @@
         });
     }
 
+    getOwner() {
+        return this.options?.queryOwner?.querySelectorAll ? this.options.queryOwner : document;
+    }
+
+    getAudioElements() {
+        const result = (this.options.connectAll ? Array.from(this.getOwner().querySelectorAll('audio, video')) : this.options.audioElements) ?? [];
+        return [...result, ...(this._createdAudioElements ?? [])];
+    }
 
     reconnectInputs() {
         const audioCtx = this.audioMotion.audioCtx;
-        const owner = this.options?.queryOwner?.querySelectorAll ? this.options.queryOwner : document;
-        const audioElements = this.options.connectAll ? Array.from(owner.querySelectorAll('audio, video')) : this.options.audioElements;
+        const audioElements = this.getAudioElements();
 
         this.disconnectInputs();
 
@@ -263,7 +283,20 @@
         });
     }
 
-
+    playTrack(url) {
+        const mediaEl = (this.audioMotion?.connectedSources ?? [])[0]?.mediaElement ?? (this.getAudioElements() ?? [])[0];
+        if (mediaEl) {
+            mediaEl.src = url;
+            mediaEl.play();
+            console.log('Playing track: ' + url);
+        } else {
+            const mediaEl = document.createElement('audio');
+            this._createdAudioElements.push(mediaEl);
+            this.reconnectInputs();
+            mediaEl.src = url;
+            mediaEl.play();
+        }
+    }
 
     setOptions(options) {
         this.audioMotion.setOptions(this.options = this.prepareOptions(options));

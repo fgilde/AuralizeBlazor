@@ -1,35 +1,9 @@
-﻿@inherits BlazorJs.BlazorJsBaseComponent<Auralizer>
+﻿@using AuralizeBlazor.Options
+@using Nextended.Core.Helper
+@inherits BlazorJs.BlazorJsBaseComponent<Auralizer>
+
 <style>
-    @@keyframes __slideFadeIn {
-        0% {
-            opacity: 0;
-            transform: translateY(-20px); /* Start 20px oberhalb der endgültigen Position */
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    .blazor-audio-visualizer-container > .message {
-        position: absolute;
-        margin-top: 10px;
-        font-size: 20pt;
-        text-align: center;
-        opacity: 1;
-        width: 100%;
-        animation: __slideFadeIn 0.5s ease forwards; 
-        transition-property: all !important;
-        transition-duration: 0.3s;
-        transition-timing-function: ease;
-    }
-    .message-fade-out {
-        opacity: 0;
-        animation: __slideFadeIn 0.5s ease reverse;
-    }
-    .blazor-audio-visualizer {
-        height: 100%;
-        width: 100%;
-    }
+
     .blazor-audio-visualizer-overlay-mode {
         margin: 0 auto;
         position: relative;
@@ -68,6 +42,22 @@
      style="@($"{(OverlayChildContent && ChildContent != null ? "" : $"{StyleStr()}")} {Style}")"
      @onmouseover="@HandleContainerMouseOver"
      @onmouseout="@HandleContainerMouseOut">
+    @if (_trackListVisible || TrackListBehaviour == SelectionListBehaviour.AlwaysVisible)
+    {
+        @RenderList(TrackList, TrackListClass, TrackListPosition, TrackListMode, t => t.Label, PlayTrackAsync)
+    }
+    @if(TrackListBehaviour == SelectionListBehaviour.Toggleable && TrackList?.Any() == true)
+    {
+        @RenderListToggleButton(TrackListToggleButtonPosition, () => _trackListVisible = !_trackListVisible, AudioIcons.TrackList)
+    }
+    @if (_presetListVisible || PresetListBehaviour == SelectionListBehaviour.AlwaysVisible)
+    {
+        @RenderList(Presets, PresetListClass, PresetListPosition, PresetListMode, p => p.Name, p => ApplyPresetAsync(p))
+    }
+    @if(PresetListBehaviour == SelectionListBehaviour.Toggleable && Presets?.Any() == true)
+    {
+        @RenderListToggleButton(PresetListToggleButtonPosition, () => _presetListVisible = !_presetListVisible, AudioIcons.Spectrum)
+    }
     @if (!string.IsNullOrEmpty(_message))
     {
         <p class="@(_isMessageVisible ? "message" : "message message-fade-out")">@_message</p>
@@ -97,3 +87,32 @@
 </div>
 
 
+@code
+{
+
+    private RenderFragment RenderListToggleButton(Position position, Action clickAction, string content)
+    {
+        return @<div @onclick="clickAction" class="@($"selection-list-toggle-btn {position.ToDescriptionString()}")">@((MarkupString)content)</div>;
+    }
+
+    private RenderFragment RenderList<T>(IEnumerable<T> source, string cls, Position position, SelectionListMode mode, Func<T, string> toString = null, Func<T, Task> clickAction = null)
+    {
+        var additionalItemCls = position is Position.BottomLeft or Position.BottomRight ? "bottom" : "";
+        toString ??= (item) => item.ToString();
+        return @<div class="@($"selection-list {mode.ToDescriptionString()} {position.ToDescriptionString()} {cls}")">
+            <div style="animation: none !important;" class="@($"inner-list {additionalItemCls}")">
+                @foreach (var item in source ?? Array.Empty<T>())
+                {
+                    @if (clickAction != null)
+                    {
+                        <p class="@($"selectable-list-item")" @onclick="() => clickAction(item).ContinueWith(_ => HideAllOpenToggleableLists())">@toString(item)</p>
+                    }
+                    else
+                    {
+                        <p class="">@toString(item)</p>
+                    }
+                }
+            </div>
+        </div>;
+    }
+}

@@ -5,6 +5,7 @@ using System.Reflection;
 using AuralizeBlazor.Features;
 using AuralizeBlazor.Options;
 using BlazorJS.Attributes;
+using Nextended.Core.Extensions;
 using Nextended.Core.Types;
 
 namespace AuralizeBlazor;
@@ -80,7 +81,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
             }
         });
 
-    public static AuralizerPreset ClassicLedBars => new(1, nameof(ClassicLedBars), visualizer =>
+    public static AuralizerPreset ClassicLedBars => new(1, nameof(ClassicLedBars).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneThirdOctaveBands;
         visualizer.AnsiBands = true;
@@ -91,7 +92,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.TrueLeds = true;
     });
 
-    public static AuralizerPreset MirrorWave => new(2, nameof(MirrorWave), visualizer =>
+    public static AuralizerPreset MirrorWave => new(2, nameof(MirrorWave).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.LineAreaGraph;
         visualizer.FillAlpha = 0.6;
@@ -106,7 +107,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.ShowScaleX = false;
     });
 
-    public static AuralizerPreset RadialSpectrumStereo => new(3,nameof(RadialSpectrumStereo), visualizer =>
+    public static AuralizerPreset RadialSpectrumStereo => new(3,nameof(RadialSpectrumStereo).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneFourthOctaveBands;
         visualizer.Gradient = AudioMotionGradient.Prism;
@@ -118,7 +119,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.Stereo = true;
     });
 
-    public static AuralizerPreset RadialSpectrumScale => new(4, nameof(RadialSpectrumScale), visualizer =>
+    public static AuralizerPreset RadialSpectrumScale => new(4, nameof(RadialSpectrumScale).Format(), visualizer =>
     {
         RadialSpectrumStereo.Apply(visualizer);
         visualizer.Stereo = false;
@@ -126,7 +127,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.Features = new[] { new RadialRadiusFeature() };
     });
 
-    public static AuralizerPreset RadialInverse => new(5, nameof(RadialInverse), visualizer =>
+    public static AuralizerPreset RadialInverse => new(5, nameof(RadialInverse).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneEighthOctaveBands;
         visualizer.BarSpacing = .25;
@@ -146,7 +147,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.WeightingFilter = WeightingFilter.D;
     });
 
-    public static AuralizerPreset BarkScaleLinearAmplitude => new(6, nameof(BarkScaleLinearAmplitude), visualizer =>
+    public static AuralizerPreset BarkScaleLinearAmplitude => new(6, nameof(BarkScaleLinearAmplitude).Format(), visualizer =>
     {
         visualizer.FrequencyScale = FrequencyScale.Bark;
         visualizer.Gradient = AudioMotionGradient.Rainbow;
@@ -161,14 +162,14 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.WeightingFilter = WeightingFilter.D;
     });
 
-    public static AuralizerPreset BarkScaleLinearAmplitudeWithWaveNode => new(7, nameof(BarkScaleLinearAmplitudeWithWaveNode), visualizer =>
+    public static AuralizerPreset BarkScaleLinearAmplitudeWithWaveNode => new(7, nameof(BarkScaleLinearAmplitudeWithWaveNode).Format(), visualizer =>
     {
         BarkScaleLinearAmplitude.Apply(visualizer);
         visualizer.Features = new[] { new WaveNodeFeature() };
     });
 
 
-    public static AuralizerPreset DualChannelCombined => new(8, nameof(DualChannelCombined), visualizer =>
+    public static AuralizerPreset DualChannelCombined => new(8, nameof(DualChannelCombined).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.LineAreaGraph;
         visualizer.ChannelLayout = ChannelLayout.DualCombined;
@@ -188,7 +189,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.WeightingFilter = WeightingFilter.D;
     });
 
-    public static AuralizerPreset RoundBarsBarLevelColorMode => new(9, nameof(RoundBarsBarLevelColorMode), visualizer =>
+    public static AuralizerPreset RoundBarsBarLevelColorMode => new(9, nameof(RoundBarsBarLevelColorMode).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneTwelfthOctaveBands;
         visualizer.AlphaBars = false;
@@ -215,7 +216,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.WeightingFilter = WeightingFilter.D;
     });
 
-    public static AuralizerPreset ReflexMirror => new(10, nameof(ReflexMirror), visualizer =>
+    public static AuralizerPreset ReflexMirror => new(10, nameof(ReflexMirror).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.LineAreaGraph;
         visualizer.ChannelLayout = ChannelLayout.Single;
@@ -232,7 +233,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.FillAlpha = 0.2;
     });
 
-    public static AuralizerPreset DualLedBars => new(11, nameof(DualLedBars), visualizer =>
+    public static AuralizerPreset DualLedBars => new(11, nameof(DualLedBars).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneTwelfthOctaveBands;
         visualizer.AlphaBars = false;
@@ -252,7 +253,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.MinFrequency = 20;
     });
 
-    public static AuralizerPreset NeonBars => new(12, nameof(NeonBars), visualizer =>
+    public static AuralizerPreset NeonBars => new(12, nameof(NeonBars).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneEighthOctaveBands;
         visualizer.BarSpacing = .25;
@@ -264,7 +265,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.OutlineBars = true;
     });
 
-    public static AuralizerPreset LumiBars => new(13, nameof(LumiBars), visualizer =>
+    public static AuralizerPreset LumiBars => new(13, nameof(LumiBars).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneEighthOctaveBands;
         visualizer.BarSpacing = .25;
@@ -276,7 +277,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.OutlineBars = true;
     });
 
-    public static AuralizerPreset GalacticJourney => new(14, nameof(GalacticJourney), visualizer =>
+    public static AuralizerPreset GalacticJourney => new(14, nameof(GalacticJourney).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.LineAreaGraph;
         //visualizer.Gradient = AudioMotionGradient.Aurora;
@@ -294,7 +295,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.SpinSpeed = 0.5; // Only effective if radial is true, but set for visual consistency
     });
 
-    public static AuralizerPreset DeepSeaDive => new(15, nameof(DeepSeaDive), visualizer =>
+    public static AuralizerPreset DeepSeaDive => new(15, nameof(DeepSeaDive).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.DiscreteFrequencies;
         visualizer.Gradient = AudioMotionGradient.DeepSea;
@@ -308,7 +309,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.Smoothing = 0.8;
     });
 
-    public static AuralizerPreset RetroVinyl => new(16, nameof(RetroVinyl), visualizer =>
+    public static AuralizerPreset RetroVinyl => new(16, nameof(RetroVinyl).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneThirdOctaveBands;
         visualizer.Gradient = AudioMotionGradient.Sunset;
@@ -322,7 +323,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.OutlineBars = false;
     });
 
-    public static AuralizerPreset ElectricPulse => new(17, nameof(ElectricPulse), visualizer =>
+    public static AuralizerPreset ElectricPulse => new(17, nameof(ElectricPulse).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.LineAreaGraph;
         visualizer.Gradient = AudioMotionGradient.Electric;
@@ -337,7 +338,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.ReflexAlpha = 0.75;
     });
 
-    public static AuralizerPreset AuroraDreams => new(18, nameof(AuroraDreams), visualizer =>
+    public static AuralizerPreset AuroraDreams => new(18, nameof(AuroraDreams).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneFourthOctaveBands;
         visualizer.Gradient = AudioMotionGradient.Aurora;
@@ -352,7 +353,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.ShowScaleX = false; 
     });
 
-    public static AuralizerPreset NeonPulse => new(19, nameof(NeonPulse), visualizer =>
+    public static AuralizerPreset NeonPulse => new(19, nameof(NeonPulse).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.LineAreaGraph;
         visualizer.Gradient = AudioMotionGradient.NeonGlow;
@@ -366,7 +367,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.ReflexAlpha = 0.75;
     });
 
-    public static AuralizerPreset CosmicJourney => new(20, nameof(CosmicJourney), visualizer =>
+    public static AuralizerPreset CosmicJourney => new(20, nameof(CosmicJourney).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneFourthOctaveBands;
         visualizer.Gradient = AudioMotionGradient.CosmicPulse;
@@ -379,7 +380,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.SpinSpeed = 0.2;
     });
 
-    public static AuralizerPreset MorningRise => new(21, nameof(MorningRise), visualizer =>
+    public static AuralizerPreset MorningRise => new(21, nameof(MorningRise).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneThirdOctaveBands;
         visualizer.Gradient = AudioMotionGradient.Sunrise;
@@ -392,7 +393,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.Radial = false;
     });
 
-    public static AuralizerPreset MiamiSpectrumOutline => new(22, nameof(MiamiSpectrumOutline), visualizer =>
+    public static AuralizerPreset MiamiSpectrumOutline => new(22, nameof(MiamiSpectrumOutline).Format(), visualizer =>
     {
         visualizer.Mode = VisualizationMode.OneEighthOctaveBands;
         visualizer.Gradient = AudioMotionGradient.Miami;
@@ -408,4 +409,9 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
     });
 
 
+}
+
+internal static class AuralizerPresetExtensions
+{
+    public static string Format(this string s) => string.Join(" ", s.SplitByUpperCase());
 }

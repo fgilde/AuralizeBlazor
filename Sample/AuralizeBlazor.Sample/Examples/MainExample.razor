@@ -3,13 +3,13 @@
 <MudExSelect HelperText="If you manually select a preset here, auto-toggling will be disabled"
              Virtualize="true" Class="mt-1 mb-1" T="AuralizerPreset" Variant="Variant.Filled" ValueChanged="@HandleChange" Value="_preset" ItemCollection="@(_presets)"></MudExSelect>
 
-
 <Auralizer @ref=_vis
            @bind-Features="_features"
            InitialPreset="AuralizerPreset.ReflexMirror"
            GradientChanged="@MainLayout.Instance.ColorsChanged"
-           Presets="@AuralizerPreset.All"
+           Presets="@AuralizerPreset.All.Except(new List<AuralizerPreset>{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()"
            OnPresetApplied="OnPresetApplied"
+           TrackList="@TracksService.DemoTracks"
            Height="700px"
            BackgroundImage="/bg1.jpg"
            OnReady="@(() => _vis.ShowMessage("Welcome to Auralizer, press play !", TimeSpan.FromSeconds(2)))"
@@ -18,16 +18,16 @@
            ClickAction="VisualizerAction.TogglePlayPause"
            Overlay="true">
     <center>
-        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="@TracksService.MainDemoTrack.Url"></audio>
     </center>
 </Auralizer>
 
 @code {
     private Auralizer _vis;
-    private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, new SwitchPresetFeature()];
+    private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, new SwitchPresetFeature { MinEnergy = .20}];
     private AuralizerPreset? _preset;
     private readonly AuralizerPreset[] _presets = AuralizerPreset.All;
 
-    private void HandleChange(AuralizerPreset value) => _vis.RemoveFeature<SwitchPresetFeature>().ApplyPreset(value);
+    private void HandleChange(AuralizerPreset value) => _vis.RemoveFeature<SwitchPresetFeature>().ApplyPresetAsync(value);
     private void OnPresetApplied(AuralizerPreset obj) => _preset = obj;
 }

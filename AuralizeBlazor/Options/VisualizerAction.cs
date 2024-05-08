@@ -11,4 +11,6 @@ public enum VisualizerAction
     ToggleMicrophone = 6,
     NextPreset = 7,
     PreviousPreset = 8,
+    NextTrack = 9,
+    PreviousTrack = 10,
 }

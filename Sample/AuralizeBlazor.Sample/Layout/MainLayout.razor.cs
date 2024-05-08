@@ -17,7 +17,11 @@ public partial class MainLayout
             PaletteDark = new PaletteDark
             {
                 Primary = (defaultPalette.First().ToMudColor()),
-                Secondary = (defaultPalette.Last().ToMudColor())
+                Secondary = (defaultPalette.Last().ToMudColor()),
+                AppbarBackground = "#1f2226",
+                DrawerBackground = "#1f2226",
+                Background = "#121518",
+                Surface = "#222529"
             }
         };
 
@@ -45,12 +49,17 @@ public partial class MainLayout
         }
 
         _palette =  arg?.ColorStops?.Select(x => new MudExColor(x.Color))?.ToArray();
+        //var randomColorFromStop = arg.ColorStops[new Random().Next(arg.ColorStops.Length)];
         _currentTheme = new()
         {
             PaletteDark = new PaletteDark
             {
                 Primary = new MudColor(arg.ColorStops.First().Color),
                 Secondary = new MudColor(arg.ColorStops.Last().Color),
+                AppbarBackground = "#1f2226",
+                DrawerBackground = "#1f2226",
+                Background = "#121518",
+                Surface = "#222529"
             }
         };
         return Task.CompletedTask;
