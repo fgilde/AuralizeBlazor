@@ -46,7 +46,7 @@
     {
         @RenderList(TrackList, TrackListClass, TrackListPosition, TrackListMode, t => t.Label, PlayTrackAsync)
     }
-    @if(TrackListBehaviour == SelectionListBehaviour.Toggleable && TrackList?.Any() == true)
+    @if (TrackListBehaviour == SelectionListBehaviour.Toggleable && TrackList?.Any() == true)
     {
         @RenderListToggleButton(TrackListToggleButtonPosition, () => _trackListVisible = !_trackListVisible, AudioIcons.TrackList)
     }
@@ -54,7 +54,7 @@
     {
         @RenderList(Presets, PresetListClass, PresetListPosition, PresetListMode, p => p.Name, p => ApplyPresetAsync(p))
     }
-    @if(PresetListBehaviour == SelectionListBehaviour.Toggleable && Presets?.Any() == true)
+    @if (PresetListBehaviour == SelectionListBehaviour.Toggleable && Presets?.Any() == true)
     {
         @RenderListToggleButton(PresetListToggleButtonPosition, () => _presetListVisible = !_presetListVisible, AudioIcons.Spectrum)
     }
@@ -92,7 +92,11 @@
 
     private RenderFragment RenderListToggleButton(Position position, Action clickAction, string content)
     {
-        return @<div @onclick="clickAction" class="@($"selection-list-toggle-btn {position.ToDescriptionString()}")">@((MarkupString)content)</div>;
+        return @<div @onclick="clickAction" class="@($"selection-list-toggle-btn {position.ToDescriptionString()}")">
+                   <svg class="icon-root icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true">
+                       @((MarkupString)content)
+                   </svg>
+               </div>;
     }
 
     private RenderFragment RenderList<T>(IEnumerable<T> source, string cls, Position position, SelectionListMode mode, Func<T, string> toString = null, Func<T, Task> clickAction = null)
@@ -100,19 +104,19 @@
         var additionalItemCls = position is Position.BottomLeft or Position.BottomRight ? "bottom" : "";
         toString ??= (item) => item.ToString();
         return @<div class="@($"selection-list {mode.ToDescriptionString()} {position.ToDescriptionString()} {cls}")">
-            <div style="animation: none !important;" class="@($"inner-list {additionalItemCls}")">
-                @foreach (var item in source ?? Array.Empty<T>())
-                {
-                    @if (clickAction != null)
-                    {
-                        <p class="@($"selectable-list-item")" @onclick="() => clickAction(item).ContinueWith(_ => HideAllOpenToggleableLists())">@toString(item)</p>
-                    }
-                    else
-                    {
-                        <p class="">@toString(item)</p>
-                    }
-                }
-            </div>
-        </div>;
+                   <div style="animation: none !important;" class="@($"inner-list {additionalItemCls}")">
+                       @foreach (var item in source ?? Array.Empty<T>())
+                       {
+                           @if (clickAction != null)
+                           {
+                               <p class="@($"selectable-list-item")" @onclick="() => clickAction(item).ContinueWith(_ => HideAllOpenToggleableLists())">@toString(item)</p>
+                           }
+                           else
+                           {
+                               <p class="">@toString(item)</p>
+                           }
+                       }
+                   </div>
+               </div>;
     }
 }
