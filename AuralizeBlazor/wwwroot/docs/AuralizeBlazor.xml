@@ -9,6 +9,22 @@
             Blazor component for visualizing audio data.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Auralizer.SuggestedWebComponentName">
+            <summary>
+            Name of the web component.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.ComponentJsFile">
+            <inheritdoc />
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.AudioMotionLib">
+            <summary>
+            Library path for the AudioMotionAnalyzer library.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.ComponentJsInitializeMethodName">
+            <inheritdoc />
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.IsAnyToggleableListOpen">
             <summary>
             Returns true if any toggleable list is open.
@@ -32,6 +48,66 @@
         <member name="P:AuralizeBlazor.Auralizer.IsCreatedAndConnected">
             <summary>
             Is true when the visualizer is created and connected to an input source.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.FullPaged">
+            <summary>
+            Is true if the visualizer is in full page mode.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.TrackListPosition">
+            <summary>
+            Position for the track list if the list is filled and should be shown.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.TrackListToggleButtonPosition">
+            <summary>
+            The position of the track list toggle button if the <see cref="P:AuralizeBlazor.Auralizer.TrackListBehaviour"/> is toggleable.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.TrackListBehaviour">
+            <summary>
+            Defines the behavior of the track list.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.TrackListMode">
+            <summary>
+            The mode how the track list should be displayed.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.TrackListClass">
+            <summary>
+            This class will be added to the track list.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.PresetListPosition">
+            <summary>
+            Position for the preset list if the list is filled and should be shown.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.PresetListToggleButtonPosition">
+            <summary>
+            The position of the preset list toggle button if the <see cref="P:AuralizeBlazor.Auralizer.PresetListBehaviour"/> is toggleable.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.PresetListBehaviour">
+            <summary>
+            Defines the behavior of the preset list.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.PresetListMode">
+            <summary>
+            Defines the mode how the preset list should be displayed.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.PresetListClass">
+            <summary>
+            This class will be added to the preset list.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Actions">
+            <summary>
+            All possible actions for the visualizer.
             </summary>
         </member>
         <member name="P:AuralizeBlazor.Auralizer.TrackList">
@@ -209,12 +285,12 @@
             Width of the visualizer component.
             </summary>
         </member>
-        <member name="M:AuralizeBlazor.Auralizer.ApplyPreset(AuralizeBlazor.AuralizerPreset,System.Nullable{System.Boolean})">
+        <member name="M:AuralizeBlazor.Auralizer.ApplyPreset(AuralizeBlazor.AuralizerPreset,AuralizeBlazor.Options.PresetApplySettings)">
             <summary>
             Applies the given preset to the visualizer.
             </summary>
         </member>
-        <member name="M:AuralizeBlazor.Auralizer.ApplyPresetAsync(AuralizeBlazor.AuralizerPreset,System.Nullable{System.Boolean})">
+        <member name="M:AuralizeBlazor.Auralizer.ApplyPresetAsync(AuralizeBlazor.AuralizerPreset,AuralizeBlazor.Options.PresetApplySettings)">
             <summary>
             Applies the given preset to the visualizer.
             </summary>
@@ -534,6 +610,26 @@
             Toggles the full screen mode and returns true if the current state is full screen otherwise false.
             </summary>
         </member>
+        <member name="M:AuralizeBlazor.Auralizer.ToggleFullPage">
+            <summary>
+            Toggles the full page mode and returns true if the current state is full screen otherwise false.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.ToggleActionMenu">
+            <summary>
+            Toggles the action menu visibility
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.TogglePresetList">
+            <summary>
+            Toggles the preset list visibility
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.ToggleTrackList">
+            <summary>
+            Toggles the track list visibility
+            </summary>
+        </member>
         <member name="M:AuralizeBlazor.Auralizer.TogglePictureInPicture">
             <summary>
             Toggles the picture in picture mode and returns true if the current state is picture in picture otherwise false.
@@ -547,22 +643,32 @@
         <member name="M:AuralizeBlazor.Auralizer.ImportModuleAndCreateJsAsync">
             <inheritdoc />
         </member>
+        <member name="M:AuralizeBlazor.Auralizer.PlayTrackAsync(AuralizeBlazor.IAuralizerTrack)">
+            <summary>
+            Plays a track
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.PlayTrackAsync(System.String)">
+            <summary>
+            Plays a track
+            </summary>
+        </member>
         <member name="M:AuralizeBlazor.Auralizer.HideAllOpenToggleableLists">
             <summary>
             Hides all currently open toggable lists.
             </summary>
         </member>
-        <member name="M:AuralizeBlazor.Auralizer.RandomPreset">
+        <member name="M:AuralizeBlazor.Auralizer.RandomPreset(AuralizeBlazor.Options.PresetApplyReason)">
             <summary>
             Applies a random preset from the Presets to the visualizer.
             </summary>
         </member>
-        <member name="M:AuralizeBlazor.Auralizer.NextPresetAsync">
+        <member name="M:AuralizeBlazor.Auralizer.NextPresetAsync(AuralizeBlazor.Options.PresetApplyReason)">
             <summary>
             Applies the next preset from the Presets to the visualizer.
             </summary>
         </member>
-        <member name="M:AuralizeBlazor.Auralizer.PreviousPresetAsync">
+        <member name="M:AuralizeBlazor.Auralizer.PreviousPresetAsync(AuralizeBlazor.Options.PresetApplyReason)">
             <summary>
             Applies the previous preset from the Presets to the visualizer.
             </summary>
@@ -580,6 +686,11 @@
         </member>
         <member name="M:AuralizeBlazor.Auralizer.OnAfterRender(System.Boolean)">
             <inheritdoc />
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.HandleMouseWheel(Microsoft.AspNetCore.Components.Web.WheelEventArgs)">
+            <summary>
+            Handles the mouse wheel event.
+            </summary>
         </member>
         <member name="T:AuralizeBlazor.AuralizerPreset">
             <summary>
@@ -847,6 +958,28 @@
             The URL of the image to display for the track.
             </summary>
         </member>
+        <member name="T:AuralizeBlazor.Options.AppliedPresetEventArgs">
+            <summary>
+            Event arguments for when a preset is applied.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Options.AppliedPresetEventArgs.#ctor(AuralizeBlazor.AuralizerPreset,AuralizeBlazor.Options.PresetApplySettings)">
+            <summary>
+            Create a new instance of the event arguments.
+            </summary>
+            <param name="preset"></param>
+            <param name="applySettings"></param>
+        </member>
+        <member name="P:AuralizeBlazor.Options.AppliedPresetEventArgs.Preset">
+            <summary>
+            The preset that was applied.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Options.AppliedPresetEventArgs.ApplySettings">
+            <summary>
+            Settings that were applied.
+            </summary>
+        </member>
         <member name="T:AuralizeBlazor.Options.AudioMotionGradient">
             <summary>
             Gradient for the audio motion visualizer.
@@ -870,6 +1003,26 @@
         <member name="P:AuralizeBlazor.Options.AudioMotionGradient.ColorStops">
             <summary>
             Color stops for the gradient.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Options.PresetApplySettings">
+            <summary>
+            Settings for applying a preset.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Options.PresetApplySettings.ResetFirst">
+            <summary>
+            If true all settings will be reset before applying the preset.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Options.PresetApplySettings.DisplayMessageIf">
+            <summary>
+            If true and the setting in the auralizer is also true a message with the name will be displayed if the preset is applied.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Options.PresetApplySettings.Reason">
+            <summary>
+            The reason for applying the preset.
             </summary>
         </member>
     </members>

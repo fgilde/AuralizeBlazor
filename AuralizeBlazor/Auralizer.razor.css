@@ -80,6 +80,11 @@
     width: 100%;
 }
 
+    .selectable-list-item.selected {
+        font-style: italic;
+        color: var(--mud-palette-primary, yellow);
+    }
+
     .selectable-list-item:hover {
         background: #00000033;
     }

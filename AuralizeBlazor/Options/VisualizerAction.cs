@@ -13,4 +13,8 @@ public enum VisualizerAction
     PreviousPreset = 8,
     NextTrack = 9,
     PreviousTrack = 10,
+    ToggleFullPage = 11,
+    DisplayTrackList = 12,
+    DisplayPresetList = 13,
+    DisplayActionMenu = 99,
 }

@@ -4,10 +4,12 @@
     audioMotion;
     _featuresPaused = false;
     _createdAudioElements = [];
-    constructor(elementRef, dotNet, options) {
+    visualizerAction;
+    constructor(elementRef, dotNet, options, visualizerAction) {
         this.elementRef = elementRef;
         this.dotnet = dotNet;
         this.options = options;
+        this.visualizerAction = visualizerAction;
         this.createVisualizer(options);
     }
 
@@ -19,11 +21,16 @@
         this.visualizer.addEventListener('click', this.onVisualizerClick.bind(this));
         this.visualizer.addEventListener('dblclick', this.onVisualizerDblClick.bind(this));
         this.visualizer.addEventListener('contextmenu', this.onVisualizerCtxMenu.bind(this));
+        this.visualizer.addEventListener('mousemove', this.onVisualizerMouseMove.bind(this));
         this.reconnectInputs();
         this.dotnet.invokeMethodAsync('HandleOnCreated');
 
         this.clickTimeout = null;
         this.preventSingleClick = false;
+    }
+
+    async onVisualizerMouseMove(e) {
+        
     }
 
     async onVisualizerCtxMenu(e) {
@@ -56,7 +63,7 @@
             e.preventDefault();
         }
         switch (action) {
-            case 1: // Pause/Resume
+            case this.visualizerAction.TogglePlayPause: // Pause/Resume
                 if (!this.pauseAllActive()) {
                     if (!this.playAllActive(true)) {
                         this.playAllActive();
@@ -66,29 +73,41 @@
             case 2: // Mute/Unmute
                 // TODO: implement
                 break;
-            case 3: // Pause/Resume Features
+            case this.visualizerAction.ToggleAllFeatures: // Pause/Resume Features
                 this._featuresPaused = !this._featuresPaused;
                 break;
-            case 4: // Picture-in-Picture
+            case this.visualizerAction.TogglePictureInPicture: // Picture-in-Picture
                 this.togglePip();
                 break;
-            case 5: // Fullscreen
+            case this.visualizerAction.ToggleFullscreen: // Fullscreen
                 this.toggleFullscreen();
                 break;
-            case 6: // Toggle Microphone
+            case this.visualizerAction.ToggleMicrophone: // Toggle Microphone
                 this.connectToMic(!this.micStream);
                 break;
-            case 7: // Next preset
-                await this.dotnet.invokeMethodAsync('NextPresetAsync');
+            case this.visualizerAction.NextPreset: // Next preset
+                await this.dotnet.invokeMethodAsync('NextPresetAsync', 3);
                 break;
-            case 8: // Previous preset
-                await this.dotnet.invokeMethodAsync('PreviousPresetAsync');
+            case this.visualizerAction.PreviousPreset: // Previous preset
+                await this.dotnet.invokeMethodAsync('PreviousPresetAsync', 3);
                 break;
-            case 9: // Next track
+            case this.visualizerAction.NextTrack: // Next track
                 await this.dotnet.invokeMethodAsync('NextTrackAsync', this.currentTrack());
                 break;
-            case 10: // Previous track
+            case this.visualizerAction.PreviousTrack: // Previous track
                 await this.dotnet.invokeMethodAsync('PreviousTrackAsync', this.currentTrack());
+                break;
+            case this.visualizerAction.ToggleFullPage: // full page
+                await this.dotnet.invokeMethodAsync('ToggleFullPage');
+                break;
+            case this.visualizerAction.DisplayActionMenu: // action menu
+                await this.dotnet.invokeMethodAsync('ToggleActionMenu');
+                break;
+            case this.visualizerAction.DisplayTrackList:
+                await this.dotnet.invokeMethodAsync('ToggleTrackList');
+                break;
+            case this.visualizerAction.DisplayPresetList:
+                await this.dotnet.invokeMethodAsync('TogglePresetList');
                 break;
             default:
                 break;
@@ -267,6 +286,7 @@
                 this.dotnet.invokeMethodAsync('HandleOnInputConnected');
             }
         });
+        this.dotnet.invokeMethodAsync('UpdateCurrentTrack', this.currentTrack());
     }
 
 
@@ -288,7 +308,6 @@
         if (mediaEl) {
             mediaEl.src = url;
             mediaEl.play();
-            console.log('Playing track: ' + url);
         } else {
             const mediaEl = document.createElement('audio');
             this._createdAudioElements.push(mediaEl);
@@ -350,6 +369,10 @@
 
     dispose() {
         this.visualizer.removeEventListener('click', this.onVisualizerClick.bind(this));
+        this.visualizer.removeEventListener('dblclick', this.onVisualizerDblClick.bind(this));
+        this.visualizer.removeEventListener('contextmenu', this.onVisualizerCtxMenu.bind(this));
+        this.visualizer.removeEventListener('mousemove', this.onVisualizerMouseMove.bind(this));
+
         this.disconnectInputs();
         this.audioMotion.destroy();
     }
@@ -360,6 +383,6 @@ window.AuralizeBlazor = {
     features: {}
 }
 
-export function initializeAuralizer(elementRef, dotnet, options) {
-    return new Auralizer(elementRef, dotnet, options);
+export function initializeAuralizer(elementRef, dotnet, options, visualizerActions) {
+    return new Auralizer(elementRef, dotnet, options, visualizerActions);
 }

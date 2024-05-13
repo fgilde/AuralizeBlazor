@@ -2,8 +2,6 @@
 <div class="html"><pre>
 <span class="atSign">&#64;</span>using AuralizeBlazor.Features
 <span class="atSign">&#64;</span>using AuralizeBlazor.Options
-<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExSelect</span> <span class="htmlAttributeName">HelperText</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">If you manually select a preset here, auto-toggling will be disabled</span><span class="quot">&quot;</span>
-             <span class="htmlAttributeName">Virtualize</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span> <span class="htmlAttributeName">Class</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">mt-1 mb-1</span><span class="quot">&quot;</span> <span class="htmlAttributeName">T</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">AuralizerPreset</span><span class="quot">&quot;</span> <span class="htmlAttributeName">Variant</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">Variant</span><span class="enumValue">.Filled</span><span class="quot">&quot;</span> <span class="htmlAttributeName">ValueChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="sharpVariable"><span class="atSign">&#64;</span>HandleChange</span><span class="quot">&quot;</span> <span class="htmlAttributeName">Value</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_preset</span><span class="quot">&quot;</span> <span class="htmlAttributeName">ItemCollection</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>(_presets)</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExSelect</span><span class="htmlTagDelimiter">&gt;</span>
 
 <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>ref</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">_vis</span>
            <span class="htmlAttributeName"><span class="atSign">&#64;</span>bind-Features</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_features</span><span class="quot">&quot;</span>
@@ -15,7 +13,6 @@
            <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">700px</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">BackgroundImage</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">/bg1.jpg</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">OnReady</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>(() =&gt; _vis.ShowMessage(&quot;Welcome to Auralizer, press play !&quot;, TimeSpan.FromSeconds(2)))</span><span class="quot">&quot;</span>
-           <span class="htmlAttributeName">ContextMenuAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.TogglePictureInPicture</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">DoubleClickAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.ToggleFullscreen</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">ClickAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.TogglePlayPause</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">Overlay</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>
@@ -28,11 +25,16 @@
 <span class="atSign">&#64;</span>code {
     <span class="keyword">private</span> Auralizer _vis;
     <span class="keyword">private</span> IVisualizerFeature[] _features = [<span class="keyword">new</span> ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, <span class="keyword">new</span> SwitchPresetFeature { MinEnergy = .<span class="number">20</span>}];
-    <span class="keyword">private</span> AuralizerPreset? _preset;
     <span class="keyword">private</span> <span class="keyword">readonly</span> AuralizerPreset[] _presets = AuralizerPreset.All;
+    
+    <span class="keyword">private</span> <span class="keyword">void</span> OnPresetApplied(AppliedPresetEventArgs arg)
+    {
+        <span class="keyword">if</span> (arg.ApplySettings.Reason <span class="keyword">is</span> PresetApplyReason.UserSelectedFromList or PresetApplyReason.UserSelectedAsAction)
+        {
+            _vis.RemoveFeature&lt;SwitchPresetFeature&gt;();
+        }
+    }
 
-    <span class="keyword">private</span> <span class="keyword">void</span> HandleChange(AuralizerPreset value) =&gt; _vis.RemoveFeature&lt;SwitchPresetFeature&gt;().ApplyPresetAsync(value);
-    <span class="keyword">private</span> <span class="keyword">void</span> OnPresetApplied(AuralizerPreset obj) =&gt; _preset = obj;
 }
 </pre></div>
 </div>

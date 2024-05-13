@@ -38,13 +38,13 @@
 
 
 <div @ref="ElementReference"
-     class="@($"blazor-audio-visualizer-container {containerMouseOverCls} {Class}")"
+     class="@($"blazor-audio-visualizer-container {_containerMouseOverCls} {Class}")"
      style="@($"{(OverlayChildContent && ChildContent != null ? "" : $"{StyleStr()}")} {Style}")"
      @onmouseover="@HandleContainerMouseOver"
      @onmouseout="@HandleContainerMouseOut">
     @if (_trackListVisible || TrackListBehaviour == SelectionListBehaviour.AlwaysVisible)
     {
-        @RenderList(TrackList, TrackListClass, TrackListPosition, TrackListMode, t => t.Label, PlayTrackAsync)
+        @RenderList(TrackList, TrackListClass, TrackListPosition, TrackListMode, true, t => t.Label, (t, _) => PlayTrackAsync(t), IsCurrentTrack)
     }
     @if (TrackListBehaviour == SelectionListBehaviour.Toggleable && TrackList?.Any() == true)
     {
@@ -52,12 +52,18 @@
     }
     @if (_presetListVisible || PresetListBehaviour == SelectionListBehaviour.AlwaysVisible)
     {
-        @RenderList(Presets, PresetListClass, PresetListPosition, PresetListMode, p => p.Name, p => ApplyPresetAsync(p))
+        @RenderList(Presets, PresetListClass, PresetListPosition, PresetListMode, true, p => p.Name, (p, _) => ApplyPresetAsync(p, new PresetApplySettings(PresetApplyReason.UserSelectedFromList)), IsCurrentPreset)
     }
     @if (PresetListBehaviour == SelectionListBehaviour.Toggleable && Presets?.Any() == true)
     {
         @RenderListToggleButton(PresetListToggleButtonPosition, () => _presetListVisible = !_presetListVisible, AudioIcons.Spectrum)
     }
+    
+    @if (_actionListVisible)
+    {
+        @RenderList(Actions, "action", Position.Mouse, SelectionListMode.Compact, false, p => p.ToString(), ExecuteAction)
+    }
+
     @if (!string.IsNullOrEmpty(_message))
     {
         <p class="@(_isMessageVisible ? "message" : "message message-fade-out")">@_message</p>
@@ -66,8 +72,9 @@
     {
         <div @ref="_visualizer"
              id="@_id"
-             class="@($"blazor-audio-visualizer blazor-audio-visualizer-overlay-mode {visualizerMouseOverCls}")"
+             class="@($"blazor-audio-visualizer blazor-audio-visualizer-overlay-mode {_visualizerMouseOverCls}")"
              @onwheel="@HandleMouseWheel"
+             @onmousemove="@HandleMouseMove"
              @onmouseover="@HandleVisualizerMouseOver"
              @onmouseout="@HandleVisualizerMouseOut">
             @ChildContent
@@ -77,8 +84,9 @@
     {
         <div @ref="_visualizer"
              id="@_id"
-             class="@($"blazor-audio-visualizer {visualizerMouseOverCls}")"
+             class="@($"blazor-audio-visualizer {_visualizerMouseOverCls}")"
              @onwheel="@HandleMouseWheel"
+             @onmousemove="@HandleMouseMove"
              @onmouseover="@HandleVisualizerMouseOver"
              @onmouseout="@HandleVisualizerMouseOut">
         </div>
@@ -99,17 +107,29 @@
                </div>;
     }
 
-    private RenderFragment RenderList<T>(IEnumerable<T> source, string cls, Position position, SelectionListMode mode, Func<T, string> toString = null, Func<T, Task> clickAction = null)
+    private RenderFragment RenderList<T>(IEnumerable<T> source, 
+        string cls, 
+        Position position, 
+        SelectionListMode mode, 
+        bool hideAllListsOnClick,
+        Func<T, string> toString = null, 
+        Func<T, MouseEventArgs, Task> clickAction = null,
+        Func<T, bool> isSelectedFunc = null)
     {
+        var hideAction = hideAllListsOnClick ? (Action)(HideAllOpenToggleableLists) : () => {};
+        isSelectedFunc ??= (item) => false;
         var additionalItemCls = position is Position.BottomLeft or Position.BottomRight ? "bottom" : "";
         toString ??= (item) => item.ToString();
-        return @<div class="@($"selection-list {mode.ToDescriptionString()} {position.ToDescriptionString()} {cls}")">
-                   <div style="animation: none !important;" class="@($"inner-list {additionalItemCls}")">
+
+        var style = position == Position.Mouse ? GetMousePosStyle() : "";
+        var innerStyle = position == Position.Mouse ? "margin-top:0; margin-bottom:0" : "";
+        return @<div style="@style" class="@($"selection-list {mode.ToDescriptionString()} {position.ToDescriptionString()} {cls}")">
+                   <div style="@($"animation: none !important; {innerStyle}")" class="@($"inner-list {additionalItemCls}")">
                        @foreach (var item in source ?? Array.Empty<T>())
                        {
                            @if (clickAction != null)
                            {
-                               <p class="@($"selectable-list-item")" @onclick="() => clickAction(item).ContinueWith(_ => HideAllOpenToggleableLists())">@toString(item)</p>
+                               <p class="@($"selectable-list-item {(isSelectedFunc(item) ? "selected" : "")}")" @onclick="(arg) => clickAction(item, arg).ContinueWith(_ => hideAction())">@toString(item)</p>
                            }
                            else
                            {

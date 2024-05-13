@@ -7,7 +7,7 @@
 ![alt text](https://raw.githubusercontent.com/fgilde/AuralizeBlazor/master/AuralizeBlazor/screenshot1.png)
 
 AuralizeBlazor provides a audio visualizer component named `Auralizer`.
-This a Blazor component that integrates the powerful features of the audioMotion.js library, enabling developers to incorporate real-time audio visualization into Blazor applications with ease. This document provides an overview of how to use the component, including its properties and methods.
+This a Blazor component that integrates the powerful features of audioMotion, enabling developers to incorporate real-time audio visualization into Blazor applications with ease. This document provides an overview of how to use the component, including its properties and methods.
 
 ## Features
 

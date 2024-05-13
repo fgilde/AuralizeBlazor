@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using AuralizeBlazor.Features;
 using AuralizeBlazor.Options;
 using BlazorJS;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Nextended.Core.Extensions;
+using Nextended.Core.Helper;
 
 namespace AuralizeBlazor;
 
@@ -20,13 +22,24 @@ namespace AuralizeBlazor;
 /// </summary>
 public partial class Auralizer
 {
+    /// <summary>
+    /// Name of the web component.
+    /// </summary>
     public static string SuggestedWebComponentName => string.Join("-", typeof(Auralizer).FullName.Replace(".", "").SplitByUpperCase()).ToLower();
 
     private const bool Minify = true;
 
     private string _id = Guid.NewGuid().ToFormattedId();
+
+    /// <inheritdoc />
     protected override string ComponentJsFile() => Minify ? "./_content/AuralizeBlazor/js/auralize.min.js" : "./_content/AuralizeBlazor/js/components/auralizer.js";
+    
+    /// <summary>
+    /// Library path for the AudioMotionAnalyzer library.
+    /// </summary>
     protected string AudioMotionLib() => "./_content/AuralizeBlazor/js/lib/audioMotion4.4.0.min.js"; // => "https://cdn.skypack.dev/audiomotion-analyzer?min";
+
+    /// <inheritdoc />
     protected override string ComponentJsInitializeMethodName() => "initializeAuralizer";
 
     private bool _isMessageVisible;
@@ -36,8 +49,8 @@ public partial class Auralizer
     private int _playingElements = 0;
     private int _presetIdx = 0;
     private string _message;
-    private string visualizerMouseOverCls;
-    private string containerMouseOverCls;
+    private string _visualizerMouseOverCls;
+    private string _containerMouseOverCls;
     private ElementReference _visualizer;
     private IJSObjectReference _audioMotion;
     private RenderFragment _childContent;
@@ -45,11 +58,19 @@ public partial class Auralizer
     private IVisualizerFeature[] _features = Array.Empty<IVisualizerFeature>();
     private bool _trackListVisible = false;
     private bool _presetListVisible = false;
+    private CancellationTokenSource _messageHideCts;
+    private bool _isActive = true;
+    private bool _fullPaged;
+    private AuralizerPreset _currentPreset;
+    private string _currentTrack;
+    private bool _actionListVisible;
+    private VisualizerAction[] _actions;
+    private MouseEventArgs _lastMouseEventArgs;
 
     /// <summary>
     /// Returns true if any toggleable list is open.
     /// </summary>
-    public bool IsAnyToggleableListOpen => _trackListVisible || _presetListVisible;
+    public bool IsAnyToggleableListOpen => _trackListVisible || _presetListVisible || _actionListVisible;
     /// <summary>
     /// is true when the visualizer is playing.
     /// </summary>
@@ -70,18 +91,78 @@ public partial class Auralizer
     /// </summary>
     public bool IsCreatedAndConnected { get; private set; }
 
+    /// <summary>
+    /// Is true if the visualizer is in full page mode.
+    /// </summary>
+    [Parameter]
+    public bool FullPaged
+    {
+        get => _fullPaged;
+        set
+        {
+            if (_fullPaged != value)
+            {
+                _fullPaged = value;
+                InvokeAsync(StateHasChanged);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Position for the track list if the list is filled and should be shown.
+    /// </summary>
     [Parameter] public Position TrackListPosition { get; set; }
+    
+    /// <summary>
+    /// The position of the track list toggle button if the <see cref="TrackListBehaviour"/> is toggleable.
+    /// </summary>
     [Parameter] public Position TrackListToggleButtonPosition { get; set; }
+    
+    /// <summary>
+    /// Defines the behavior of the track list.
+    /// </summary>
     [Parameter] public SelectionListBehaviour TrackListBehaviour { get; set; } = SelectionListBehaviour.Toggleable;
+    
+    /// <summary>
+    /// The mode how the track list should be displayed.
+    /// </summary>
     [Parameter] public SelectionListMode TrackListMode { get; set; }
+    
+    /// <summary>
+    /// This class will be added to the track list.
+    /// </summary>
     [Parameter] public string TrackListClass { get; set; }
 
-
+    /// <summary>
+    /// Position for the preset list if the list is filled and should be shown.
+    /// </summary>
     [Parameter] public Position PresetListPosition { get; set; } = Position.TopRight;
+
+    /// <summary>
+    /// The position of the preset list toggle button if the <see cref="PresetListBehaviour"/> is toggleable.
+    /// </summary>
     [Parameter] public Position PresetListToggleButtonPosition { get; set; } = Position.TopRight;
+
+    /// <summary>
+    /// Defines the behavior of the preset list.
+    /// </summary>
     [Parameter] public SelectionListBehaviour PresetListBehaviour { get; set; } = SelectionListBehaviour.Toggleable;
+    
+    /// <summary>
+    /// Defines the mode how the preset list should be displayed.
+    /// </summary>
     [Parameter] public SelectionListMode PresetListMode { get; set; }
+    
+    /// <summary>
+    /// This class will be added to the preset list.
+    /// </summary>
     [Parameter] public string PresetListClass { get; set; }
+
+
+    /// <summary>
+    /// All possible actions for the visualizer.
+    /// </summary>
+    public VisualizerAction[] Actions => _actions ??= Nextended.Core.Helper.Enum<VisualizerAction>.Values.Except(new []{VisualizerAction.None, VisualizerAction.DisplayActionMenu}).ToArray();
 
 
     /// <summary>
@@ -112,7 +193,7 @@ public partial class Auralizer
     /// <summary>
     /// Invoked when a preset is applied to the visualizer.
     /// </summary>
-    [Parameter] public EventCallback<AuralizerPreset> OnPresetApplied { get; set; }
+    [Parameter] public EventCallback<AppliedPresetEventArgs> OnPresetApplied { get; set; }
 
     /// <summary>
     /// Invoked when the gradient used by the visualizer is changed.
@@ -162,7 +243,7 @@ public partial class Auralizer
     /// <summary>
     /// Defines the action taken when the context menu is invoked on the visualizer.
     /// </summary>
-    [Parameter, ForJs("visualizerCtxMenuAction")] public VisualizerAction ContextMenuAction { get; set; } = VisualizerAction.None;
+    [Parameter, ForJs("visualizerCtxMenuAction")] public VisualizerAction ContextMenuAction { get; set; } = VisualizerAction.DisplayActionMenu;
 
     /// <summary>
     /// Defines the action taken when the mouse wheel is scrolled up over the visualizer.
@@ -300,34 +381,33 @@ public partial class Auralizer
     /// Applies the given preset to the visualizer.
     /// </summary>
     [Obsolete("Use ApplyPresetAsync instead.")]
-    public virtual Auralizer ApplyPreset(AuralizerPreset preset, bool? resetFirst = null) => ExecuteApplyPreset(preset, resetFirst);
+    public virtual Auralizer ApplyPreset(AuralizerPreset preset, PresetApplySettings settings = null) => ExecuteApplyPreset(preset, settings);
 
     /// <summary>
     /// Applies the given preset to the visualizer.
     /// </summary>
-    public virtual Task ApplyPresetAsync(AuralizerPreset preset, bool? resetFirst = null)
+    public virtual Task ApplyPresetAsync(AuralizerPreset preset, PresetApplySettings settings = null)
     {
-        ExecuteApplyPreset(preset, resetFirst);
+        ExecuteApplyPreset(preset, settings);
         return UpdateJsOptions();
     }
 
-    private Auralizer ExecuteApplyPreset(AuralizerPreset preset, bool? resetFirst = null, bool messageIf = true)
+    private Auralizer ExecuteApplyPreset(AuralizerPreset preset, PresetApplySettings settings = null)
     {
+        settings ??= new PresetApplySettings(PresetApplyReason.Unknown);
         if (preset == null)
             return this;
         if (Presets?.Contains(preset) == true)
             _presetIdx = Array.IndexOf(Presets, preset);
-        if (messageIf && ShowPresetNameOnChange)
+        if (settings.DisplayMessageIf && ShowPresetNameOnChange)
             ShowMessage(preset.Name, TimeSpan.FromSeconds(2));
-        preset.Apply(this, resetFirst);
-        HandleOnPresetApplied(preset);
+        preset.Apply(this, settings.ResetFirst);
+        _currentPreset = preset;
+        HandleOnPresetApplied(preset, settings);
 
         return this;
     }
-
-    private CancellationTokenSource _messageHideCts;
-    private bool _isActive = true;
-
+    
     /// <summary>
     /// Displays a message on the visualizer for the specified duration.
     /// </summary>
@@ -774,6 +854,45 @@ public partial class Auralizer
     public ValueTask<bool> ToggleFullScreen() => JsReference.InvokeAsync<bool>("toggleFullscreen");
 
     /// <summary>
+    /// Toggles the full page mode and returns true if the current state is full screen otherwise false.
+    /// </summary>
+    [JSInvokable]
+    public bool ToggleFullPage() => FullPaged = !FullPaged;
+
+    /// <summary>
+    /// Toggles the action menu visibility
+    /// </summary>
+    [JSInvokable]
+    public bool ToggleActionMenu()
+    {
+        var res = _actionListVisible = !_actionListVisible;
+        InvokeAsync(StateHasChanged);
+        return res;
+    }
+
+    /// <summary>
+    /// Toggles the preset list visibility
+    /// </summary>
+    [JSInvokable]
+    public bool TogglePresetList()
+    {
+        var res = _presetListVisible = !_presetListVisible;
+        InvokeAsync(StateHasChanged);
+        return res;
+    }
+
+    /// <summary>
+    /// Toggles the track list visibility
+    /// </summary>
+    [JSInvokable]
+    public bool ToggleTrackList()
+    {
+        var res = _trackListVisible = !_trackListVisible;
+        InvokeAsync(StateHasChanged);
+        return res;
+    }
+
+    /// <summary>
     /// Toggles the picture in picture mode and returns true if the current state is picture in picture otherwise false.
     /// </summary>
     public ValueTask<bool> TogglePictureInPicture() => JsReference.InvokeAsync<bool>("togglePip");
@@ -781,7 +900,14 @@ public partial class Auralizer
     /// <summary>
     /// Gets the JavaScript arguments to pass to the component.
     /// </summary>
-    public override object[] GetJsArguments() => new[] { ElementReference, CreateDotNetObjectReference(), JsOptions() };
+    public override object[] GetJsArguments() => new[] { ElementReference, CreateDotNetObjectReference(), JsOptions(), EnumFor<VisualizerAction>() };
+
+    private static Dictionary<string, int> EnumFor<T>() where T : struct
+    {
+        return Enum.GetValues(typeof(T))
+            .Cast<T>()
+            .ToDictionary(e => e.ToString(), e => Convert.ToInt32(e));
+    }
 
     /// <inheritdoc />
     public override async Task ImportModuleAndCreateJsAsync()
@@ -792,22 +918,30 @@ public partial class Auralizer
         await ImportFeatureFilesAsync();
         if (InitialPreset != null)
         {
-            ExecuteApplyPreset(InitialPreset, null, false);
+            var settings = new PresetApplySettings(PresetApplyReason.Initial) { ResetFirst = null, DisplayMessageIf = false};
+            ExecuteApplyPreset(InitialPreset, settings);
             await UpdateJsOptions();
         }
 
         ModulesReady = true;
     }
 
+    /// <summary>
+    /// Plays a track
+    /// </summary>
     public Task PlayTrackAsync(IAuralizerTrack track)
     {
         ShowMessage(track.Label, TimeSpan.FromSeconds(2));
         return PlayTrackAsync(track.Url);
     }
 
-    public Task PlayTrackAsync(string url)
+    /// <summary>
+    /// Plays a track
+    /// </summary>
+    public async Task PlayTrackAsync(string url)
     {
-        return JsReference.InvokeVoidAsync("playTrack", url).AsTask();
+        await UpdateCurrentTrack(url);
+        await JsReference.InvokeVoidAsync("playTrack", url).AsTask();
     }
 
     [JSInvokable]
@@ -826,6 +960,7 @@ public partial class Auralizer
     /// </summary>
     public void HideAllOpenToggleableLists()
     {
+        _actionListVisible = false;
         _presetListVisible = false;
         _trackListVisible = false;
         InvokeAsync(StateHasChanged);
@@ -835,23 +970,23 @@ public partial class Auralizer
     /// Applies a random preset from the Presets to the visualizer.
     /// </summary>
     [JSInvokable]
-    public Task RandomPreset()
+    public Task RandomPreset(PresetApplyReason reason = PresetApplyReason.Unknown)
     {
-        return Presets?.Any() == true ? ApplyPresetAsync(Presets.MinBy(p => Guid.NewGuid())) : Task.CompletedTask;
+        return Presets?.Any() == true ? ApplyPresetAsync(Presets.MinBy(p => Guid.NewGuid()), new PresetApplySettings(reason)) : Task.CompletedTask;
     }
 
     /// <summary>
     /// Applies the next preset from the Presets to the visualizer.
     /// </summary>
     [JSInvokable]
-    public Task NextPresetAsync() => SelectPreset(1);
+    public Task NextPresetAsync(PresetApplyReason reason = PresetApplyReason.Unknown) => SelectPreset(1, reason);
 
     /// <summary>
     /// Applies the previous preset from the Presets to the visualizer.
     /// </summary>
     /// <returns></returns>
     [JSInvokable]
-    public Task PreviousPresetAsync() => SelectPreset(-1);
+    public Task PreviousPresetAsync(PresetApplyReason reason = PresetApplyReason.Unknown) => SelectPreset(-1, reason);
 
     [JSInvokable]
     public void HandleOnPlay()
@@ -889,25 +1024,35 @@ public partial class Auralizer
     }
 
     [JSInvokable]
-    public void HandleOnInputConnected()
+    public async Task HandleOnInputConnected()
     {
         if (_minOneInputConnected)
             return;
         _minOneInputConnected = true;
-        OnInputConnected.InvokeAsync();
+        await OnInputConnected.InvokeAsync();
         if (_created)
-            HandleOnReady();
+            await HandleOnReady();
     }
 
     [JSInvokable]
-    public void HandleOnCreated()
+    public async Task HandleOnCreated()
     {
         if (_created)
             return;
         _created = true;
-        OnCreated.InvokeAsync();
+        await OnCreated.InvokeAsync();
         if (_minOneInputConnected)
-            HandleOnReady();
+            await HandleOnReady();
+    }
+
+    [JSInvokable]
+    public async Task UpdateCurrentTrack(string track = null)
+    {
+        _currentTrack = track;
+        if (track == null && JsReference != null)
+        {
+            _currentTrack = await JsReference.InvokeAsync<string>("currentTrack");
+        }
     }
 
     [JSInvokable]
@@ -948,8 +1093,9 @@ public partial class Auralizer
 
     }
 
-    protected virtual void HandleOnReady()
+    protected virtual async Task HandleOnReady()
     {
+        await UpdateCurrentTrack();
         IsCreatedAndConnected = true;
         OnReady.InvokeAsync();
     }
@@ -959,9 +1105,9 @@ public partial class Auralizer
         await UpdateJsOptions();
     }
 
-    protected virtual void HandleOnPresetApplied(AuralizerPreset preset)
+    protected virtual void HandleOnPresetApplied(AuralizerPreset preset, PresetApplySettings settings)
     {
-        OnPresetApplied.InvokeAsync(preset);
+        OnPresetApplied.InvokeAsync(new AppliedPresetEventArgs(preset, settings));
     }
 
     /// <summary>
@@ -982,25 +1128,36 @@ public partial class Auralizer
 
     protected virtual Task HandleContainerMouseOver(MouseEventArgs arg)
     {
-        containerMouseOverCls = "mouse-over";
+        _containerMouseOverCls = "mouse-over";
         return OnContainerMouseOver.InvokeAsync(arg);
     }
 
     protected virtual Task HandleContainerMouseOut(MouseEventArgs arg)
     {
-        containerMouseOverCls = null;
+        _containerMouseOverCls = null;
         return OnContainerMouseOut.InvokeAsync(arg);
+    }
+
+    protected virtual Task HandleMouseMove(MouseEventArgs obj)
+    {
+        if (!IsAnyToggleableListOpen)
+        {
+            _lastMouseEventArgs = obj;
+        }
+
+        return Task.CompletedTask;
     }
 
     protected virtual Task HandleVisualizerMouseOver(MouseEventArgs arg)
     {
-        visualizerMouseOverCls = "mouse-over";
+        
+        _visualizerMouseOverCls = "mouse-over";
         return OnVisualizerMouseOver.InvokeAsync(arg);
     }
 
     protected virtual Task HandleVisualizerMouseOut(MouseEventArgs arg)
     {
-        visualizerMouseOverCls = null;
+        _visualizerMouseOverCls = null;
         return OnVisualizerMouseOut.InvokeAsync(arg);
     }
 
@@ -1043,6 +1200,16 @@ public partial class Auralizer
         });
     }
 
+    private string GetMousePosStyle()
+    {
+        var style = new StringBuilder();
+        style.Append($"position: fixed;");
+        style.Append($"top: {_lastMouseEventArgs.ClientY}px;");
+        style.Append($"left: {_lastMouseEventArgs.ClientX}px;");
+        return style.ToString();
+
+    }
+
     private string StyleStr()
     {
         var style = new StringBuilder();
@@ -1050,23 +1217,49 @@ public partial class Auralizer
             style.Append($"height: {Height};");
         if (!string.IsNullOrWhiteSpace(Width))
             style.Append($"width: {Width};");
+        if (FullPaged)
+        {
+            style.Append("position: fixed;");
+            style.Append("top: 0;");
+            style.Append("left: 0;");
+            style.Append("z-index: 99999999;");
+            style.Append("height: 100vh;");
+            style.Append("width: 100vw;");
+        }
         return style.ToString();
     }
 
-    protected virtual Task HandleMouseWheel(WheelEventArgs arg)
-    {
-        //MaxFrequency = Math.Max(20, MaxFrequency + (int)arg.DeltaY);
-        //return UpdateJsOptions();
-        return JsReference
-            .InvokeVoidAsync("handleAction", arg.DeltaY > 0 ? MouseWheelDownAction : MouseWheelUpAction, arg).AsTask();
-    }
+    /// <summary>
+    /// Handles the mouse wheel event.
+    /// </summary>
+    protected virtual Task HandleMouseWheel(WheelEventArgs arg) => ExecuteAction(arg.DeltaY > 0 ? MouseWheelDownAction : MouseWheelUpAction, arg);
 
-    private Task SelectPreset(int delta)
+    private Task ExecuteAction(VisualizerAction action, MouseEventArgs arg) => JsReference.InvokeVoidAsync("handleAction", action, arg).AsTask();
+
+    private Task SelectPreset(int delta, PresetApplyReason reason)
     {
         if (Presets == null || Presets.Length == 0)
             return Task.CompletedTask;
         int nextIndex = (_presetIdx + delta + Presets.Length) % Presets.Length;
 
-        return ApplyPresetAsync(Presets[_presetIdx = nextIndex]);
+        return ApplyPresetAsync(Presets[_presetIdx = nextIndex], new PresetApplySettings(reason));
     }
+
+    private bool IsCurrentPreset(AuralizerPreset preset)
+    {
+        return _currentPreset == preset;
+    }
+
+    private bool IsCurrentTrack(IAuralizerTrack arg)
+    {
+        if (!string.IsNullOrEmpty(_currentTrack))
+        {
+            var t1 = NormalizeUrl(arg.Url, _currentTrack);
+            var t2 = NormalizeUrl(_currentTrack, _currentTrack);
+            return t1 == t2;
+        }
+
+        return false;
+    }
+
 }

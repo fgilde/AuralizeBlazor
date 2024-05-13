@@ -12,7 +12,7 @@
             //    energy = energy * auralizer.options.linearBoost;
             //}
             if (energy > featureOptions.minEnergy) {
-                auralizer.dotnet.invokeMethodAsync(featureOptions.pickRandom ? 'RandomPreset' : 'NextPresetAsync');
+                auralizer.dotnet.invokeMethodAsync(featureOptions.pickRandom ? 'RandomPreset' : 'NextPresetAsync', 5);
                 lastChangeTime = currentTime; 
             }
         }
