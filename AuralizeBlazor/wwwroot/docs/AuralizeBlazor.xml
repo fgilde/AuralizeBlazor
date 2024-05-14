@@ -55,6 +55,11 @@
             Is true if the visualizer is in full page mode.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Auralizer.TranslateFn">
+            <summary>
+            Specify a Translations function to translate or localize texts with.
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.TrackListPosition">
             <summary>
             Position for the track list if the list is filled and should be shown.
@@ -218,6 +223,11 @@
         <member name="P:AuralizeBlazor.Auralizer.BackgroundImage">
             <summary>
             Sets the background image of the visualizer component.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ApplyBackgroundImageFromTrack">
+            <summary>
+            If a track from <see cref="P:AuralizeBlazor.Auralizer.TrackList"/>> is played the background image will be set to the track image if this setting is true.
             </summary>
         </member>
         <member name="P:AuralizeBlazor.Auralizer.IgnoredPropertiesForReset">
@@ -687,6 +697,11 @@
         <member name="M:AuralizeBlazor.Auralizer.OnAfterRender(System.Boolean)">
             <inheritdoc />
         </member>
+        <member name="M:AuralizeBlazor.Auralizer.Translate(System.String)">
+            <summary>
+            Function is called for text render and can used to translate text.
+            </summary>
+        </member>
         <member name="M:AuralizeBlazor.Auralizer.HandleMouseWheel(Microsoft.AspNetCore.Components.Web.WheelEventArgs)">
             <summary>
             Handles the mouse wheel event.
@@ -1023,6 +1038,81 @@
         <member name="P:AuralizeBlazor.Options.PresetApplySettings.Reason">
             <summary>
             The reason for applying the preset.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Options.VisualizerAction">
+            <summary>
+            Simple actions that can be performed by the visualizer
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.None">
+            <summary>
+            No action
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.TogglePlayPause">
+            <summary>
+            Toggle play/pause
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.ToggleAllFeatures">
+            <summary>
+            Toggle all features
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.TogglePictureInPicture">
+            <summary>
+            Toggle picture in picture
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.ToggleFullscreen">
+            <summary>
+            Toggle fullscreen
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.ToggleFullPage">
+            <summary>
+            Toggle full page
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.ToggleMicrophone">
+            <summary>
+            Connect/disconnect microphone
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.NextPreset">
+            <summary>
+            Select next preset
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.PreviousPreset">
+            <summary>
+            Select previous preset
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.NextTrack">
+            <summary>
+            Select next track
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.PreviousTrack">
+            <summary>
+            Select previous track
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.DisplayTrackList">
+            <summary>
+            Open/close track list
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.DisplayPresetList">
+            <summary>
+            Open/close preset list
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.VisualizerAction.DisplayActionMenu">
+            <summary>
+            Open/close action menu
             </summary>
         </member>
     </members>

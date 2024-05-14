@@ -1,5 +1,6 @@
 ﻿@using AuralizeBlazor.Options
 @using Nextended.Core.Helper
+@using AuralizeBlazor.Extensions
 @inherits BlazorJs.BlazorJsBaseComponent<Auralizer>
 
 <style>
@@ -40,6 +41,10 @@
 <div @ref="ElementReference"
      class="@($"blazor-audio-visualizer-container {_containerMouseOverCls} {Class}")"
      style="@($"{(OverlayChildContent && ChildContent != null ? "" : $"{StyleStr()}")} {Style}")"
+     tabindex="1"
+     @onkeydown="HandleKeyDown"
+     @onkeypress="HandleKeyPress"
+     @onkeyup="HandleKeyUp"
      @onmouseover="@HandleContainerMouseOver"
      @onmouseout="@HandleContainerMouseOut">
     @if (_trackListVisible || TrackListBehaviour == SelectionListBehaviour.AlwaysVisible)
@@ -61,7 +66,7 @@
     
     @if (_actionListVisible)
     {
-        @RenderList(Actions, "action", Position.Mouse, SelectionListMode.Compact, false, p => p.ToString(), ExecuteAction)
+        @RenderList(Actions, "action", Position.Mouse, SelectionListMode.Compact, false, p => p.GetLabel(), ExecuteAction)
     }
 
     @if (!string.IsNullOrEmpty(_message))
@@ -129,7 +134,7 @@
                        {
                            @if (clickAction != null)
                            {
-                               <p class="@($"selectable-list-item {(isSelectedFunc(item) ? "selected" : "")}")" @onclick="(arg) => clickAction(item, arg).ContinueWith(_ => hideAction())">@toString(item)</p>
+                               <p class="@($"selectable-list-item {(isSelectedFunc(item) ? "selected" : "")}")" @onclick="(arg) => clickAction(item, arg).ContinueWith(_ => hideAction())">@Translate(toString(item))</p>
                            }
                            else
                            {

@@ -626,7 +626,7 @@
 }
 
 .docs-section-content {
-  padding: 20px;
+  /*padding: 20px;*/
   border-radius: 4px;
   margin-bottom: 40px;
   background-color: var(--mud-palette-surface);
@@ -662,7 +662,7 @@
   display: grid;
 }
 .docs-section-content.docs-section-auto-margin-content > .docs-section-content-inner > *:not(.mud-grid) {
-  margin: 8px;
+  /*margin: 8px;*/
 }
 .docs-section-content.docs-section-flex-column > .docs-section-content-inner {
   flex-direction: column;

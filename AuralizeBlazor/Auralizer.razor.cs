@@ -109,6 +109,11 @@ public partial class Auralizer
     }
 
     /// <summary>
+    /// Specify a Translations function to translate or localize texts with.
+    /// </summary>
+    [Parameter] public Func<string, string> TranslateFn { get; set; } = s => s;
+    
+    /// <summary>
     /// Position for the track list if the list is filled and should be shown.
     /// </summary>
     [Parameter] public Position TrackListPosition { get; set; }
@@ -276,6 +281,11 @@ public partial class Auralizer
     /// </summary>
     [Parameter, ForJs]
     public string BackgroundImage { get; set; }
+
+    /// <summary>
+    /// If a track from <see cref="TrackList"/>> is played the background image will be set to the track image if this setting is true.
+    /// </summary>
+    public bool ApplyBackgroundImageFromTrack { get; set; } = true;
 
     /// <summary>
     /// If a preset is applied this properties will be ignored when the preset is applied and a reset is triggered from the preset.
@@ -904,9 +914,11 @@ public partial class Auralizer
 
     private static Dictionary<string, int> EnumFor<T>() where T : struct
     {
-        return Enum.GetValues(typeof(T))
+        var res = Enum.GetValues(typeof(T))
             .Cast<T>()
             .ToDictionary(e => e.ToString(), e => Convert.ToInt32(e));
+
+        return res;
     }
 
     /// <inheritdoc />
@@ -931,6 +943,8 @@ public partial class Auralizer
     /// </summary>
     public Task PlayTrackAsync(IAuralizerTrack track)
     {
+        if(ApplyBackgroundImageFromTrack && !string.IsNullOrEmpty(track.Image))
+            BackgroundImage = track.Image;
         ShowMessage(track.Label, TimeSpan.FromSeconds(2));
         return PlayTrackAsync(track.Url);
     }
@@ -1148,6 +1162,21 @@ public partial class Auralizer
         return Task.CompletedTask;
     }
 
+    protected virtual Task HandleKeyDown(KeyboardEventArgs arg)
+    {
+        if (arg.Key == "Escape")
+        {
+            if (FullPaged)
+                FullPaged = false;
+            else
+                HideAllOpenToggleableLists();
+        }
+        return Task.CompletedTask;
+    }
+
+    protected virtual Task HandleKeyUp(KeyboardEventArgs arg) => Task.CompletedTask;
+    protected virtual Task HandleKeyPress(KeyboardEventArgs arg) => Task.CompletedTask;
+
     protected virtual Task HandleVisualizerMouseOver(MouseEventArgs arg)
     {
         
@@ -1167,6 +1196,14 @@ public partial class Auralizer
         base.OnAfterRender(firstRender);
         if (firstRender)
             IsRendered = true;
+    }
+
+    /// <summary>
+    /// Function is called for text render and can used to translate text.
+    /// </summary>
+    protected virtual string Translate(string s)
+    {
+        return TranslateFn?.Invoke(s);
     }
 
     private async Task UpdateJsOptions()
