@@ -57,7 +57,7 @@
     }
     @if (_presetListVisible || PresetListBehaviour == SelectionListBehaviour.AlwaysVisible)
     {
-        @RenderList(Presets, PresetListClass, PresetListPosition, PresetListMode, true, p => p.Name, (p, _) => ApplyPresetAsync(p, new PresetApplySettings(PresetApplyReason.UserSelectedFromList)), IsCurrentPreset)
+        @RenderList(Presets, PresetListClass, PresetListPosition, PresetListMode, true, p => p.Name, (p, _) => ApplyPresetAsync(p, new PresetApplySettings(PresetApplyReason.UserSelectedFromList)), IsCurrentPreset, PresetPreview)
     }
     @if (PresetListBehaviour == SelectionListBehaviour.Toggleable && Presets?.Any() == true)
     {
@@ -103,6 +103,16 @@
 @code
 {
 
+    private RenderFragment PresetPreview(AuralizerPreset preset)
+    {
+        return @<Auralizer InitialPreset="preset"
+                           InitialRender="InitialRender.WithRandomData"
+                           IsActive="false"
+                           Height="100px">
+
+        </Auralizer>;
+    }
+
     private RenderFragment RenderListToggleButton(Position position, Action clickAction, string content)
     {
         return @<div @onclick="clickAction" class="@($"selection-list-toggle-btn {position.ToDescriptionString()}")">
@@ -119,7 +129,8 @@
         bool hideAllListsOnClick,
         Func<T, string> toString = null, 
         Func<T, MouseEventArgs, Task> clickAction = null,
-        Func<T, bool> isSelectedFunc = null)
+        Func<T, bool> isSelectedFunc = null, 
+        RenderFragment<T> itemTemplate = null)
     {
         var hideAction = hideAllListsOnClick ? (Action)(HideAllOpenToggleableLists) : () => {};
         isSelectedFunc ??= (item) => false;
@@ -134,7 +145,16 @@
                        {
                            @if (clickAction != null)
                            {
-                               <p class="@($"selectable-list-item {(isSelectedFunc(item) ? "selected" : "")}")" @onclick="(arg) => clickAction(item, arg).ContinueWith(_ => hideAction())">@Translate(toString(item))</p>
+                               if (itemTemplate != null)
+                                 {
+                                      @itemTemplate(item);
+                                 }
+                               else
+                               {
+                                   <p class="@($"selectable-list-item {(isSelectedFunc(item) ? "selected" : "")}")" @onclick="(arg) => clickAction(item, arg).ContinueWith(_ => hideAction())">
+                                       @Translate(toString(item))
+                                   </p>
+                               }
                            }
                            else
                            {

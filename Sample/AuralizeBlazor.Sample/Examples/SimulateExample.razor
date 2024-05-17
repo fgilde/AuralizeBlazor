@@ -1,10 +1,14 @@
 ﻿@using AuralizeBlazor.Features
 @using AuralizeBlazor.Options
 
+<MudButton OnClick="@Simulate">Simulate</MudButton>
 <Auralizer @ref=_vis
            @bind-Features="_features"
+           OnContainerMouseOver="OnMouseIn"
+           OnContainerMouseOut="OnMouseOut"
            InitialPreset="AuralizerPreset.ReflexMirror"
-           InitialRender="InitialRender.WithRandomData"
+           InitialRender="InitialRender.WithFullSpectrumAudioDataPrefilledWithRandomData"
+           KeepState="true"
            GradientChanged="@MainLayout.Instance.ColorsChanged"
            Presets="@AuralizerPreset.All.Except(new List<AuralizerPreset>{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()"
            OnPresetApplied="OnPresetApplied"
@@ -32,5 +36,34 @@
             _vis.RemoveFeature<SwitchPresetFeature>();
         }
     }
-    
+
+    private async Task Simulate()
+    {
+        await _vis.SimulateFullAudioSpectrumAsync(null, 20, true);
+        Console.WriteLine("DONNNE");
+    }
+
+    private async Task OnMouseIn()
+    {
+        if(_vis.JsReference is null || _vis.IsPlaying)
+        {
+            return;
+        }
+        var simulating = await _vis.IsSimulationRunning();
+        if (!simulating)
+        {
+            _ = _vis.SimulateFullAudioSpectrumWithRandomLoadingDataAsync(null, 1, true);
+            Console.WriteLine("Simulating");
+        }
+        else
+        {
+            await _vis.ResumeSimulationAsync();
+        }
+    }
+
+    private async Task OnMouseOut()
+    {
+        await _vis.PauseSimulationAsync();
+    }
+
 }

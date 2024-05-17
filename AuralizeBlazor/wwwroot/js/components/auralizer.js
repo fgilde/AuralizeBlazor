@@ -2,6 +2,7 @@
     elementRef;
     dotnet;
     audioMotion;
+    isSimulating = false;
     _featuresPaused = false;
     _createdAudioElements = [];
     visualizerAction;
@@ -27,10 +28,333 @@
 
         this.clickTimeout = null;
         this.preventSingleClick = false;
+        this.analyzer = this.audioMotion._analyzer[0];
+        this.originalGetFloatFrequencyData = this.analyzer.getFloatFrequencyData.bind(this.analyzer);
+        if (options.initialRender > 0) {
+            this.renderOneTimeStatic();
+        }
     }
 
+    async renderOneTimeStatic() {
+        const audioElements = this.getAudioElements();
+
+        //render enum 2 means real data and 3 full spectrum
+        if (this.options.initialRender === 1 || this.options.initialRender === 6) {
+            const frequencyData = this.generateRandomAudioFrequencyData();
+            this.setAudioData(frequencyData);
+        }
+        if ((this.options.initialRender === 2 || this.options.initialRender === 3 || this.options.initialRender === 6) && audioElements.length > 0) {
+            const frequencyDataArray = await Promise.all(audioElements.map(async (audioElement) => {
+                return await (this.options.initialRender === 2 ? this.getRealAudioFrequencyData(audioElement) : this.getFullAudioSpectrumFrequencyData(audioElement, true));
+            }));
+            const combinedFrequencyData = this.combineFrequencyData(frequencyDataArray);
+            this.setAudioData(combinedFrequencyData);
+        }
+        if (this.options.initialRender === 4) {
+            this.simulateRandomAudioSpectrum();
+        }
+        if (this.options.initialRender === 5) {
+            this.simulateFullAudioSpectrum(audioElements[0], 1, true);
+        }
+    }
+
+    //#region Frequency Data helpers
+    // TODO: Move to separate class
+
+    setAudioData(frequencyData, oneTime = true) {
+        this.analyzer.getFloatFrequencyData = this._tmpGetFloatFrequencyData = function (array) {
+            array.set(frequencyData);
+        };
+        if (oneTime) {
+            this.audioMotion.toggleAnalyzer(true);
+        }
+        setTimeout(() => {
+            if (oneTime) {
+                this.audioMotion.toggleAnalyzer(false);
+                this.analyzer.getFloatFrequencyData = this.originalGetFloatFrequencyData;
+            }
+        }, 100); // Delay in milliseconds (adjust as needed)
+    }
+
+
+    combineFrequencyData(frequencyDataArray) {
+        const length = frequencyDataArray[0].length;
+        const combinedData = new Float32Array(length);
+
+        frequencyDataArray.forEach(data => {
+            for (let i = 0; i < length; i++) {
+                combinedData[i] += data[i];
+            }
+        });
+
+        // Normalize the combined data
+        for (let i = 0; i < length; i++) {
+            combinedData[i] /= frequencyDataArray.length;
+        }
+
+        return combinedData;
+    }
+
+    generateRandomAudioFrequencyData() {
+        const smoothingFactor = 0.6; // Adjust this value to control smoothing level
+        let previousValue = Math.random() * 20 - 80; // Initial random value in a lower range
+
+        const frequencyData = new Float32Array(this.audioMotion._analyzer[0].frequencyBinCount);
+        for (let i = 0; i < frequencyData.length; i++) {
+            const randomValue = Math.random() * 30 - 80; // Random value between -80 and -50 dB
+            const smoothedValue = previousValue * smoothingFactor + randomValue * (1 - smoothingFactor);
+            frequencyData[i] = smoothedValue;
+            previousValue = smoothedValue;
+        }
+        return frequencyData;
+    }
+
+
+    async getRealAudioFrequencyData(audioElementOrFile) {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const fileUrl = typeof audioElementOrFile === 'string' ? audioElementOrFile : audioElementOrFile.src;
+        const response = await fetch(fileUrl);
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        const offlineContext = new OfflineAudioContext(1, audioBuffer.length, audioContext.sampleRate);
+        const source = offlineContext.createBufferSource();
+        source.buffer = audioBuffer;
+
+        const analyzer = offlineContext.createAnalyser();
+        analyzer.fftSize = this.options.fftSize;
+        source.connect(analyzer);
+        analyzer.connect(offlineContext.destination);
+
+        source.start();
+        await offlineContext.startRendering();
+
+        const frequencyData = new Float32Array(analyzer.frequencyBinCount);
+        analyzer.getFloatFrequencyData(frequencyData);
+
+        return frequencyData;
+    }
+
+    async getFullAudioSpectrumFrequencyData(audioElementOrFile, aggregate = false) {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const fileUrl = typeof audioElementOrFile === 'string' ? audioElementOrFile : audioElementOrFile.src;
+        const response = await fetch(fileUrl);
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        const frameSize = this.options.fftSize || 2048;
+        const frameStep = frameSize / 4; // Overlap frames by 25%
+        const frames = Math.ceil(audioBuffer.length / frameStep);
+        const frequencyDataArray = [];
+
+        let aggregatedFrequencyData;
+        const timestamps = [];
+
+        if (aggregate) {
+            aggregatedFrequencyData = new Float32Array(frameSize / 2);
+        }
+
+        for (let i = 0; i < frames; i++) {
+            const frameStart = i * frameStep;
+            const frameEnd = frameStart + frameSize;
+
+            // Calculate the timestamp for this frame
+            const timestamp = (frameStart / audioBuffer.sampleRate) * 1000; // Convert to milliseconds
+            timestamps.push(timestamp);
+
+            // Create a temporary buffer to hold the current frame
+            const tempBuffer = audioBuffer.getChannelData(0).slice(frameStart, frameEnd);
+            const offlineContext = new OfflineAudioContext(1, tempBuffer.length, audioContext.sampleRate);
+            const tempAudioBuffer = offlineContext.createBuffer(1, tempBuffer.length, offlineContext.sampleRate);
+            tempAudioBuffer.copyToChannel(tempBuffer, 0);
+
+            // Create a temporary source for the current frame
+            const tempSource = offlineContext.createBufferSource();
+            tempSource.buffer = tempAudioBuffer;
+
+            const analyzer = offlineContext.createAnalyser();
+            analyzer.fftSize = frameSize;
+            tempSource.connect(analyzer);
+            analyzer.connect(offlineContext.destination);
+
+            tempSource.start();
+            await offlineContext.startRendering();
+
+            const frequencyData = new Float32Array(analyzer.frequencyBinCount);
+            analyzer.getFloatFrequencyData(frequencyData);
+
+            if (aggregate) {
+                // Aggregate frequency data
+                for (let j = 0; j < frequencyData.length; j++) {
+                    aggregatedFrequencyData[j] += frequencyData[j];
+                }
+            } else {
+                frequencyDataArray.push(frequencyData);
+            }
+        }
+
+        if (aggregate) {
+            // Normalize the aggregated frequency data
+            for (let j = 0; j < aggregatedFrequencyData.length; j++) {
+                aggregatedFrequencyData[j] /= frames;
+            }
+            //return { frequencyDataArray: [aggregatedFrequencyData], timestamps: [0] };
+            return aggregatedFrequencyData;
+        }
+
+        return { frequencyDataArray, timestamps };
+    }
+
+    isSimulationRunning() {
+        return this.isSimulating;
+    }
+
+    stopSimulation() {
+        if (!this.isSimulating)
+            return;
+        this.isSimulating = false;
+        this._simulationStopped = true;
+        if (this._simulateId) {
+            clearInterval(this._simulateId);
+        }
+        setTimeout(() => this.audioMotion.toggleAnalyzer(true), 100);
+    }
+
+    simulateRandomAudioSpectrum() {
+        if (this.isSimulating)
+            return;
+        this.isSimulating = true;
+        this._simulateId = setInterval(() => {
+            if (!this.simulationIsPaused()) {
+                requestAnimationFrame(() => this.setAudioData(this.generateRandomAudioFrequencyData(), false));
+            }
+        }, 10);
+    }
+
+    simulateRandomAudioSpectrumContinueWithFullSpectrum(audioElementOrFileOrData, speedFactor = 1, endless = false) {
+        if (!audioElementOrFileOrData)
+            audioElementOrFileOrData = this.getAudioElements()[0];
+        if (audioElementOrFileOrData) {
+            const task = 'frequencyDataArray' in audioElementOrFileOrData
+                ? Promise.resolve(audioElementOrFileOrData)
+                : this.getFullAudioSpectrumFrequencyData(audioElementOrFileOrData, false);
+
+            task.then(data => {
+                //this.stopSimulation(); // Stop the random simulation
+                clearInterval(this._simulateId);
+                this.simulateFullAudioSpectrum(data, speedFactor, endless); // Start the full spectrum simulation
+            });
+        }
+        this.simulateRandomAudioSpectrum(); // Start the random simulation
+    }
+
+
+
+    async simulateFullAudioSpectrum(audioElementOrFileOrData, speedFactor = 1, endless = false) {
+        if (!audioElementOrFileOrData)
+            audioElementOrFileOrData = this.getAudioElements()[0];
+        if (!audioElementOrFileOrData)
+            return Promise.resolve();
+        const { frequencyDataArray, timestamps } = 'frequencyDataArray' in audioElementOrFileOrData ? audioElementOrFileOrData : await this.getFullAudioSpectrumFrequencyData(audioElementOrFileOrData, false);
+        const analyzer = this.analyzer;
+        const originalGetFloatFrequencyData = this.originalGetFloatFrequencyData;
+
+        this.isSimulating = true;
+        const totalFrames = frequencyDataArray.length;
+        let currentFrame = 0;
+        let accumulatedPauseTime = 0;
+        let lastPauseTime = 0;
+        let startTime = performance.now();
+
+        const updateFrame = () => {
+            if (this.simulationIsPaused()) {
+                if (lastPauseTime === 0) {
+                    lastPauseTime = performance.now();
+                }
+                requestAnimationFrame(updateFrame);
+                return;
+            }
+
+            if (lastPauseTime !== 0) {
+                accumulatedPauseTime += performance.now() - lastPauseTime;
+                lastPauseTime = 0;
+            }
+
+            const currentTime = performance.now() - startTime - accumulatedPauseTime;
+            while (currentFrame < totalFrames && timestamps[currentFrame] <= currentTime * speedFactor) {
+                currentFrame++;
+            }
+
+            requestAnimationFrame(updateFrame);
+        };
+
+        return new Promise((resolve) => {
+            analyzer.getFloatFrequencyData = this._tmpGetFloatFrequencyData = function (array) {
+                originalGetFloatFrequencyData(array);
+                if (currentFrame < totalFrames) {
+                    array.set(frequencyDataArray[currentFrame]);
+                } else {
+                    array.fill(-Infinity); // Fill with silence after last frame
+                }
+            };
+
+            this.audioMotion.toggleAnalyzer(true);
+            requestAnimationFrame(updateFrame);
+
+            const checkCompletion = () => {
+                if (currentFrame >= totalFrames || this._simulationStopped) {
+                    if (endless && !this._simulationStopped) {
+                        currentFrame = 0;
+                        startTime = performance.now();
+                        accumulatedPauseTime = 0;
+                        lastPauseTime = 0;
+                        setTimeout(checkCompletion, 100); // Restart after 100ms
+                        return;
+                    }
+                    this._simulationStopped = false;
+                    analyzer.getFloatFrequencyData = originalGetFloatFrequencyData;
+                    this._tmpGetFloatFrequencyData = null;
+                    this.isSimulating = false;
+                    resolve();
+                } else {
+                    setTimeout(checkCompletion, 100); // Check completion every 100ms
+                }
+            };
+            checkCompletion();
+        });
+    }
+
+    simulationIsPaused() {
+        return this._simulationPaused;
+    }
+
+    pauseSimulation(keepState) {
+        if (this.isSimulating) {
+            this._simulationPaused = true;
+            this.analyzer.getFloatFrequencyData = this.originalGetFloatFrequencyData;
+            if (!keepState) {
+                this.audioMotion.toggleAnalyzer(false);
+            }
+        }
+    }
+
+    resumeSimulation() {
+        if (this.isSimulating) {
+            if (this._tmpGetFloatFrequencyData) {
+                this.analyzer.getFloatFrequencyData = this._tmpGetFloatFrequencyData;
+            }
+            this._simulationPaused = false;
+            if (!this.audioMotion.isOn) {
+                this.audioMotion.toggleAnalyzer(true);
+            }
+        }
+    }
+
+
+    //#endregion
+
     async onVisualizerMouseMove(e) {
-        
+
     }
 
     async onVisualizerCtxMenu(e) {
@@ -272,8 +596,29 @@
                 this.audioMotion.connectInput(el.audioSourceNode);
                 if (!el.listeners) {
                     el.listeners = {
-                        play: () => this.dotnet.invokeMethodAsync('HandleOnPlay'),
-                        pause: () => this.dotnet.invokeMethodAsync('HandleOnPause'),
+                        play: () => {
+                            if (audioCtx.state === 'suspended') {
+                                audioCtx.resume();
+                            }
+                            if (this.options.keepState || (this.options.initialRender > 0)) {
+                                if (!this.audioMotion.isOn) {
+                                    this.audioMotion.toggleAnalyzer(true);
+                                }
+                            }
+                            if (this.options.keepState) {
+                                this.pauseSimulation(true);
+                            } else {
+                                this.stopSimulation();
+                            }
+                            this.dotnet.invokeMethodAsync('HandleOnPlay');
+                        },
+                        pause: () => {
+                            if (this.options.keepState) {
+                                this.audioMotion.toggleAnalyzer(false);
+                                this.resumeSimulation();
+                            }
+                            this.dotnet.invokeMethodAsync('HandleOnPause');
+                        },
                         ended: () => this.dotnet.invokeMethodAsync('HandleOnEnded')
                     };
                     Object.keys(el.listeners).forEach(event => {

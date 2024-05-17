@@ -27,7 +27,7 @@ public partial class Auralizer
     /// </summary>
     public static string SuggestedWebComponentName => string.Join("-", typeof(Auralizer).FullName.Replace(".", "").SplitByUpperCase()).ToLower();
 
-    private const bool Minify = true;
+    private const bool Minify = false;
 
     private string _id = Guid.NewGuid().ToFormattedId();
 
@@ -138,6 +138,21 @@ public partial class Auralizer
     /// </summary>
     [Parameter] public string TrackListClass { get; set; }
 
+    [Parameter] public bool PreviewImageInPresetList { get; set; }
+
+    /// <summary>
+    /// Here you can set the initial render mode for the visualizer to show visualization data before audio is played.
+    /// You can choose between random data, real data and full spectrum.
+    /// But be careful with real audio data because it can take a while to load the data and for sure the full spectrum is having the most heavy loading time.
+    /// </summary>
+    [Parameter, ForJs] public InitialRender InitialRender { get; set; } = InitialRender.None;
+
+    /// <summary>
+    /// Set this to true to automatically activate the visualizer before play and deactivate before pause that means that the audio data is staying displayed when audio is paused.
+    /// Also, if in <see cref="InitialRender"/> a simulation is set the simulation will be always running when no audio is playing.
+    /// </summary>
+    [Parameter, ForJs] public bool KeepState { get; set; }
+    
     /// <summary>
     /// Position for the preset list if the list is filled and should be shown.
     /// </summary>
@@ -524,7 +539,7 @@ public partial class Auralizer
     /// Sets the FFT size for the audio processing. Higher values provide more detail.
     /// </summary>
     [Parameter, ForJs("fftSize")]
-    public int FFTSize { get; set; } = 8192;
+    public int FFTSize { get; set; } = 8192; // TODO: Ensure the value is a power of 2 maybe with data type PowerOfTwo<int> or something...
 
     /// <summary>
     /// Sets the maximum decibel level for the visualizer.
@@ -937,6 +952,52 @@ public partial class Auralizer
 
         ModulesReady = true;
     }
+
+    /// <summary>
+    /// Simulates a random audio spectrum visualization.
+    /// </summary>
+    /// <returns>A task that is completed directly after the simulation has started</returns>
+    public Task SimulateRandomAudioSpectrumAsync() => JsReference?.InvokeVoidAsync("simulateRandomAudioSpectrum").AsTask();
+    
+    /// <summary>
+    /// Simulates a full audio spectrum visualization.
+    /// Notice: If you use endless you need manually to stop or pause the simulation and this task will never be completed and should be discarded.
+    /// </summary>
+    /// <param name="audioFileUrl">The audio file to use or null or empty for the current connected source</param>
+    /// <param name="speedFactor">Factor for speed 1 is the original speed that means 0.5 is half of speed and 2 double of speed</param>
+    /// <param name="endless">if true simulation will not end and automatic restarted but notice then the task will never be completed</param>
+    /// <returns>A task that will be completed when the simulation is done</returns>
+    public Task SimulateFullAudioSpectrumAsync(string audioFileUrl = "", double speedFactor = 1, bool endless = false) => JsReference?.InvokeVoidAsync("simulateFullAudioSpectrum", audioFileUrl, speedFactor, endless).AsTask();
+    
+    /// <summary>
+    /// Simulates a full audio spectrum visualization but while data is loading a random simulation is running .
+    /// </summary>
+    public Task SimulateFullAudioSpectrumWithRandomLoadingDataAsync(string audioFileUrl = "", double speedFactor = 1, bool endless = false) => JsReference?.InvokeVoidAsync("simulateRandomAudioSpectrumContinueWithFullSpectrum", audioFileUrl, speedFactor, endless).AsTask();
+    
+    /// <summary>
+    /// Returns true if a simulation is running otherwise false.
+    /// </summary>
+    public Task<bool> IsSimulationRunning() => JsReference?.InvokeAsync<bool>("isSimulationRunning").AsTask() ?? Task.FromResult(false);
+
+    /// <summary>
+    /// Returns true if a simulation is running and paused otherwise false.
+    /// </summary>
+    public Task<bool> IsSimulationPaused() => JsReference?.InvokeAsync<bool>("simulationIsPaused").AsTask() ?? Task.FromResult(false);
+
+    /// <summary>
+    /// If a simulation is running it will be paused otherwise nothing happens.
+    /// </summary>
+    public Task PauseSimulationAsync() => JsReference?.InvokeVoidAsync("pauseSimulation").AsTask();
+    
+    /// <summary>
+    /// If a simulation is paused it will be resumed otherwise nothing happens.
+    /// </summary>
+    public Task ResumeSimulationAsync() => JsReference?.InvokeVoidAsync("resumeSimulation").AsTask();
+    
+    /// <summary>
+    /// If a simulation is running it will be stopped otherwise nothing happens.
+    /// </summary>
+    public Task StopSimulationAsync() => JsReference?.InvokeVoidAsync("stopSimulation").AsTask();
 
     /// <summary>
     /// Plays a track
