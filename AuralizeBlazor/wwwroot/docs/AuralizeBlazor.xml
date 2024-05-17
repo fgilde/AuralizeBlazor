@@ -133,6 +133,11 @@
             Optional track list to be displayed in the visualizer where the user can change a track.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Auralizer.OnClick">
+            <summary>
+            On click
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.OnContainerMouseOver">
             <summary>
             Invoked when the mouse pointer enters the container area.

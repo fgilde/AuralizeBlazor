@@ -1,10 +1,19 @@
 ﻿@using AuralizeBlazor.Options
 @using Nextended.Core.Helper
 @using AuralizeBlazor.Extensions
+@using System.Text
 @inherits BlazorJs.BlazorJsBaseComponent<Auralizer>
 
 <style>
-
+    .test {
+        opacity: 0.7 !important;
+        font-size: 10pt !important;        
+    }
+    .test-vis {
+        opacity: 1 !important;
+        font-size: 12pt !important;
+        text-decoration: underline;
+    }
     .blazor-audio-visualizer-overlay-mode {
         margin: 0 auto;
         position: relative;
@@ -42,6 +51,7 @@
      class="@($"blazor-audio-visualizer-container {_containerMouseOverCls} {Class}")"
      style="@($"{(OverlayChildContent && ChildContent != null ? "" : $"{StyleStr()}")} {Style}")"
      tabindex="1"
+     @onclick="HandleClick"
      @onkeydown="HandleKeyDown"
      @onkeypress="HandleKeyPress"
      @onkeyup="HandleKeyUp"
@@ -57,7 +67,8 @@
     }
     @if (_presetListVisible || PresetListBehaviour == SelectionListBehaviour.AlwaysVisible)
     {
-        @RenderList(Presets, PresetListClass, PresetListPosition, PresetListMode, true, p => p.Name, (p, _) => ApplyPresetAsync(p, new PresetApplySettings(PresetApplyReason.UserSelectedFromList)), IsCurrentPreset, PresetPreview)
+        RenderFragment<AuralizerPreset>  itemTemplate = PreviewImageInPresetList ? PresetPreview : null;
+        @RenderList(Presets, PresetListClass, PresetListPosition, PresetListMode, true, p => p.Name, (p, _) => ApplyPresetAsync(p, new PresetApplySettings(PresetApplyReason.UserSelectedFromList)), IsCurrentPreset, itemTemplate)
     }
     @if (PresetListBehaviour == SelectionListBehaviour.Toggleable && Presets?.Any() == true)
     {
@@ -71,7 +82,10 @@
 
     @if (!string.IsNullOrEmpty(_message))
     {
-        <p class="@(_isMessageVisible ? "message" : "message message-fade-out")">@_message</p>
+        <p style="@($"{MessageStyle} {(IsMouseOver ? MouseOverMessageStyle : "")}")" 
+            class="@(_isMessageVisible ? $"message {MessageClass} {(IsMouseOver ? MouseOverMessageClass : "")}" : "message message-fade-out")">
+            @_message
+        </p>
     }
     @if (OverlayChildContent && ChildContent != null)
     {
@@ -105,12 +119,29 @@
 
     private RenderFragment PresetPreview(AuralizerPreset preset)
     {
-        return @<Auralizer InitialPreset="preset"
+        var styleBuilder = new StringBuilder();
+        var isSelected = IsCurrentPreset(preset);
+       // styleBuilder.Append("font-size: 10pt;");
+        styleBuilder.Append("opacity: 0;");
+        if (isSelected)
+        {
+            styleBuilder.Append("color: var(--mud-palette-primary, yellow) !important;");
+            styleBuilder.Append("font-weight: bold;");
+        }
+        
+        return @<Auralizer InitialPreset="preset"                   
+                            Style="cursor: pointer; border-bottom: 3px solid white; margin-bottom: 5px;"             
+                            InitialMessage="@preset.Name"
+                            MessageStyle="@styleBuilder.ToString()"
+                            MessageClass="test"
+                            MouseOverMessageClass="test-vis"
+                            OnClick="@(() => { _presetListVisible = false; ApplyPresetAsync(preset, new PresetApplySettings(PresetApplyReason.UserSelectedFromList));})"
                            InitialRender="InitialRender.WithRandomData"
-                           IsActive="false"
+                           SimulateOnHover="true"                           
+                           IsActive="false"                                             
                            Height="100px">
-
-        </Auralizer>;
+                           
+                </Auralizer>;
     }
 
     private RenderFragment RenderListToggleButton(Position position, Action clickAction, string content)

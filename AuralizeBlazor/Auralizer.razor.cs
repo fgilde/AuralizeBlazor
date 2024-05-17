@@ -67,6 +67,21 @@ public partial class Auralizer
     private VisualizerAction[] _actions;
     private MouseEventArgs _lastMouseEventArgs;
 
+
+    [Parameter]
+    public string InitialMessage { get; set; }
+
+    [Parameter]
+    public TimeSpan? InitialMessageVisibilityTime { get; set; }
+
+    [Parameter] public string MessageStyle { get; set; }
+    [Parameter] public string MessageClass { get; set; }
+    [Parameter] public string MouseOverMessageStyle { get; set; }
+    [Parameter] public string MouseOverMessageClass { get; set; }
+    [Parameter] public bool PreviewImageInPresetList { get; set; } = true;
+
+    public bool IsMouseOver { get; private set; }
+
     /// <summary>
     /// Returns true if any toggleable list is open.
     /// </summary>
@@ -108,6 +123,8 @@ public partial class Auralizer
         }
     }
 
+    [Parameter] public bool RenderOnlyOnce { get; set; }
+
     /// <summary>
     /// Specify a Translations function to translate or localize texts with.
     /// </summary>
@@ -137,8 +154,6 @@ public partial class Auralizer
     /// This class will be added to the track list.
     /// </summary>
     [Parameter] public string TrackListClass { get; set; }
-
-    [Parameter] public bool PreviewImageInPresetList { get; set; }
 
     /// <summary>
     /// Here you can set the initial render mode for the visualizer to show visualization data before audio is played.
@@ -189,6 +204,11 @@ public partial class Auralizer
     /// Optional track list to be displayed in the visualizer where the user can change a track.
     /// </summary>
     [Parameter] public IAuralizerTrack[] TrackList { get; set; }
+
+    /// <summary>
+    /// On click
+    /// </summary>
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
 
     /// <summary>
     /// Invoked when the mouse pointer enters the container area.
@@ -468,6 +488,13 @@ public partial class Auralizer
                 });
             }
         }, currentCts.Token);
+    }
+
+    protected override bool ShouldRender()
+    {
+        if (RenderOnlyOnce)
+            return false;
+        return base.ShouldRender();
     }
 
     /// <summary>
@@ -1201,16 +1228,37 @@ public partial class Auralizer
         GradientChanged.InvokeAsync(value);
     }
 
-    protected virtual Task HandleContainerMouseOver(MouseEventArgs arg)
+    [Parameter]
+    public bool SimulateOnHover { get; set; }
+    protected virtual async Task HandleContainerMouseOver(MouseEventArgs arg)
     {
+        IsMouseOver = true;
         _containerMouseOverCls = "mouse-over";
-        return OnContainerMouseOver.InvokeAsync(arg);
+        if (SimulateOnHover && JsReference is not null && !IsPlaying)
+        {           
+            var simulating = await IsSimulationRunning();
+            if (!simulating)
+            {                
+                _ = SimulateFullAudioSpectrumWithRandomLoadingDataAsync(null, 1, true);                
+            }
+            else
+            {
+                await ResumeSimulationAsync();
+            }
+        }
+
+        await OnContainerMouseOver.InvokeAsync(arg);
     }
 
-    protected virtual Task HandleContainerMouseOut(MouseEventArgs arg)
+    protected virtual async Task HandleContainerMouseOut(MouseEventArgs arg)
     {
+        IsMouseOver = false;
         _containerMouseOverCls = null;
-        return OnContainerMouseOut.InvokeAsync(arg);
+        if (SimulateOnHover)
+        {
+            await PauseSimulationAsync();
+        }
+        await OnContainerMouseOut.InvokeAsync(arg);
     }
 
     protected virtual Task HandleMouseMove(MouseEventArgs obj)
@@ -1221,6 +1269,11 @@ public partial class Auralizer
         }
 
         return Task.CompletedTask;
+    }
+
+    protected virtual Task HandleClick(MouseEventArgs arg)
+    {
+        return OnClick.InvokeAsync(arg);
     }
 
     protected virtual Task HandleKeyDown(KeyboardEventArgs arg)
@@ -1240,7 +1293,7 @@ public partial class Auralizer
 
     protected virtual Task HandleVisualizerMouseOver(MouseEventArgs arg)
     {
-        
+        IsMouseOver = true;
         _visualizerMouseOverCls = "mouse-over";
         return OnVisualizerMouseOver.InvokeAsync(arg);
     }
@@ -1256,7 +1309,11 @@ public partial class Auralizer
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
+        {
             IsRendered = true;
+            if (!string.IsNullOrEmpty(InitialMessage))
+                ShowMessage(InitialMessage, InitialMessageVisibilityTime);
+        }
     }
 
     /// <summary>
