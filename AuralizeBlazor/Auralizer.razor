@@ -2,6 +2,8 @@
 @using Nextended.Core.Helper
 @using AuralizeBlazor.Extensions
 @using System.Text
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+
 @inherits BlazorJs.BlazorJsBaseComponent<Auralizer>
 
 <style>
@@ -67,14 +69,14 @@
     }
     @if (_presetListVisible || PresetListBehaviour == SelectionListBehaviour.AlwaysVisible)
     {
-        RenderFragment<AuralizerPreset>  itemTemplate = PreviewImageInPresetList ? PresetPreview : null;
+        RenderFragment<AuralizerPreset> itemTemplate = PreviewImageInPresetList ? PresetPreview : null;
         @RenderList(Presets, PresetListClass, PresetListPosition, PresetListMode, true, p => p.Name, (p, _) => ApplyPresetAsync(p, new PresetApplySettings(PresetApplyReason.UserSelectedFromList)), IsCurrentPreset, itemTemplate)
     }
     @if (PresetListBehaviour == SelectionListBehaviour.Toggleable && Presets?.Any() == true)
     {
         @RenderListToggleButton(PresetListToggleButtonPosition, () => _presetListVisible = !_presetListVisible, AudioIcons.Spectrum)
     }
-    
+
     @if (_actionListVisible)
     {
         @RenderList(Actions, "action", Position.Mouse, SelectionListMode.Compact, false, p => p.GetLabel(), ExecuteAction)
@@ -82,8 +84,8 @@
 
     @if (!string.IsNullOrEmpty(_message))
     {
-        <p style="@($"{MessageStyle} {(IsMouseOver ? MouseOverMessageStyle : "")}")" 
-            class="@(_isMessageVisible ? $"message {MessageClass} {(IsMouseOver ? MouseOverMessageClass : "")}" : "message message-fade-out")">
+        <p style="@($"{MessageStyle} {(IsMouseOver ? MouseOverMessageStyle : "")}")"
+           class="@(_isMessageVisible ? $"message {MessageClass} {(IsMouseOver ? MouseOverMessageClass : "")}" : "message message-fade-out")">
             @_message
         </p>
     }
@@ -121,27 +123,27 @@
     {
         var styleBuilder = new StringBuilder();
         var isSelected = IsCurrentPreset(preset);
-       // styleBuilder.Append("font-size: 10pt;");
+        // styleBuilder.Append("font-size: 10pt;");
         styleBuilder.Append("opacity: 0;");
         if (isSelected)
         {
             styleBuilder.Append("color: var(--mud-palette-primary, yellow) !important;");
             styleBuilder.Append("font-weight: bold;");
         }
-        
-        return @<Auralizer InitialPreset="preset"                   
-                            Style="cursor: pointer; border-bottom: 3px solid white; margin-bottom: 5px;"             
-                            InitialMessage="@preset.Name"
-                            MessageStyle="@styleBuilder.ToString()"
-                            MessageClass="test"
-                            MouseOverMessageClass="test-vis"
-                            OnClick="@(() => { _presetListVisible = false; ApplyPresetAsync(preset, new PresetApplySettings(PresetApplyReason.UserSelectedFromList));})"
+
+        return @<Auralizer InitialPreset="preset"
+                           Style="cursor: pointer; border-bottom: 3px solid white; margin-bottom: 5px;"
+                           InitialMessage="@preset.Name"
+                           MessageStyle="@styleBuilder.ToString()"
+                           MessageClass="test"
+                           MouseOverMessageClass="test-vis"
+                           OnClick="@(() => { _presetListVisible = false; ApplyPresetAsync(preset, new PresetApplySettings(PresetApplyReason.UserSelectedFromList)); })"
                            InitialRender="InitialRender.WithRandomData"
-                           SimulateOnHover="true"                           
-                           IsActive="false"                                             
+                           SimulateOnHover="true"
+                           IsActive="false"
                            Height="100px">
-                           
-                </Auralizer>;
+
+               </Auralizer>;
     }
 
     private RenderFragment RenderListToggleButton(Position position, Action clickAction, string content)
@@ -153,46 +155,47 @@
                </div>;
     }
 
-    private RenderFragment RenderList<T>(IEnumerable<T> source, 
-        string cls, 
-        Position position, 
-        SelectionListMode mode, 
+    private RenderFragment RenderList<T>(ICollection<T> source,
+        string cls,
+        Position position,
+        SelectionListMode mode,
         bool hideAllListsOnClick,
-        Func<T, string> toString = null, 
+        Func<T, string> toString = null,
         Func<T, MouseEventArgs, Task> clickAction = null,
-        Func<T, bool> isSelectedFunc = null, 
+        Func<T, bool> isSelectedFunc = null,
         RenderFragment<T> itemTemplate = null)
     {
-        var hideAction = hideAllListsOnClick ? (Action)(HideAllOpenToggleableLists) : () => {};
+        var hideAction = hideAllListsOnClick ? (Action)(HideAllOpenToggleableLists) : () => { };
         isSelectedFunc ??= (item) => false;
         var additionalItemCls = position is Position.BottomLeft or Position.BottomRight ? "bottom" : "";
         toString ??= (item) => item.ToString();
 
         var style = position == Position.Mouse ? GetMousePosStyle() : "";
         var innerStyle = position == Position.Mouse ? "margin-top:0; margin-bottom:0" : "";
+        var itemSize = itemTemplate != null ? 100 : 10;
+        
         return @<div style="@style" class="@($"selection-list {mode.ToDescriptionString()} {position.ToDescriptionString()} {cls}")">
-                   <div style="@($"animation: none !important; {innerStyle}")" class="@($"inner-list {additionalItemCls}")">
-                       @foreach (var item in source ?? Array.Empty<T>())
-                       {
-                           @if (clickAction != null)
-                           {
-                               if (itemTemplate != null)
-                                 {
-                                      @itemTemplate(item);
-                                 }
-                               else
-                               {
-                                   <p class="@($"selectable-list-item {(isSelectedFunc(item) ? "selected" : "")}")" @onclick="(arg) => clickAction(item, arg).ContinueWith(_ => hideAction())">
-                                       @Translate(toString(item))
-                                   </p>
-                               }
-                           }
-                           else
-                           {
-                               <p class="">@toString(item)</p>
-                           }
-                       }
-                   </div>
-               </div>;
+            <div style="@($"animation: none !important; {innerStyle}")" class="@($"inner-list {additionalItemCls}")">
+                <Virtualize ItemSize="@itemSize" Items="source" Context="item">
+                    @if (clickAction != null)
+                    {
+                        if (itemTemplate != null)
+                        {
+                            @itemTemplate(item)
+                        }
+                        else
+                        {
+                            <p class="@($"selectable-list-item {(isSelectedFunc(item) ? "selected" : "")}")" @onclick="(arg) => clickAction(item, arg).ContinueWith(_ => hideAction())">
+                                @Translate(toString(item))
+                            </p>
+                        }
+                    }
+                    else
+                    {
+                        <p class="">@toString(item)</p>
+                    }
+                </Virtualize>
+            </div>
+        </div>;
     }
 }
