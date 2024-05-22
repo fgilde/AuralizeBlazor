@@ -65,7 +65,8 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
                 nameof(Auralizer.Width),
                 nameof(Auralizer.KeepState),
                 nameof(Auralizer.InitialRender),
-                nameof(Auralizer.ConnectMicrophone)
+                nameof(Auralizer.ConnectMicrophone),
+                nameof(Auralizer.ConnectionMode),
             };
             
             visualizer.Features = (visualizer.Features ?? Array.Empty<IVisualizerFeature>()).Where(f => !f.AppliedFromPreset).ToArray();
@@ -292,7 +293,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.ShowPeaks = true;
         visualizer.Mirror = MirrorMode.Right;
         visualizer.LineWidth = 0.5;
-        visualizer.FillAlpha = 0.4;
+        visualizer.FillAlpha = 0.4;        
         visualizer.Radial = false;
         visualizer.SpinSpeed = 0.5; // Only effective if radial is true, but set for visual consistency
     });

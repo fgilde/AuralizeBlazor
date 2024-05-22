@@ -406,6 +406,15 @@ public partial class Auralizer
     public bool ConnectMicrophone { get; set; }
 
     /// <summary>
+    /// The mode, how auralizer should connect to the source.
+    /// Preferred is Gain to ensure the best quality and flexibility for connection changes.
+    /// Use Stream if you plan to use more than one visualizer at the same time connected to the same source
+    /// Use Direct only if you are sure everything is rendered and connection will never change
+    /// </summary>
+    [Parameter, ForJs]
+    public ConnectionMode ConnectionMode { get; set; } = ConnectionMode.Gain;
+
+    /// <summary>
     /// Device ID of the microphone to connect to the visualizer.
     /// </summary>
     [Parameter, ForJs]
@@ -1114,13 +1123,7 @@ public partial class Auralizer
             HandleIsPlayingChanged(_isPlaying);
         }
     }
-
-    [JSInvokable]
-    public void HandleOnInputDisconnected()
-    {
-
-    }
-
+ 
     [JSInvokable]
     public async Task HandleOnInputConnected()
     {

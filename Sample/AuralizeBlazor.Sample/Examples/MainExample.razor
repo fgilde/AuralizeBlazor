@@ -10,6 +10,7 @@
            OnPresetApplied="OnPresetApplied"
            TrackList="@TracksService.DemoTracks"
            Height="700px"
+           ConnectionMode="ConnectionMode.Stream"
            BackgroundImage="/bg1.jpg"
            OnReady="@(() => _vis.ShowMessage("Welcome to Auralizer, press play !", TimeSpan.FromSeconds(2)))"
            DoubleClickAction="VisualizerAction.ToggleFullscreen"

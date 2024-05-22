@@ -298,6 +298,14 @@
             Connects the microphone to the visualizer.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Auralizer.ConnectionMode">
+            <summary>
+            The mode, how auralizer should connect to the source.
+            Preferred is Gain to ensure the best quality and flexibility for connection changes.
+            Use Stream if you plan to use more than one visualizer at the same time connected to the same source
+            Use Direct only if you are sure everything is rendered and connection will never change
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.MicrophoneDeviceId">
             <summary>
             Device ID of the microphone to connect to the visualizer.
@@ -1082,6 +1090,26 @@
         <member name="P:AuralizeBlazor.Options.AudioMotionGradient.ColorStops">
             <summary>
             Color stops for the gradient.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Options.ConnectionMode">
+            <summary>
+            Mode how the auralizer should connect to audio
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.ConnectionMode.Gain">
+            <summary>
+            Creates a gain node for the element(s) to connect to.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.ConnectionMode.Stream">
+            <summary>
+            Creates a captured stream for the element(s) and connects to the stream. Should be used when more than one Visualizer is connected to the same source
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Options.ConnectionMode.Direct">
+            <summary>
+            Connects directly to the element, but then connection can never change at runtime
             </summary>
         </member>
         <member name="T:AuralizeBlazor.Options.PresetApplySettings">
