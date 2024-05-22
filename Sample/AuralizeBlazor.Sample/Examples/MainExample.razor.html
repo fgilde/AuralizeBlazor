@@ -26,8 +26,7 @@
 <span class="atSign">&#64;</span>code {
     <span class="keyword">private</span> Auralizer _vis;
     <span class="keyword">private</span> IVisualizerFeature[] _features = [<span class="keyword">new</span> ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, <span class="keyword">new</span> SwitchPresetFeature { MinEnergy = .<span class="number">20</span> }];
-    <span class="keyword">private</span> <span class="keyword">readonly</span> AuralizerPreset[] _presets = AuralizerPreset.All;
-
+    
     <span class="keyword">private</span> <span class="keyword">void</span> OnPresetApplied(AppliedPresetEventArgs arg)
     {
         <span class="keyword">if</span> (arg.ApplySettings.Reason <span class="keyword">is</span> PresetApplyReason.UserSelectedFromList or PresetApplyReason.UserSelectedAsAction)

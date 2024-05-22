@@ -1,0 +1,53 @@
+﻿@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+<center>
+    <audio @ref="_audio" preload="metadata" loading="lazy" controls="true" src="@TracksService.MainDemoTrack.Url"></audio>
+</center>
+
+<MudExGrid Column="2" Row="2">
+    <MudExGridSection Column="1" Row="1">
+        <Auralizer InitialPreset="AuralizerPreset.ReflexMirror"
+                   KeepState="true"
+                   GradientChanged="@MainLayout.Instance.ColorsChanged"
+                   Presets="@AuralizerPreset.All"
+                   Height="400px"
+                   ConnectMicrophone="true"
+                   Overlay="true">
+        </Auralizer>
+    </MudExGridSection>
+    <MudExGridSection Column="2" Row="1">
+        <Auralizer InitialPreset="AuralizerPreset.ReflexMirror"
+                   KeepState="true"
+                   GradientChanged="@MainLayout.Instance.ColorsChanged"
+                   Presets="@AuralizerPreset.All"
+                   Height="400px"
+                   ConnectMicrophone="true"
+                   Overlay="true">
+        </Auralizer>
+    </MudExGridSection>
+    <MudExGridSection Column="1" Row="2">
+        <Auralizer InitialPreset="AuralizerPreset.ReflexMirror"
+                   KeepState="true"
+                   GradientChanged="@MainLayout.Instance.ColorsChanged"
+                   Presets="@AuralizerPreset.All"
+                   Height="400px"
+                   AudioElements="@(new[] { _audio })"
+                   Overlay="true">
+        </Auralizer>
+    </MudExGridSection>
+    <MudExGridSection Column="2" Row="2">
+        <Auralizer InitialPreset="AuralizerPreset.ReflexMirror"
+                   KeepState="true"
+                   GradientChanged="@MainLayout.Instance.ColorsChanged"
+                   Presets="@AuralizerPreset.All"
+                   Height="400px"
+                   AudioElements="@(new[] { _audio })"
+                   Overlay="true">
+        </Auralizer>
+    </MudExGridSection>
+</MudExGrid>
+
+@code {
+    private ElementReference _audio;
+}

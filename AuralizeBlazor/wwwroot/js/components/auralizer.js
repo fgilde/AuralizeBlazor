@@ -566,6 +566,7 @@
                 this.dotnet.invokeMethodAsync('HandleOnInputDisconnected');
             }
         });
+        this.connectToMic(false);
     }
 
     getOwner() {
@@ -582,7 +583,7 @@
         const audioElements = this.getAudioElements();
 
         this.disconnectInputs();
-
+                
         this.connectToMic(this.options.connectMicrophone);
 
         audioElements?.forEach(el => {

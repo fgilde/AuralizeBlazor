@@ -23,8 +23,7 @@
 @code {
     private Auralizer _vis;
     private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, new SwitchPresetFeature { MinEnergy = .20 }];
-    private readonly AuralizerPreset[] _presets = AuralizerPreset.All;
-
+    
     private void OnPresetApplied(AppliedPresetEventArgs arg)
     {
         if (arg.ApplySettings.Reason is PresetApplyReason.UserSelectedFromList or PresetApplyReason.UserSelectedAsAction)

@@ -1,0 +1,18 @@
+﻿@page "/simulate"
+@using AuralizeBlazor.Options
+
+<PageTitle>Simulation</PageTitle>
+
+
+<DocsPageSection>
+    <SectionHeader Title="Simulate Sample">
+        <Description>
+            This demo simulates the full visualization of the selected track on mouse over. But you can trigger the simulation as you want.
+            For the simulation you have the option to use random data or the real audio data from connected audio.
+        </Description>
+    </SectionHeader>
+    <SectionContent Outlined="true" FullWidth="true">
+        <SimulateExample />
+    </SectionContent>
+    <SectionSource Code="@nameof(SimulateExample)" />
+</DocsPageSection>

@@ -1,47 +1,25 @@
 ﻿@using AuralizeBlazor.Features
 @using AuralizeBlazor.Options
 
-<MudButton OnClick="@Simulate">Simulate</MudButton>
+<MudExSelect T="IAuralizerTrack" @bind-Value="_track" SelectedValuesChanged="@((_) => TrackSelected())" ItemCollection="@TracksService.DemoTracks"></MudExSelect>
 <Auralizer @ref=_vis
-           @bind-Features="_features"
            OnContainerMouseOver="OnMouseIn"
-           OnContainerMouseOut="OnMouseOut"
+           OnContainerMouseOut="OnMouseOut"           
            InitialPreset="AuralizerPreset.ReflexMirror"
            InitialRender="InitialRender.WithFullSpectrumAudioDataPrefilledWithRandomData"
            KeepState="true"
            GradientChanged="@MainLayout.Instance.ColorsChanged"
-           Presets="@AuralizerPreset.All.Except(new List<AuralizerPreset>{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()"
-           OnPresetApplied="OnPresetApplied"
-           TrackList="@TracksService.DemoTracks"
-           Height="700px"
-           BackgroundImage="/bg1.jpg"
-           OnReady="@(() => _vis.ShowMessage("Welcome to Auralizer, press play !", TimeSpan.FromSeconds(2)))"
-           DoubleClickAction="VisualizerAction.ToggleFullscreen"
-           ClickAction="VisualizerAction.TogglePlayPause"
+           Presets="@AuralizerPreset.All"                      
+           Height="400px"           
            Overlay="true">
     <center>
-        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="@TracksService.MainDemoTrack.Url"></audio>
+        <audio style="display:none;" src="@((_track ??= TracksService.MainDemoTrack).Url)"></audio>
     </center>
 </Auralizer>
 
 @code {
-    private Auralizer _vis;
-    private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, new SwitchPresetFeature { MinEnergy = .20 }];
-    private readonly AuralizerPreset[] _presets = AuralizerPreset.All;
-
-    private void OnPresetApplied(AppliedPresetEventArgs arg)
-    {
-        if (arg.ApplySettings.Reason is PresetApplyReason.UserSelectedFromList or PresetApplyReason.UserSelectedAsAction)
-        {
-            _vis.RemoveFeature<SwitchPresetFeature>();
-        }
-    }
-
-    private async Task Simulate()
-    {
-        await _vis.SimulateFullAudioSpectrumAsync(null, 20, true);
-        Console.WriteLine("DONNNE");
-    }
+    private Auralizer _vis;   
+    private IAuralizerTrack _track = null;
 
     private async Task OnMouseIn()
     {
@@ -52,8 +30,7 @@
         var simulating = await _vis.IsSimulationRunning();
         if (!simulating)
         {
-            _ = _vis.SimulateFullAudioSpectrumWithRandomLoadingDataAsync(null, 1, true);
-            Console.WriteLine("Simulating");
+            _ = _vis.SimulateFullAudioSpectrumAsync(null, 1, true);            
         }
         else
         {
@@ -64,6 +41,11 @@
     private async Task OnMouseOut()
     {
         await _vis.PauseSimulationAsync();
+    }
+
+    private Task TrackSelected()
+    {
+        return _vis.StopSimulationAsync();            
     }
 
 }

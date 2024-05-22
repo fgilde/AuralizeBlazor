@@ -758,7 +758,7 @@
             Called when the gradient is changed.
             </summary>
         </member>
-        <member name="M:AuralizeBlazor.Auralizer.OnAfterRender(System.Boolean)">
+        <member name="M:AuralizeBlazor.Auralizer.OnAfterRenderAsync(System.Boolean)">
             <inheritdoc />
         </member>
         <member name="M:AuralizeBlazor.Auralizer.Translate(System.String)">

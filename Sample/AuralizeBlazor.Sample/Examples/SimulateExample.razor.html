@@ -3,48 +3,26 @@
 <span class="atSign">&#64;</span>using AuralizeBlazor.Features
 <span class="atSign">&#64;</span>using AuralizeBlazor.Options
 
-<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudButton</span> <span class="htmlAttributeName">OnClick</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="sharpVariable"><span class="atSign">&#64;</span>Simulate</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>Simulate<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudButton</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExSelect</span> <span class="htmlAttributeName">T</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">IAuralizerTrack</span><span class="quot">&quot;</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>bind-Value</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_track</span><span class="quot">&quot;</span> <span class="htmlAttributeName">SelectedValuesChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>((_) =&gt; TrackSelected())</span><span class="quot">&quot;</span> <span class="htmlAttributeName">ItemCollection</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>TracksService.DemoTracks</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExSelect</span><span class="htmlTagDelimiter">&gt;</span>
 <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>ref</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">_vis</span>
-           <span class="htmlAttributeName"><span class="atSign">&#64;</span>bind-Features</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_features</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">OnContainerMouseOver</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">OnMouseIn</span><span class="quot">&quot;</span>
-           <span class="htmlAttributeName">OnContainerMouseOut</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">OnMouseOut</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">OnContainerMouseOut</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">OnMouseOut</span><span class="quot">&quot;</span>           
            <span class="htmlAttributeName">InitialPreset</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">AuralizerPreset</span><span class="enumValue">.ReflexMirror</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">InitialRender</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">InitialRender</span><span class="enumValue">.WithFullSpectrumAudioDataPrefilledWithRandomData</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">KeepState</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">GradientChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>MainLayout.Instance.ColorsChanged</span><span class="quot">&quot;</span>
-           <span class="htmlAttributeName">Presets</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>AuralizerPreset.All.Except(new List&lt;AuralizerPreset&gt;{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()</span><span class="quot">&quot;</span>
-           <span class="htmlAttributeName">OnPresetApplied</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">OnPresetApplied</span><span class="quot">&quot;</span>
-           <span class="htmlAttributeName">TrackList</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>TracksService.DemoTracks</span><span class="quot">&quot;</span>
-           <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">700px</span><span class="quot">&quot;</span>
-           <span class="htmlAttributeName">BackgroundImage</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">/bg1.jpg</span><span class="quot">&quot;</span>
-           <span class="htmlAttributeName">OnReady</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>(() =&gt; _vis.ShowMessage(&quot;Welcome to Auralizer, press play !&quot;, TimeSpan.FromSeconds(2)))</span><span class="quot">&quot;</span>
-           <span class="htmlAttributeName">DoubleClickAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.ToggleFullscreen</span><span class="quot">&quot;</span>
-           <span class="htmlAttributeName">ClickAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.TogglePlayPause</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">Presets</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>AuralizerPreset.All</span><span class="quot">&quot;</span>                      
+           <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">400px</span><span class="quot">&quot;</span>           
            <span class="htmlAttributeName">Overlay</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>
     <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
-        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">audio-main mud-ex-animate-all-properties</span><span class="quot">&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">metadata</span><span class="quot">&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">lazy</span><span class="quot">&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>TracksService.MainDemoTrack.Url</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">style</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">display:none;</span><span class="quot">&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>((_track ??= TracksService.MainDemoTrack).Url)</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
     <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
 <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
 </pre></div>
 <div class="csharp"><pre>
 <span class="atSign">&#64;</span>code {
-    <span class="keyword">private</span> Auralizer _vis;
-    <span class="keyword">private</span> IVisualizerFeature[] _features = [<span class="keyword">new</span> ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, <span class="keyword">new</span> SwitchPresetFeature { MinEnergy = .<span class="number">20</span> }];
-    <span class="keyword">private</span> <span class="keyword">readonly</span> AuralizerPreset[] _presets = AuralizerPreset.All;
-
-    <span class="keyword">private</span> <span class="keyword">void</span> OnPresetApplied(AppliedPresetEventArgs arg)
-    {
-        <span class="keyword">if</span> (arg.ApplySettings.Reason <span class="keyword">is</span> PresetApplyReason.UserSelectedFromList or PresetApplyReason.UserSelectedAsAction)
-        {
-            _vis.RemoveFeature&lt;SwitchPresetFeature&gt;();
-        }
-    }
-
-    <span class="keyword">private</span> <span class="keyword">async</span> Task Simulate()
-    {
-        <span class="keyword">await</span> _vis.SimulateFullAudioSpectrumAsync(<span class="keyword">null</span>, <span class="number">20</span>, <span class="keyword">true</span>);
-        Console.WriteLine(<span class="string">&quot;DONNNE&quot;</span>);
-    }
+    <span class="keyword">private</span> Auralizer _vis;   
+    <span class="keyword">private</span> IAuralizerTrack _track = <span class="keyword">null</span>;
 
     <span class="keyword">private</span> <span class="keyword">async</span> Task OnMouseIn()
     {
@@ -55,8 +33,7 @@
         <span class="keyword">var</span> simulating = <span class="keyword">await</span> _vis.IsSimulationRunning();
         <span class="keyword">if</span> (!simulating)
         {
-            _ = _vis.SimulateFullAudioSpectrumWithRandomLoadingDataAsync(<span class="keyword">null</span>, <span class="number">1</span>, <span class="keyword">true</span>);
-            Console.WriteLine(<span class="string">&quot;Simulating&quot;</span>);
+            _ = _vis.SimulateFullAudioSpectrumAsync(<span class="keyword">null</span>, <span class="number">1</span>, <span class="keyword">true</span>);            
         }
         <span class="keyword">else</span>
         {
@@ -67,6 +44,11 @@
     <span class="keyword">private</span> <span class="keyword">async</span> Task OnMouseOut()
     {
         <span class="keyword">await</span> _vis.PauseSimulationAsync();
+    }
+
+    <span class="keyword">private</span> Task TrackSelected()
+    {
+        <span class="keyword">return</span> _vis.StopSimulationAsync();            
     }
 
 }

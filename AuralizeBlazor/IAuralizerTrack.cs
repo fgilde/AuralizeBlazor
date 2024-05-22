@@ -55,5 +55,7 @@ public class AuralizerTrack: IAuralizerTrack
     /// The URL of the image to display for the track.
     /// </summary>
     public string Image { get; set; }
-    
+
+    public override string ToString() => Label;
+
 }

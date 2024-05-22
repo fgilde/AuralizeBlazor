@@ -1,0 +1,41 @@
+<div class="mud-codeblock">
+<div class="html"><pre>
+<span class="atSign">&#64;</span>using AuralizeBlazor.Features
+<span class="atSign">&#64;</span>using AuralizeBlazor.Options
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExEnumSelect</span> <span class="htmlAttributeName">Variant</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">Variant</span><span class="enumValue">.Outlined</span><span class="quot">&quot;</span> <span class="htmlAttributeName">TEnum</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">InitialRender</span><span class="quot">&quot;</span> <span class="htmlAttributeName">Disabled</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>(!_rendered)</span><span class="quot">&quot;</span> <span class="htmlAttributeName">Value</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>_initialRender</span><span class="quot">&quot;</span> <span class="htmlAttributeName">ValueChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="sharpVariable"><span class="atSign">&#64;</span>OnInitialRenderChanged</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExEnumSelect</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="atSign">&#64;</span>if (_rendered)
+{
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>ref</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">_vis</span>
+               <span class="htmlAttributeName">InitialPreset</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>_preset</span><span class="quot">&quot;</span>
+               <span class="htmlAttributeName">InitialRender</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>_initialRender</span><span class="quot">&quot;</span>        
+               <span class="htmlAttributeName">KeepState</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span>
+               <span class="htmlAttributeName">GradientChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>MainLayout.Instance.ColorsChanged</span><span class="quot">&quot;</span>
+               <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">400px</span><span class="quot">&quot;</span>
+               <span class="htmlAttributeName">ContextMenuAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.None</span><span class="quot">&quot;</span>               
+               <span class="htmlAttributeName">ClickAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.TogglePlayPause</span><span class="quot">&quot;</span>
+               <span class="htmlAttributeName">Overlay</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">audio-main mud-ex-animate-all-properties</span><span class="quot">&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">metadata</span><span class="quot">&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">lazy</span><span class="quot">&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>TracksService.DemoTracks[0].Url</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+}
+</pre></div>
+<div class="csharp"><pre>
+<span class="atSign">&#64;</span>code {
+    <span class="keyword">private</span> <span class="keyword">bool</span> _rendered = <span class="keyword">true</span>;
+    <span class="keyword">private</span> AuralizerPreset _preset = AuralizerPreset.Default;
+    <span class="keyword">private</span> Auralizer _vis;
+    <span class="keyword">private</span> InitialRender _initialRender = InitialRender.WithRandomData;
+    <span class="keyword">private</span> <span class="keyword">void</span> OnInitialRenderChanged(InitialRender render)
+    {
+        _rendered = <span class="keyword">false</span>;
+        StateHasChanged();
+        _initialRender = render;
+        _rendered = <span class="keyword">true</span>;
+        StateHasChanged();
+    }
+
+}
+</pre></div>
+</div>

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Analyzers" Version="8.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.CustomElements" Version="8.0.2" />
     <PackageReference Include="MudBlazor.Extensions" Version="1.7.87" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.1" />
@@ -25,6 +26,13 @@
   <!--Project path for code generator-->
   <PropertyGroup>
     <ProjectDocsCompiler>dotnet run --configuration release --project "$(SolutionDir)DocsCompiler/DocsCompiler.csproj"</ProjectDocsCompiler>
+    <PublishAot>False</PublishAot>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <RunAOTCompilation>False</RunAOTCompilation>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <RunAOTCompilation>False</RunAOTCompilation>
   </PropertyGroup>
 
   <!--Execute the code generator-->
@@ -66,9 +74,13 @@
     <None Remove="Examples\ConnectElementsExample - Copy.razor.html" />
     <None Remove="Examples\MainExample - Copy.razor.html" />
     <None Remove="Examples\PresetsExample - Copy.razor.html" />
+    <None Remove="Examples\SimulateExample - Copy.razor.html" />
   </ItemGroup>
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <_WebToolingArtifacts Remove="Properties\PublishProfiles\profile.publishsettings" />
   </ItemGroup>
   <ItemGroup>
     <None Include="compilerconfig.json" />

@@ -41,7 +41,8 @@ public partial class Auralizer
 
     /// <inheritdoc />
     protected override string ComponentJsInitializeMethodName() => "initializeAuralizer";
-
+    
+    private bool _initialPresetApplied;
     private bool _isMessageVisible;
     private bool _created;
     private bool _minOneInputConnected;
@@ -970,12 +971,7 @@ public partial class Auralizer
             _audioMotion = await JsRuntime.ImportModuleAsync(AudioMotionLib());
         await base.ImportModuleAndCreateJsAsync();
         await ImportFeatureFilesAsync();
-        if (InitialPreset != null)
-        {
-            var settings = new PresetApplySettings(PresetApplyReason.Initial) { ResetFirst = null, DisplayMessageIf = false};
-            ExecuteApplyPreset(InitialPreset, settings);
-            await UpdateJsOptions();
-        }
+        await ApplyInitialPresetIf();
 
         ModulesReady = true;
     }
@@ -1305,14 +1301,15 @@ public partial class Auralizer
     }
 
     /// <inheritdoc />
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        base.OnAfterRender(firstRender);
+        await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
             IsRendered = true;
             if (!string.IsNullOrEmpty(InitialMessage))
                 ShowMessage(InitialMessage, InitialMessageVisibilityTime);
+            await ApplyInitialPresetIf();
         }
     }
 
@@ -1355,6 +1352,16 @@ public partial class Auralizer
         });
     }
 
+    private async Task ApplyInitialPresetIf()
+    {
+        if (InitialPreset != null && !_initialPresetApplied && JsReference != null)
+        {
+            var settings = new PresetApplySettings(PresetApplyReason.Initial) { ResetFirst = null, DisplayMessageIf = false };
+            ExecuteApplyPreset(InitialPreset, settings);
+            await UpdateJsOptions();
+            _initialPresetApplied = true;
+        }
+    }
     private string GetMousePosStyle()
     {
         var style = new StringBuilder();

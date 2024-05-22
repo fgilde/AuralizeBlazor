@@ -142,7 +142,6 @@
                            SimulateOnHover="true"
                            IsActive="false"
                            Height="100px">
-
                </Auralizer>;
     }
 
@@ -164,12 +163,8 @@
         Func<T, MouseEventArgs, Task> clickAction = null,
         Func<T, bool> isSelectedFunc = null,
         RenderFragment<T> itemTemplate = null)
-    {
-        var hideAction = hideAllListsOnClick ? (Action)(HideAllOpenToggleableLists) : () => { };
-        isSelectedFunc ??= (item) => false;
-        var additionalItemCls = position is Position.BottomLeft or Position.BottomRight ? "bottom" : "";
-        toString ??= (item) => item.ToString();
-
+    {        
+        var additionalItemCls = position is Position.BottomLeft or Position.BottomRight ? "bottom" : "";        
         var style = position == Position.Mouse ? GetMousePosStyle() : "";
         var innerStyle = position == Position.Mouse ? "margin-top:0; margin-bottom:0" : "";
         var itemSize = itemTemplate != null ? 100 : 10;
@@ -177,25 +172,34 @@
         return @<div style="@style" class="@($"selection-list {mode.ToDescriptionString()} {position.ToDescriptionString()} {cls}")">
             <div style="@($"animation: none !important; {innerStyle}")" class="@($"inner-list {additionalItemCls}")">
                 <Virtualize ItemSize="@itemSize" Items="source" Context="item">
-                    @if (clickAction != null)
-                    {
-                        if (itemTemplate != null)
-                        {
-                            @itemTemplate(item)
-                        }
-                        else
-                        {
-                            <p class="@($"selectable-list-item {(isSelectedFunc(item) ? "selected" : "")}")" @onclick="(arg) => clickAction(item, arg).ContinueWith(_ => hideAction())">
-                                @Translate(toString(item))
-                            </p>
-                        }
-                    }
-                    else
-                    {
-                        <p class="">@toString(item)</p>
-                    }
+                    @ListItem(item, hideAllListsOnClick, toString, clickAction, isSelectedFunc, itemTemplate)
                 </Virtualize>
             </div>
         </div>;
     }
+    
+    private RenderFragment ListItem<T>(T item, bool hideAllListsOnClick,
+        Func<T, string> toString = null,
+        Func<T, MouseEventArgs, Task> clickAction = null,
+        Func<T, bool> isSelectedFunc = null,
+        RenderFragment<T> itemTemplate = null) {
+            
+        var hideAction = hideAllListsOnClick ? (Action)(HideAllOpenToggleableLists) : () => { };
+        toString ??= (i) => i.ToString();
+        isSelectedFunc ??= (i) => false;
+        
+        if (itemTemplate != null)
+        {
+            return itemTemplate(item);
+        }
+        @if (clickAction != null)
+        {    
+            return @<p class="@($"selectable-list-item {(isSelectedFunc(item) ? "selected" : "")}")" @onclick="(arg) => clickAction(item, arg).ContinueWith(_ => hideAction())">
+                @Translate(toString(item))
+            </p>;
+            
+        }  
+        return @<p class="">@toString(item)</p>;        
+    }
+    
 }
