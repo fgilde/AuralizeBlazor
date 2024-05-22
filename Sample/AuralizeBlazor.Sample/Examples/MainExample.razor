@@ -4,6 +4,7 @@
 <Auralizer @ref=_vis
            @bind-Features="_features"
            InitialPreset="AuralizerPreset.ReflexMirror"
+           PreviewImageInPresetList="true"
            InitialRender="InitialRender.WithRandomData"
            GradientChanged="@MainLayout.Instance.ColorsChanged"
            Presets="@AuralizerPreset.All.Except(new List<AuralizerPreset>{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()"

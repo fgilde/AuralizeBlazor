@@ -79,7 +79,7 @@ public partial class Auralizer
     [Parameter] public string MessageClass { get; set; }
     [Parameter] public string MouseOverMessageStyle { get; set; }
     [Parameter] public string MouseOverMessageClass { get; set; }
-    [Parameter] public bool PreviewImageInPresetList { get; set; } = true;
+    [Parameter] public bool PreviewImageInPresetList { get; set; }
 
     public bool IsMouseOver { get; private set; }
 

@@ -6,6 +6,7 @@
 <MudIconButton Title="Picture in picture" OnClick="@(() => _vis.TogglePictureInPicture())" Icon="@Icons.Material.Filled.PictureInPicture" />
 <Auralizer @ref=_vis
            InitialPreset="_myPresets[0]"
+           PreviewImageInPresetList="true"
            GradientChanged="@MainLayout.Instance.ColorsChanged"
            ShowPresetNameOnChange="true"
            Presets="@_myPresets"
