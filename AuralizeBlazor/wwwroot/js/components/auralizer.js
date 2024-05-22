@@ -573,10 +573,7 @@
         }
 
         this.audioMotion?.connectedSources?.forEach(source => {
-            if (source.gainNode) {
-                this.audioMotion.disconnectInput(source.gainNode);
-            }
-
+            this.audioMotion.disconnectInput(source.gain);            
             if (source.mediaElement && source.mediaElement.listeners) {
                 Object.keys(source.mediaElement.listeners).forEach(event => {
                     source.mediaElement.removeEventListener(event, source.mediaElement.listeners[event]);
@@ -584,7 +581,7 @@
                 source.mediaElement.listeners = null;
                 if (!source.mediaElement.paused) {
                     this.dotnet.invokeMethodAsync('HandleOnPause');
-                }
+                }                
             }
         });
         this.connectToMic(false);
