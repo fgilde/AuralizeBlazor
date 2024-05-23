@@ -514,8 +514,7 @@
             this.micStream = null;
         }
         else if (connect && !this.micStream) {
-            const deviceId = this.options.microphoneDeviceId;
-            console.log(deviceId);
+            const deviceId = this.options.microphoneDeviceId;            
             const audioOptions = deviceId ? { audio: { deviceId: { exact: deviceId } } } : { audio: true };
             navigator.mediaDevices.getUserMedia(audioOptions)
                 .then(stream => {
@@ -589,21 +588,30 @@
 
     _connectToStream(el) {
         if (!el.stream) {
-            el.stream = el.captureStream(60);
+            el.stream = el.captureStream();
         }
         const audioTracks = el.stream.getAudioTracks();
-        if (audioTracks.length <= 0) {
-            // retry when track available
-            el.stream.onaddtrack = () => {
-                el.stream.onaddtrack = null;
+        if (audioTracks.length <= 0) {            
+            const onAddTrackHandler = () => {                
+                el?.stream?.removeEventListener('addtrack', onAddTrackHandler);
                 this._connectToStream(el);
             };
+            el.stream.addEventListener('addtrack', onAddTrackHandler);
             return;
         }
         var s = this.audioMotion.audioCtx.createMediaStreamSource(el.stream);
+        
+        const onInactiveHandler = () => {            
+            el?.stream?.removeEventListener('inactive', onInactiveHandler);
+            el.stream = null;            
+            this.reconnectInputs();
+        };
+        el.stream.addEventListener('inactive', onInactiveHandler);
+
         this.connectedStreams.push(s);
         this.audioMotion.connectInput(s);
     }
+
 
     _createGainNode(el) {
         const audioCtx = this.audioMotion.audioCtx;
@@ -651,8 +659,11 @@
                 this._connectTo(el);
 
                 if (!el.listeners) {
-                    el.listeners = {
+                    el.listeners = {                 
                         play: () => {
+                            if (this.options.connectionMode === 1 && !el.stream) {                                
+                                this._connectToStream(el);                                
+                            }
                             if (audioCtx.state === 'suspended') {
                                 audioCtx.resume();
                             }
@@ -709,6 +720,7 @@
     playTrack(url) {
         const mediaEl = (this.audioMotion?.connectedSources ?? [])[0]?.mediaElement ?? (this.getAudioElements() ?? [])[0];
         if (mediaEl) {
+            mediaEl.stream = null; // TODO: Better to do this general on src change
             mediaEl.src = url;
             mediaEl.play();
         } else {
