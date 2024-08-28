@@ -288,7 +288,7 @@
             Updates the meta information of the current track.
             </summary>
         </member>
-        <member name="M:AuralizeBlazor.Auralizer.ReadStreamAsync(System.String)">
+        <member name="M:AuralizeBlazor.Auralizer.ReadBytesAsync(System.String)">
             <summary>
             Reads the stream from the given url.
             </summary>

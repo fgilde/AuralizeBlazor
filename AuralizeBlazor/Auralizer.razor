@@ -90,7 +90,7 @@
         </p>
     }
     
-    @if(_showMeta && Meta != null) {
+    @if(ShowMeta && Meta != null) {
         var position = TrackInfoPosition;
     
         <div class="@($"selection-list {SelectionListMode.Compact.ToDescriptionString()} {position.ToDescriptionString()} meta-container {(_metaCollapsed ? "collapsed" : "")}")">
@@ -98,12 +98,14 @@
                 @if (!_metaCollapsed)
                 {
                     <img src="@CoverImage" alt="Cover Image" class="cover-image"/>
-                    @RenderButton(Position.TopRight, () => _showMeta = false, AudioIcons.Close)
+                    @RenderButton(Position.TopRight, () => ShowMeta = false, AudioIcons.Close)
                 }
                 @RenderButton(Position.TopLeft, () => _metaCollapsed = !_metaCollapsed, _metaCollapsed ? AudioIcons.ArrowUp : AudioIcons.ArrowDown)
-                
-                @RenderButton(Position.CenterLeft, () => { PreviousTrackAsync(_currentTrack);  }, AudioIcons.PreviousTrack, "hover-effect")
-                @RenderButton(Position.CenterRight, () => { NextTrackAsync(_currentTrack);  }, AudioIcons.NextTrack, "hover-effect")
+                @if (TrackList is { Length: > 1 })
+                {
+                    @RenderButton(Position.CenterLeft, () => { PreviousTrackAsync(_currentTrack); }, AudioIcons.PreviousTrack, "hover-effect")
+                    @RenderButton(Position.CenterRight, () => { NextTrackAsync(_currentTrack); }, AudioIcons.NextTrack, "hover-effect")
+                }
                 <div class="meta-info @(_metaTagsHidden && !_metaCollapsed ? "hidden" : "")">
                     <p class="meta-title">@($"{string.Join(",", Meta.Tag.Performers)} - {@Meta.Tag.Title}")</p>
                     <p class="meta-tag">@Meta.Tag.Album</p>

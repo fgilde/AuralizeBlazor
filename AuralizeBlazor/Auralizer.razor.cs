@@ -374,7 +374,7 @@ public partial class Auralizer
     /// </summary>
     public TagLib.File Meta {get; private set;}
 
-    private bool _showMeta = false;
+    protected bool ShowMeta = false;
     private ConcurrentDictionary<string, TagLib.File> _metaCache = new();
 
     /// <summary>
@@ -392,13 +392,16 @@ public partial class Auralizer
         string url = await GetCurrentAbsoluteTrackUrlAsync();
         if(string.IsNullOrWhiteSpace(url) || (!force && !ApplyBackgroundImageFromTrack && !ShowTrackInfosOnPlay))
             return;
-        
-        await using var ms = await ReadStreamAsync(url);
-        if (ms == null)
+        var bytes = await ReadBytesAsync(url);
+        if (bytes == null)
+        {
             return;
+        }
+
+        using var ms = new MemoryStream(bytes);
         ms.Position = 0;
         ms.Seek(0, SeekOrigin.Begin);
-        var file = File.Create(new StreamFileAbstraction(_currentTrack.Split("/").LastOrDefault() ?? string.Empty, ms, ms));
+        var file = File.Create(new StreamFileAbstraction(_currentTrack.Split("/").LastOrDefault() ?? string.Empty, ms, null));
         Meta = file;
         _metaCache[_currentTrack] = file; 
         _= ApplyMetaIf();
@@ -407,17 +410,14 @@ public partial class Auralizer
     /// <summary>
     /// Reads the stream from the given url.
     /// </summary>
-    protected virtual async Task<Stream> ReadStreamAsync(string url)
+    protected virtual async Task<byte[]> ReadBytesAsync(string url)
     {
         if (DataUrl.TryParse(url, out var data)) // If not but given url is a data url we can use the bytes from it
-            return new MemoryStream(data.Bytes);
+            return data.Bytes;
         if (url.StartsWith("blob:")) 
-        {
-            var resultByteArray = await JsReference.InvokeAsync<byte[]>("readBlobAsByteArray", url);
-            return new MemoryStream(resultByteArray);
-        }
-
-        return await new HttpClient().GetStreamAsync(url);
+            return await JsReference.InvokeAsync<byte[]>("readBlobAsByteArray", url);
+        
+        return await new HttpClient().GetByteArrayAsync(url);
     }
 
 
@@ -436,7 +436,7 @@ public partial class Auralizer
     {
         var file = Meta;
         _= MetaInfosChanged.InvokeAsync(file);
-        _showMeta = ShowTrackInfosOnPlay && !string.IsNullOrEmpty(file.Tag.Title);
+        ShowMeta = ShowTrackInfosOnPlay && !string.IsNullOrEmpty(file?.Tag?.Title);
 
         var image = file.Tag.Pictures.FirstOrDefault();
         CoverImage = image != null ? $"data:{image.MimeType};base64,{Convert.ToBase64String(image.Data.Data)}" : null;
