@@ -17,6 +17,7 @@ using BlazorJS.Attributes;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Nextended.Blazor.Models;
 using Nextended.Core.Extensions;
 using Nextended.Core.Helper;
 using Nextended.Core.Types;
@@ -391,15 +392,27 @@ public partial class Auralizer
         string url = await GetCurrentAbsoluteTrackUrlAsync();
         if(string.IsNullOrWhiteSpace(url) || (!force && !ApplyBackgroundImageFromTrack && !ShowTrackInfosOnPlay))
             return;
-      
-        var bytes = await new HttpClient().GetByteArrayAsync(url);
-        using MemoryStream ms = new MemoryStream(bytes);
+        
+        await using var ms = await ReadStreamAsync(url);
         ms.Position = 0;
         ms.Seek(0, SeekOrigin.Begin);
-        var file = File.Create(new StreamFileAbstraction(_currentTrack.Split("/").LastOrDefault() ?? string.Empty, ms, null));
+        var file = File.Create(new StreamFileAbstraction(_currentTrack.Split("/").LastOrDefault() ?? string.Empty, ms, ms));
         Meta = file;
         _metaCache[_currentTrack] = file; 
         _= ApplyMetaIf();
+    }
+
+    private async Task<Stream> ReadStreamAsync(string url)
+    {
+        if (DataUrl.TryParse(url, out var data)) // If not but given url is a data url we can use the bytes from it
+            return new MemoryStream(data.Bytes);
+        if (url.StartsWith("blob:")) 
+        {
+            var resultByteArray = await JsReference.InvokeAsync<byte[]>("readBlobAsByteArray", url);
+            return new MemoryStream(resultByteArray);
+        }
+
+        return await new HttpClient().GetStreamAsync(url);
     }
 
 
@@ -1078,6 +1091,8 @@ public partial class Auralizer
     {
         string url = _currentTrack ?? (JsReference != null ? await JsReference.InvokeAsync<string>("currentTrack") : null);
         if (string.IsNullOrWhiteSpace(url))
+            return url;
+        if(url.StartsWith("blob:") || url.StartsWith("data:"))
             return url;
         if (!url.StartsWith("http"))
         {

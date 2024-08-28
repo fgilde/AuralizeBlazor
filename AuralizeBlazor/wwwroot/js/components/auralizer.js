@@ -461,6 +461,12 @@
         }
     }
 
+    async readBlobAsByteArray(blobUrl) {
+        const response = await fetch(blobUrl);
+        const blob = await response.blob();
+        const arrayBuffer = await blob.arrayBuffer();
+        return Array.from(new Uint8Array(arrayBuffer));
+    }
 
     prepareOptions(options) {
         options.fsElement = options.fsElement || options.visualizer;
