@@ -288,6 +288,11 @@
             Updates the meta information of the current track.
             </summary>
         </member>
+        <member name="M:AuralizeBlazor.Auralizer.ReadStreamAsync(System.String)">
+            <summary>
+            Reads the stream from the given url.
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.ApplyBackgroundImageFromTrack">
             <summary>
             If a track from <see cref="P:AuralizeBlazor.Auralizer.TrackList"/>> is played the background image will be set to the track image if this setting is true.

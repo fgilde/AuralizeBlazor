@@ -380,7 +380,7 @@ public partial class Auralizer
     /// <summary>
     /// Updates the meta information of the current track.
     /// </summary>
-    protected async Task UpdateMetaInfos(bool force = false)
+    protected virtual async Task UpdateMetaInfos(bool force = false)
     {
         if (_metaCache.TryGetValue(_currentTrack, out var cachedFile))
         {
@@ -394,6 +394,8 @@ public partial class Auralizer
             return;
         
         await using var ms = await ReadStreamAsync(url);
+        if (ms == null)
+            return;
         ms.Position = 0;
         ms.Seek(0, SeekOrigin.Begin);
         var file = File.Create(new StreamFileAbstraction(_currentTrack.Split("/").LastOrDefault() ?? string.Empty, ms, ms));
@@ -402,7 +404,10 @@ public partial class Auralizer
         _= ApplyMetaIf();
     }
 
-    private async Task<Stream> ReadStreamAsync(string url)
+    /// <summary>
+    /// Reads the stream from the given url.
+    /// </summary>
+    protected virtual async Task<Stream> ReadStreamAsync(string url)
     {
         if (DataUrl.TryParse(url, out var data)) // If not but given url is a data url we can use the bytes from it
             return new MemoryStream(data.Bytes);
@@ -416,7 +421,16 @@ public partial class Auralizer
     }
 
 
-    private void ToggleTagsVisibility() => _metaTagsHidden = !_metaTagsHidden;
+    private void ToggleTagsVisibility()
+    {
+        if (_metaCollapsed)
+        {
+            _metaCollapsed = false;
+            return;
+        }
+
+        _metaTagsHidden = !_metaTagsHidden;
+    }
 
     private async Task ApplyMetaIf()
     {

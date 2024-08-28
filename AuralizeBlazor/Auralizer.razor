@@ -102,8 +102,8 @@
                 }
                 @RenderButton(Position.TopLeft, () => _metaCollapsed = !_metaCollapsed, _metaCollapsed ? AudioIcons.ArrowUp : AudioIcons.ArrowDown)
                 
-                @RenderButton(Position.CenterLeft, () => { PreviousTrackAsync(_currentTrack); ToggleTagsVisibility(); }, AudioIcons.PreviousTrack, "hover-effect")
-                @RenderButton(Position.CenterRight, () => { NextTrackAsync(_currentTrack); ToggleTagsVisibility(); }, AudioIcons.NextTrack, "hover-effect")
+                @RenderButton(Position.CenterLeft, () => { PreviousTrackAsync(_currentTrack);  }, AudioIcons.PreviousTrack, "hover-effect")
+                @RenderButton(Position.CenterRight, () => { NextTrackAsync(_currentTrack);  }, AudioIcons.NextTrack, "hover-effect")
                 <div class="meta-info @(_metaTagsHidden && !_metaCollapsed ? "hidden" : "")">
                     <p class="meta-title">@($"{string.Join(",", Meta.Tag.Performers)} - {@Meta.Tag.Title}")</p>
                     <p class="meta-tag">@Meta.Tag.Album</p>
@@ -179,7 +179,7 @@
 
     private RenderFragment RenderButton(Position position, Action clickAction, string content, string cls="")
     {
-        return @<div @onclick="clickAction" class="@($"selection-list-toggle-btn {position.ToDescriptionString()} {cls}")">
+        return @<div @onclick:stopPropagation="true" @onclick:preventDefault="true" @onclick="clickAction" class="@($"selection-list-toggle-btn {position.ToDescriptionString()} {cls}")">
                    <svg class="icon-root icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true">
                        @((MarkupString)content)
                    </svg>

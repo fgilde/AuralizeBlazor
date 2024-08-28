@@ -13,7 +13,7 @@
 
 .hover-effect {
     transition: all 0.3s ease;
-    border-radius: 10px;
+    border-radius: 25%;
 }
 
 .hover-effect:hover {
