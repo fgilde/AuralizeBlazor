@@ -466,8 +466,8 @@
         options.fsElement = options.fsElement || options.visualizer;
         options.gradientLeft = options.gradientLeft || options.gradient;
         options.gradientRight = options.gradientRight || options.gradient;
-        if (options.backgroundImage) {
-            this.visualizer.style.backgroundImage = `url('${options.backgroundImage}')`;
+        if (options.backgroundImageToApply) {
+            this.visualizer.style.backgroundImage = `url('${options.backgroundImageToApply}')`;
             this.visualizer.style.backgroundSize = options.backgroundSize || 'cover';
             this.visualizer.style.backgroundRepeat = options.backgroundRepeat || 'no-repeat';
             this.visualizer.style.backgroundPosition = options.backgroundPosition || 'center';
@@ -491,8 +491,7 @@
             }
         };
 
-        options.overlay = true;
-        options.overlay = options.overlay || options.backgroundImage;
+        options.overlay = options.overlay || options.backgroundImageToApply;
 
         return options;
     }

@@ -1,0 +1,26 @@
+﻿@page "/meta"
+@page "/eyirish"
+
+<PageTitle>Meta Tags</PageTitle>
+
+@if (Navigation.FullPaged())
+{
+    <MetaExample/>
+}
+else
+{
+    <DocsPageSection>
+        <SectionHeader Title="Meta Tag Sample">
+            <Description>
+                This sample show how to display Meta Track data.
+                You can use the property <CodeInline>ShowTrackInfosOnPlay</CodeInline> to show meta tags when available. <br/>
+                To control the position of the meta box you can set the <CodeInline>TrackInfoPosition</CodeInline> property. <br/>
+                Also you can set <CodeInline>ApplyBackgroundImageFromTrack</CodeInline> to automatically uses the album/track cover as <CodeInline>BackgroundImage</CodeInline>. <br/>
+            </Description>
+        </SectionHeader>
+        <SectionContent Outlined="true" FullWidth="true">
+            <MetaExample/>
+        </SectionContent>
+        <SectionSource Code="@nameof(MainExample)"/>
+    </DocsPageSection>
+}

@@ -27,6 +27,10 @@ public enum Position
     BottomLeft,
     [Description("bottom right")]
     BottomRight,
+    [Description("center left")]
+    CenterLeft,
+    [Description("center right")]
+    CenterRight,
     [Description("mouse")]
     Mouse
 }

@@ -87,7 +87,7 @@
             ctx.fillStyle = featureOptions.labelColor;
         } 
 
-        ctx.fillText(featureOptions?.label || 'AuralizeBlazor', pos.x, pos.y);
+        ctx.fillText(featureOptions?.label || '', pos.x, pos.y);
     }
 
 

@@ -65,7 +65,7 @@
     }
     @if (TrackListBehaviour == SelectionListBehaviour.Toggleable && TrackList?.Any() == true)
     {
-        @RenderListToggleButton(TrackListToggleButtonPosition, () => _trackListVisible = !_trackListVisible, AudioIcons.TrackList)
+        @RenderButton(TrackListToggleButtonPosition, () => _trackListVisible = !_trackListVisible, AudioIcons.TrackList)
     }
     @if (_presetListVisible || PresetListBehaviour == SelectionListBehaviour.AlwaysVisible)
     {
@@ -74,7 +74,7 @@
     }
     @if (PresetListBehaviour == SelectionListBehaviour.Toggleable && Presets?.Any() == true)
     {
-        @RenderListToggleButton(PresetListToggleButtonPosition, () => _presetListVisible = !_presetListVisible, AudioIcons.Spectrum)
+        @RenderButton(PresetListToggleButtonPosition, () => _presetListVisible = !_presetListVisible, AudioIcons.Spectrum)
     }
 
     @if (_actionListVisible)
@@ -89,6 +89,38 @@
             @_message
         </p>
     }
+    
+    @if(_showMeta && Meta != null) {
+        var position = TrackInfoPosition;
+    
+        <div class="@($"selection-list {SelectionListMode.Compact.ToDescriptionString()} {position.ToDescriptionString()} meta-container {(_metaCollapsed ? "collapsed" : "")}")">
+            <div class="meta-cover" @onclick="ToggleTagsVisibility">
+                @if (!_metaCollapsed)
+                {
+                    <img src="@CoverImage" alt="Cover Image" class="cover-image"/>
+                    @RenderButton(Position.TopRight, () => _showMeta = false, AudioIcons.Close)
+                }
+                @RenderButton(Position.TopLeft, () => _metaCollapsed = !_metaCollapsed, _metaCollapsed ? AudioIcons.ArrowUp : AudioIcons.ArrowDown)
+                
+                @RenderButton(Position.CenterLeft, () => { PreviousTrackAsync(_currentTrack); ToggleTagsVisibility(); }, AudioIcons.PreviousTrack, "hover-effect")
+                @RenderButton(Position.CenterRight, () => { NextTrackAsync(_currentTrack); ToggleTagsVisibility(); }, AudioIcons.NextTrack, "hover-effect")
+                <div class="meta-info @(_metaTagsHidden && !_metaCollapsed ? "hidden" : "")">
+                    <p class="meta-title">@($"{string.Join(",", Meta.Tag.Performers)} - {@Meta.Tag.Title}")</p>
+                    <p class="meta-tag">@Meta.Tag.Album</p>
+                </div>
+                @if (!_metaTagsHidden)
+                {
+                    <div class="meta-info-bottom">
+                        <p class="meta-tag">@Meta.Tag?.Year</p>
+                        <p class="meta-tag">@Meta.Tag?.JoinedGenres</p>
+                        <p class="meta-tag">@Meta.Properties?.Duration.ToString("mm\\:ss")</p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+
     @if (OverlayChildContent && ChildContent != null)
     {
         <div @ref="_visualizer"
@@ -145,9 +177,9 @@
                </Auralizer>;
     }
 
-    private RenderFragment RenderListToggleButton(Position position, Action clickAction, string content)
+    private RenderFragment RenderButton(Position position, Action clickAction, string content, string cls="")
     {
-        return @<div @onclick="clickAction" class="@($"selection-list-toggle-btn {position.ToDescriptionString()}")">
+        return @<div @onclick="clickAction" class="@($"selection-list-toggle-btn {position.ToDescriptionString()} {cls}")">
                    <svg class="icon-root icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true">
                        @((MarkupString)content)
                    </svg>

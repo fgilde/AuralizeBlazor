@@ -1,0 +1,51 @@
+﻿@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+<Auralizer @ref=_vis
+           @bind-Features="_features"
+           InitialPreset="AuralizerPreset.RadialSpectrumScale"
+           PreviewImageInPresetList="true"
+           InitialRender="InitialRender.WithRandomData"
+           GradientChanged="@MainLayout.Instance.ColorsChanged"
+           Presets="@AuralizerPreset.All.Except(new List<AuralizerPreset>{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()"
+           OnPresetApplied="OnPresetApplied"
+           TrackList="@TracksService.EyirishTracks"
+           Height="700px"        
+           ClickAction="VisualizerAction.TogglePlayPause"
+           ApplyBackgroundImageFromTrack="true"
+           ContextMenuAction="VisualizerAction.None"
+           FullPaged="_fullPaged"
+           ShowTrackInfosOnPlay="true"
+           BackgroundSize="contain"
+           MetaInfosChanged="@MetaChanged"
+           Overlay="false">
+    <center>
+        <audio class="audio-main mud-ex-animate-all-properties" autoplay="true" preload="metadata" loading="lazy" controls="true" src="@TracksService.EyirishTracks[0].Url"></audio>
+    </center>
+</Auralizer>
+
+@code {
+    bool _fullPaged = false;
+    private Auralizer _vis;
+    private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = string.Empty, Position = TextPosition.CenterCenter }];
+
+    protected override void OnInitialized()
+    {
+        _fullPaged = Navigation.FullPaged();
+        base.OnInitialized();
+    }
+
+    private void OnPresetApplied(AppliedPresetEventArgs arg)
+    {
+        if (arg.ApplySettings.Reason is PresetApplyReason.UserSelectedFromList or PresetApplyReason.UserSelectedAsAction)
+        {
+            _vis.RemoveFeature<SwitchPresetFeature>();
+        }
+    }
+
+    private void MetaChanged(TagLib.File f)
+    {
+        _vis.Feature<ShowLogoFeature>().Label = $"{string.Join(",", f.Tag.Performers)} - {f.Tag.Title}";
+    }
+
+}

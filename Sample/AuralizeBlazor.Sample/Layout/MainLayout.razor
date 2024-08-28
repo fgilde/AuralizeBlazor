@@ -7,21 +7,24 @@
 
 
 <MudLayout Style="height: 100%">
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Secondary" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudSpacer />
-        <MudExGradientText Style="font-weight: bold" Typo="Typo.h5" AnimationDuration="@TimeSpan.FromSeconds(20)" Palette="@(_palette)" Class="ml-3">@Const.AppName</MudExGradientText>
-        <MudSpacer />
-        <MudTooltip Text="GitHub">
-                <MudIconButton Href="https://github.com/fgilde/AuralizeBlazor" Target="_blank" Icon="@Icons.Custom.Brands.GitHub" Color="Color.Primary" Edge="Edge.End" />
-        </MudTooltip>
-        <MudTooltip Text="Nuget Package">
-                <MudIconButton Href="https://www.nuget.org/packages/AuralizeBlazor/" Target="_blank" Icon="@MudExIcons.Custom.Brands.Nuget" Color="Color.Primary" Edge="Edge.End" />
-        </MudTooltip>
-    </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Temporary" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <NavMenu></NavMenu>
-    </MudDrawer>
+    @if (!Navigation.FullPaged())
+    {
+        <MudAppBar Elevation="1">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Secondary" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
+            <MudSpacer/>
+            <MudExGradientText Style="font-weight: bold" Typo="Typo.h5" AnimationDuration="@TimeSpan.FromSeconds(20)" Palette="@(_palette)" Class="ml-3">@Const.AppName</MudExGradientText>
+            <MudSpacer/>
+            <MudTooltip Text="GitHub">
+                <MudIconButton Href="https://github.com/fgilde/AuralizeBlazor" Target="_blank" Icon="@Icons.Custom.Brands.GitHub" Color="Color.Primary" Edge="Edge.End"/>
+            </MudTooltip>
+            <MudTooltip Text="Nuget Package">
+                <MudIconButton Href="https://www.nuget.org/packages/AuralizeBlazor/" Target="_blank" Icon="@MudExIcons.Custom.Brands.Nuget" Color="Color.Primary" Edge="Edge.End"/>
+            </MudTooltip>
+        </MudAppBar>
+        <MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Temporary" ClipMode="DrawerClipMode.Always" Elevation="2">
+            <NavMenu></NavMenu>
+        </MudDrawer>
+    }
     <MudMainContent Style="height: 100%">
         @Body
     </MudMainContent>

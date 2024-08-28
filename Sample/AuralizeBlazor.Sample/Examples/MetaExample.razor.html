@@ -1,0 +1,56 @@
+<div class="mud-codeblock">
+<div class="html"><pre>
+<span class="atSign">&#64;</span>using AuralizeBlazor.Features
+<span class="atSign">&#64;</span>using AuralizeBlazor.Options
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>ref</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">_vis</span>
+           <span class="htmlAttributeName"><span class="atSign">&#64;</span>bind-Features</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_features</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">InitialPreset</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">AuralizerPreset</span><span class="enumValue">.RadialSpectrumScale</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">PreviewImageInPresetList</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">InitialRender</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">InitialRender</span><span class="enumValue">.WithRandomData</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">GradientChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>MainLayout.Instance.ColorsChanged</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">Presets</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>AuralizerPreset.All.Except(new List&lt;AuralizerPreset&gt;{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">OnPresetApplied</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">OnPresetApplied</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">TrackList</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>TracksService.EyirishTracks</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">700px</span><span class="quot">&quot;</span>        
+           <span class="htmlAttributeName">ClickAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.TogglePlayPause</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">ApplyBackgroundImageFromTrack</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">ContextMenuAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.None</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">FullPaged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_fullPaged</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">ShowTrackInfosOnPlay</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">BackgroundSize</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">contain</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">MetaInfosChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="sharpVariable"><span class="atSign">&#64;</span>MetaChanged</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">Overlay</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">false</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">audio-main mud-ex-animate-all-properties</span><span class="quot">&quot;</span> <span class="htmlAttributeName">autoplay</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">metadata</span><span class="quot">&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">lazy</span><span class="quot">&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>TracksService.EyirishTracks[0].Url</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+</pre></div>
+<div class="csharp"><pre>
+<span class="atSign">&#64;</span>code {
+    <span class="keyword">bool</span> _fullPaged = <span class="keyword">false</span>;
+    <span class="keyword">private</span> Auralizer _vis;
+    <span class="keyword">private</span> IVisualizerFeature[] _features = [<span class="keyword">new</span> ShowLogoFeature { Label = <span class="keyword">string</span>.Empty, Position = TextPosition.CenterCenter }];
+
+    <span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> OnInitialized()
+    {
+        _fullPaged = Navigation.FullPaged();
+        <span class="keyword">base</span>.OnInitialized();
+    }
+
+    <span class="keyword">private</span> <span class="keyword">void</span> OnPresetApplied(AppliedPresetEventArgs arg)
+    {
+        <span class="keyword">if</span> (arg.ApplySettings.Reason <span class="keyword">is</span> PresetApplyReason.UserSelectedFromList or PresetApplyReason.UserSelectedAsAction)
+        {
+            _vis.RemoveFeature&lt;SwitchPresetFeature&gt;();
+        }
+    }
+
+    <span class="keyword">private</span> <span class="keyword">void</span> MetaChanged(TagLib.File f)
+    {
+        _vis.Feature&lt;ShowLogoFeature&gt;().Label = $<span class="string">&quot;{string.Join(&quot;</span>,<span class="string">&quot;, f.Tag.Performers)} - {f.Tag.Title}&quot;</span>;
+    }
+
+}
+</pre></div>
+</div>

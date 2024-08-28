@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Buffers.Text;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +19,9 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Nextended.Core.Extensions;
 using Nextended.Core.Helper;
+using Nextended.Core.Types;
+using static System.Net.Mime.MediaTypeNames;
+using File = TagLib.File;
 
 namespace AuralizeBlazor;
 
@@ -28,7 +36,7 @@ public partial class Auralizer
     public static string SuggestedWebComponentName => string.Join("-", typeof(Auralizer).FullName.Replace(".", "").SplitByUpperCase()).ToLower();
 
     private const bool Minify = true;
-
+    private string _backgroundImageToApply;
     private string _id = Guid.NewGuid().ToFormattedId();
 
     /// <inheritdoc />
@@ -41,7 +49,9 @@ public partial class Auralizer
 
     /// <inheritdoc />
     protected override string ComponentJsInitializeMethodName() => "initializeAuralizer";
-    
+
+    private bool _metaCollapsed = false;
+    private bool _metaTagsHidden = false;
     private bool _initialPresetApplied;
     private bool _isMessageVisible;
     private bool _created;
@@ -64,6 +74,7 @@ public partial class Auralizer
     private bool _fullPaged;
     private AuralizerPreset _currentPreset;
     private string _currentTrack;
+    private byte[] _currentTrackBytes;
     private bool _actionListVisible;
     private VisualizerAction[] _actions;
     private MouseEventArgs _lastMouseEventArgs;
@@ -237,6 +248,11 @@ public partial class Auralizer
     [Parameter] public EventCallback<AppliedPresetEventArgs> OnPresetApplied { get; set; }
 
     /// <summary>
+    /// Invoked when meta data are changed
+    /// </summary>
+    [Parameter] public EventCallback<File?> MetaInfosChanged { get; set; }
+
+    /// <summary>
     /// Invoked when the gradient used by the visualizer is changed.
     /// </summary>
     [Parameter] public EventCallback<AudioMotionGradient> GradientChanged { get; set; }
@@ -319,8 +335,107 @@ public partial class Auralizer
     public string BackgroundImage { get; set; }
 
     /// <summary>
+    /// Background size
+    /// </summary>
+    [Parameter, ForJs]
+    public string BackgroundSize { get; set; }
+
+    /// <summary>
+    /// Background repeat
+    /// </summary>
+    [Parameter, ForJs]
+    public string BackgroundRepeat { get; set; }  
+
+    /// <summary>
+    /// Background position
+    /// </summary>
+    [Parameter, ForJs]
+    public string BackgroundPosition { get; set; }
+
+    /// <summary>
+    /// If true track infos will be faded in when a track is played.
+    /// </summary>
+    [Parameter]
+    public bool ShowTrackInfosOnPlay { get; set; } = true;
+
+    /// <summary>
+    /// Position for the meta tag box.
+    /// </summary>
+    [Parameter] public Position TrackInfoPosition { get; set; } = Position.BottomLeft;
+
+    /// <summary>
+    /// The image of the current track.
+    /// </summary>
+    public string CoverImage { get; private set; }
+
+    /// <summary>
+    /// Meta data of the current track.
+    /// </summary>
+    public TagLib.File Meta {get; private set;}
+
+    private bool _showMeta = false;
+    private ConcurrentDictionary<string, TagLib.File> _metaCache = new();
+
+    /// <summary>
+    /// Updates the meta information of the current track.
+    /// </summary>
+    protected async Task UpdateMetaInfos(bool force = false)
+    {
+        if (_metaCache.TryGetValue(_currentTrack, out var cachedFile))
+        {
+            Meta = cachedFile;
+            _ = ApplyMetaIf();
+            return;
+        }
+   
+        string url = await GetCurrentAbsoluteTrackUrlAsync();
+        if(string.IsNullOrWhiteSpace(url) || (!force && !ApplyBackgroundImageFromTrack && !ShowTrackInfosOnPlay))
+            return;
+      
+        var bytes = await new HttpClient().GetByteArrayAsync(url);
+        using MemoryStream ms = new MemoryStream(bytes);
+        ms.Position = 0;
+        ms.Seek(0, SeekOrigin.Begin);
+        var file = File.Create(new StreamFileAbstraction(_currentTrack.Split("/").LastOrDefault() ?? string.Empty, ms, null));
+        Meta = file;
+        _metaCache[_currentTrack] = file; 
+        _= ApplyMetaIf();
+    }
+
+
+    private void ToggleTagsVisibility() => _metaTagsHidden = !_metaTagsHidden;
+
+    private async Task ApplyMetaIf()
+    {
+        var file = Meta;
+        _= MetaInfosChanged.InvokeAsync(file);
+        _showMeta = ShowTrackInfosOnPlay && !string.IsNullOrEmpty(file.Tag.Title);
+
+        var image = file.Tag.Pictures.FirstOrDefault();
+        CoverImage = image != null ? $"data:{image.MimeType};base64,{Convert.ToBase64String(image.Data.Data)}" : null;
+        if (ApplyBackgroundImageFromTrack && CoverImage != null)
+        {
+            await SetBackgroundImage(CoverImage);
+        } else         {
+            await SetBackgroundImage(null);
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SetBackgroundImage(string url)
+    {
+        //if(_backgroundImageToApply == url)
+        //    return;
+        _backgroundImageToApply = url;
+        await UpdateJsOptions();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
     /// If a track from <see cref="TrackList"/>> is played the background image will be set to the track image if this setting is true.
     /// </summary>
+    [Parameter]
     public bool ApplyBackgroundImageFromTrack { get; set; } = true;
 
     /// <summary>
@@ -345,6 +460,11 @@ public partial class Auralizer
             }
         }
     }
+
+    /// <summary>
+    ///  Gets a Feature by type
+    /// </summary>
+    public TFeature Feature<TFeature>() where TFeature : IVisualizerFeature => _features.OfType<TFeature>().FirstOrDefault();
 
     /// <summary>
     /// Array of visualizer features to be applied to the visualizer.
@@ -954,6 +1074,21 @@ public partial class Auralizer
         return res;
     }
 
+    public async Task<string> GetCurrentAbsoluteTrackUrlAsync()
+    {
+        string url = _currentTrack ?? (JsReference != null ? await JsReference.InvokeAsync<string>("currentTrack") : null);
+        if (string.IsNullOrWhiteSpace(url))
+            return url;
+        if (!url.StartsWith("http"))
+        {
+            if(JsRuntime == null)
+                return null; // TODO: Fallback 
+            var host = await JsRuntime.DInvokeAsync<string>(w => w.location.origin);
+            url = host + url.EnsureStartsWith("/");
+        }
+        return url;
+    }
+
     /// <summary>
     /// Toggles the picture in picture mode and returns true if the current state is picture in picture otherwise false.
     /// </summary>
@@ -1034,12 +1169,20 @@ public partial class Auralizer
     /// <summary>
     /// Plays a track
     /// </summary>
-    public Task PlayTrackAsync(IAuralizerTrack track)
+    public async Task PlayTrackAsync(IAuralizerTrack track)
     {
-        if(ApplyBackgroundImageFromTrack && !string.IsNullOrEmpty(track.Image))
-            BackgroundImage = track.Image;
+        if (ApplyBackgroundImageFromTrack && !string.IsNullOrEmpty(track.Image))
+        {
+            await SetBackgroundImage(track.Image);
+        }
+        else
+        {
+            await SetBackgroundImage(null);
+        }
+
         ShowMessage(track.Label, TimeSpan.FromSeconds(2));
-        return PlayTrackAsync(track.Url);
+        await UpdateJsOptions();
+        await PlayTrackAsync(track.Url);
     }
 
     /// <summary>
@@ -1149,12 +1292,19 @@ public partial class Auralizer
     [JSInvokable]
     public async Task UpdateCurrentTrack(string track = null)
     {
-        _currentTrack = track;
+        var currentTrack = track;
         if (track == null && JsReference != null)
         {
-            _currentTrack = await JsReference.InvokeAsync<string>("currentTrack");
+            currentTrack = await JsReference.InvokeAsync<string>("currentTrack");
+        }
+
+        if (_currentTrack != currentTrack)
+        {
+            _currentTrack = currentTrack;
+            _= UpdateMetaInfos();
         }
     }
+
 
     [JSInvokable]
     public Task NextTrackAsync(string currentTrackUrl)
@@ -1346,6 +1496,7 @@ public partial class Auralizer
             queryOwner = ChildContent != null && !ConnectAllAudioSources ? ElementReference : default,
             audioMotion = _audioMotion,
             visualizer = _visualizer,
+            backgroundImageToApply = _backgroundImageToApply ?? BackgroundImage,
             features = Features.Select(f => new
             {
                 onCanvasDrawCallbackName = f.OnCanvasDrawCallbackName,

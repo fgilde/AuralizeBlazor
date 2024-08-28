@@ -163,6 +163,11 @@
             Invoked when a preset is applied to the visualizer.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Auralizer.MetaInfosChanged">
+            <summary>
+            Invoked when meta data are changed
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.GradientChanged">
             <summary>
             Invoked when the gradient used by the visualizer is changed.
@@ -243,6 +248,46 @@
             Sets the background image of the visualizer component.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Auralizer.BackgroundSize">
+            <summary>
+            Background size
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.BackgroundRepeat">
+            <summary>
+            Background repeat
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.BackgroundPosition">
+            <summary>
+            Background position
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.ShowTrackInfosOnPlay">
+            <summary>
+            If true track infos will be faded in when a track is played.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.TrackInfoPosition">
+            <summary>
+            Position for the meta tag box.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.CoverImage">
+            <summary>
+            The image of the current track.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.Meta">
+            <summary>
+            Meta data of the current track.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.UpdateMetaInfos(System.Boolean)">
+            <summary>
+            Updates the meta information of the current track.
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.ApplyBackgroundImageFromTrack">
             <summary>
             If a track from <see cref="P:AuralizeBlazor.Auralizer.TrackList"/>> is played the background image will be set to the track image if this setting is true.
@@ -256,6 +301,11 @@
         <member name="P:AuralizeBlazor.Auralizer.ChildContent">
             <summary>
             The content to be rendered within the visualizer component. All here containing audio and video elements will be connected to the visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.Feature``1">
+            <summary>
+             Gets a Feature by type
             </summary>
         </member>
         <member name="P:AuralizeBlazor.Auralizer.Features">
