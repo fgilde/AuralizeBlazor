@@ -372,7 +372,7 @@ public partial class Auralizer
     /// <summary>
     /// Meta data of the current track.
     /// </summary>
-    public TagLib.File Meta {get; private set;}
+    public TagLib.File Meta {get; protected set;}
 
     protected bool ShowMeta = false;
     private ConcurrentDictionary<string, TagLib.File> _metaCache = new();
@@ -385,7 +385,7 @@ public partial class Auralizer
         if (_metaCache.TryGetValue(_currentTrack, out var cachedFile))
         {
             Meta = cachedFile;
-            _ = ApplyMetaIf();
+            await ApplyMetaIf();
             return;
         }
    
@@ -404,7 +404,7 @@ public partial class Auralizer
         var file = File.Create(new StreamFileAbstraction(_currentTrack.Split("/").LastOrDefault() ?? string.Empty, ms, null));
         Meta = file;
         _metaCache[_currentTrack] = file; 
-        _= ApplyMetaIf();
+        await ApplyMetaIf();
     }
 
     /// <summary>
@@ -432,13 +432,17 @@ public partial class Auralizer
         _metaTagsHidden = !_metaTagsHidden;
     }
 
+    protected virtual Task OnMetaChanged()
+    {
+        return MetaInfosChanged.InvokeAsync(Meta);
+    }
+
     private async Task ApplyMetaIf()
     {
-        var file = Meta;
-        _= MetaInfosChanged.InvokeAsync(file);
-        ShowMeta = ShowTrackInfosOnPlay && !string.IsNullOrEmpty(file?.Tag?.Title);
+        await OnMetaChanged();
+        ShowMeta = ShowTrackInfosOnPlay && !string.IsNullOrEmpty(Meta?.Tag?.Title);
 
-        var image = file.Tag.Pictures.FirstOrDefault();
+        var image = Meta?.Tag?.Pictures.FirstOrDefault();
         CoverImage = image != null ? $"data:{image.MimeType};base64,{Convert.ToBase64String(image.Data.Data)}" : null;
         if (ApplyBackgroundImageFromTrack && CoverImage != null)
         {
@@ -1330,7 +1334,7 @@ public partial class Auralizer
         if (_currentTrack != currentTrack)
         {
             _currentTrack = currentTrack;
-            _= UpdateMetaInfos();
+            _= UpdateMetaInfos().ContinueWith(_ => InvokeAsync(StateHasChanged));
         }
     }
 
