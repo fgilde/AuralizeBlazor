@@ -2,6 +2,7 @@
 @using AuralizeBlazor.Options
 @using MudBlazor.Extensions.Components.ObjectEdit.Options
 @using Nextended.Core.Extensions
+@using Position = AuralizeBlazor.Options.Position
 
 <PageTitle>Playground</PageTitle>
 
@@ -21,12 +22,15 @@
         <audio class="m-2" style="width: 300px;" src="/sample.mp3" controls="true"></audio>
         <Auralizer @ref=_vis
                    Presets="AuralizerPreset.All"
+                   PresetListPosition="Position.TopLeft"
+                   PresetListToggleButtonPosition="Position.TopLeft"
+                   PreviewImageInPresetList="true"
                    ShowPresetNameOnChange="true"
                    OnPresetApplied="PresetsApplied"
                    GradientChanged="@MainLayout.Instance.ColorsChanged"
                    Height="90%"
                    ConnectAllAudioSources="true"
-                   ContextMenuAction="VisualizerAction.TogglePictureInPicture"
+                   ContextMenuAction="VisualizerAction.DisplayActionMenu"
                    DoubleClickAction="VisualizerAction.ToggleFullscreen"
                    Overlay="true">
         </Auralizer>

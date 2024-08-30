@@ -490,6 +490,7 @@
             }
         };
 
+        //options.overlay = true;
         options.overlay = options.overlay || options.backgroundImageToApply;
 
         return options;
