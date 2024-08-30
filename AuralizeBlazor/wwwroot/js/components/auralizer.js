@@ -31,6 +31,9 @@
         this.preventSingleClick = false;
         this.analyzer = this.audioMotion._analyzer[0];
         this.originalGetFloatFrequencyData = this.analyzer.getFloatFrequencyData.bind(this.analyzer);
+        if (options.initialRender > 0) {
+            this.renderOneTimeStatic();
+        }
     }
 
     async renderOneTimeStatic() {
@@ -744,7 +747,10 @@
     setOptions(options) {
         this.audioMotion.setOptions(this.options = this.prepareOptions(options));
         this.reconnectInputs();
-        if (this.options.initialRender > 0 && !this.isPlaying()) {
+    }
+
+    renderOneTimeStaticIf(force) {
+        if (force || (!this.isSimulationRunning() && this.options.initialRender > 0 && !this.isPlaying())) {
             this.renderOneTimeStatic();
         }
     }

@@ -16,7 +16,6 @@
         <audio style="display:none;" src="@((_track ??= TracksService.MainDemoTrack).Url)"></audio>
     </center>
 </Auralizer>
-
 @code {
     private Auralizer _vis;   
     private IAuralizerTrack _track = null;
@@ -47,5 +46,6 @@
     {
         return _vis.StopSimulationAsync();            
     }
+
 
 }

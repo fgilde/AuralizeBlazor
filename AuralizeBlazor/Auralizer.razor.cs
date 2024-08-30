@@ -40,6 +40,7 @@ public partial class Auralizer
     [Inject] protected IServiceProvider ServiceProvider { get; set; }
 
     private const bool Minify = true;
+
     private string _backgroundImageToApply;
     private string _id = Guid.NewGuid().ToFormattedId();
 
@@ -480,7 +481,7 @@ public partial class Auralizer
     /// <summary>
     /// The image of the current track.
     /// </summary>
-    public string CoverImage { get; private set; }
+    public string CoverImage { get; protected set; }
 
     /// <summary>
     /// Meta data of the current track.
@@ -560,19 +561,20 @@ public partial class Auralizer
         _metaTagsHidden = !_metaTagsHidden;
     }
 
-    protected virtual Task OnMetaChanged()
+    protected virtual async Task OnMetaChanged()
     {
-        return MetaInfosChanged.InvokeAsync(Meta);
+         await MetaInfosChanged.InvokeAsync(Meta);
+         await ApplyInitialRender();
     }
 
-    private async Task ApplyMetaIf()
+    protected virtual async Task ApplyMetaIf()
     {
         await OnMetaChanged();
         ShowMeta = ShowTrackInfosOnPlay && !string.IsNullOrEmpty(Meta?.Tag?.Title);
 
         var image = Meta?.Tag?.Pictures.FirstOrDefault();
-        await UpdateColors(image?.Data?.Data, AutoGradientFrom.MetaCoverImage);
         CoverImage = image != null ? $"data:{image.MimeType};base64,{Convert.ToBase64String(image.Data.Data)}" : null;
+        await UpdateColors(image?.Data?.Data, AutoGradientFrom.MetaCoverImage);
         if (ApplyBackgroundImageFromTrack && CoverImage != null)
         {
             await SetBackgroundImage(CoverImage);
@@ -590,6 +592,16 @@ public partial class Auralizer
         _backgroundImageToApply = url;
         await UpdateJsOptions();
         await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// Re applies the InitialRender property to the visualizer.
+    /// </summary>
+    public Task ApplyInitialRender(bool force = false)
+    {
+        if(JsReference == null)
+            return Task.CompletedTask;
+        return JsReference.InvokeVoidAsync("renderOneTimeStaticIf", force).AsTask();
     }
 
     /// <summary>
@@ -1684,7 +1696,10 @@ public partial class Auralizer
         return TranslateFn?.Invoke(s);
     }
 
-    private async Task UpdateJsOptions()
+    /// <summary>
+    /// Update JS options
+    /// </summary>
+    protected async Task UpdateJsOptions()
     {
         if(AutoApplyGradient != AutoGradientFrom.None && AutoApplyGradient == AutoGradientFrom.BackgroundImage)
             await UpdateColors(_backgroundImageToApply ?? BackgroundImage, AutoGradientFrom.BackgroundImage);

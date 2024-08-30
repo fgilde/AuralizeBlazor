@@ -309,6 +309,11 @@
             Reads the stream from the given url.
             </summary>
         </member>
+        <member name="M:AuralizeBlazor.Auralizer.ApplyInitialRender(System.Boolean)">
+            <summary>
+            Re applies the InitialRender property to the visualizer.
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.ApplyBackgroundImageFromTrack">
             <summary>
             If a track from <see cref="P:AuralizeBlazor.Auralizer.TrackList"/>> is played the background image will be set to the track image if this setting is true.
@@ -855,6 +860,11 @@
         <member name="M:AuralizeBlazor.Auralizer.Translate(System.String)">
             <summary>
             Function is called for text render and can used to translate text.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.UpdateJsOptions">
+            <summary>
+            Update JS options
             </summary>
         </member>
         <member name="M:AuralizeBlazor.Auralizer.HandleMouseWheel(Microsoft.AspNetCore.Components.Web.WheelEventArgs)">
