@@ -31,9 +31,6 @@
         this.preventSingleClick = false;
         this.analyzer = this.audioMotion._analyzer[0];
         this.originalGetFloatFrequencyData = this.analyzer.getFloatFrequencyData.bind(this.analyzer);
-        if (options.initialRender > 0) {
-            this.renderOneTimeStatic();
-        }
     }
 
     async renderOneTimeStatic() {
@@ -461,13 +458,6 @@
         }
     }
 
-    async readBlobAsByteArray(blobUrl) {
-        const response = await fetch(blobUrl);
-        const blob = await response.blob();
-        const arrayBuffer = await blob.arrayBuffer();
-        return Array.from(new Uint8Array(arrayBuffer));
-    }
-
     prepareOptions(options) {
         options.fsElement = options.fsElement || options.visualizer;
         options.gradientLeft = options.gradientLeft || options.gradient;
@@ -502,9 +492,19 @@
         return options;
     }
 
+    updateGradient(gradient, gradientLeft, gradientRight) {
+        this.audioMotion.setOptions({
+            gradient: this.registerGradientIfRequired(gradient),
+            gradientLeft: this.registerGradientIfRequired(gradientLeft),
+            gradientRight: this.registerGradientIfRequired(gradientRight)
+        });
+        this.audioMotion.redraw();
+    }
+
     registerGradientIfRequired(gradient) {
         if (!gradient) return 'classic';
         if (typeof gradient === 'string') return gradient;
+        if (!this.audioMotion) return 'classic';
         if (!gradient.name) return 'classic';
         const name = gradient.name.toLowerCase();
         if (this.audioMotion?._gradients?.[name] || !gradient.colorStops || gradient.isPredefined) return name;
@@ -737,9 +737,16 @@
         }
     }
 
+    isPlaying() {
+        return this.getAudioElements().some(el => !el.paused || el.autoplay);
+    }
+
     setOptions(options) {
         this.audioMotion.setOptions(this.options = this.prepareOptions(options));
         this.reconnectInputs();
+        if (this.options.initialRender > 0 && !this.isPlaying()) {
+            this.renderOneTimeStatic();
+        }
     }
 
     async togglePip() {
@@ -785,6 +792,16 @@
     toggleFullscreen() {
         this.audioMotion.toggleFullscreen();
         return this.audioMotion.isFullscreen;
+    }
+
+
+    async readBlobAsByteArray(blobUrl) {
+        console.log('READ THE BLOB BYTES');
+        const response = await fetch(blobUrl);
+        const blob = await response.blob();
+        const arrayBuffer = await blob.arrayBuffer();
+        console.log('ARRAY BUFFER', arrayBuffer);
+        return Array.from(new Uint8Array(arrayBuffer));
     }
 
     dispose() {

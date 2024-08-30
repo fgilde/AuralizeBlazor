@@ -1,0 +1,28 @@
+﻿@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+<MudExEnumSelect TEnum="AutoGradientFrom" @bind-Value="_autoApplyGradient"></MudExEnumSelect>
+
+<Auralizer @ref=_vis
+           InitialPreset="AuralizerPreset.ReflexMirror"
+           PreviewImageInPresetList="true"
+           InitialRender="InitialRender.WithRandomData"
+           GradientChanged="@MainLayout.Instance.ColorsChanged"
+           Presets="@AuralizerPreset.All.ToArray()"
+           TrackList="@TracksService.EyirishTracks"
+           Height="700px"           
+           BackgroundImage="/bg1.jpg"
+           ApplyBackgroundImageFromTrack="false"
+           AutoApplyGradient="_autoApplyGradient"
+           ClickAction="VisualizerAction.TogglePlayPause"
+           Overlay="true">
+    <center>
+        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="@TracksService.EyirishTracks[0].Url"></audio>
+    </center>
+</Auralizer>
+
+@code {
+    private AutoGradientFrom _autoApplyGradient = AutoGradientFrom.BackgroundImage;
+    private Auralizer _vis;
+
+}

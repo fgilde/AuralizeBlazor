@@ -97,7 +97,11 @@
             <div class="meta-cover" @onclick="ToggleTagsVisibility">
                 @if (!_metaCollapsed)
                 {
-                    <img src="@CoverImage" alt="Cover Image" class="cover-image"/>
+                    if (!string.IsNullOrEmpty(CoverImage))
+                    {
+                        <img src="@CoverImage" alt="Cover Image" class="cover-image"/>
+                    }
+
                     @RenderButton(Position.TopRight, () => ShowMeta = false, AudioIcons.Close)
                 }
                 @RenderButton(Position.TopLeft, () => _metaCollapsed = !_metaCollapsed, _metaCollapsed ? AudioIcons.ArrowUp : AudioIcons.ArrowDown)

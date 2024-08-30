@@ -26,6 +26,7 @@ public class DemoTracksService
         yield return new AuralizerTrack("/3.Brothers-of-the-heart.mp3");
         yield return new AuralizerTrack("/4.Unified-Voice.mp3");
         yield return new AuralizerTrack("/5.Heading-Back-to-Dublin.mp3");
+        yield return new AuralizerTrack("/6.Paddys_Roar.mp3");
         yield return new AuralizerTrack("/7.Rosalie.mp3");
         yield return new AuralizerTrack("/8.Fiona's Melody.mp3");
     }

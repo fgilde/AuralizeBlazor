@@ -10,10 +10,10 @@
     <Description>AuralizeBlazor is a wrapper component for audioMotion-analyzer.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Version>1.0.7</Version>
+    <Version>1.1.1</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <AssemblyVersion>1.0.7</AssemblyVersion>
+    <AssemblyVersion>1.1.1</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,6 +42,7 @@
     <PackageReference Include="BlazorJS" Version="2.1.6" />
     <PackageReference Include="Nextended.Core" Version="7.0.55" />
     <PackageReference Include="Nextended.Blazor" Version="7.0.38" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 

@@ -88,4 +88,9 @@
     <None Include="wwwroot\Digital Serenade.mp3" />
     <None Include="wwwroot\web.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="Examples\AutoGradientsExample.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
 </Project>

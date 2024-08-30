@@ -1,6 +1,7 @@
 ﻿@using AuralizeBlazor.Features
 @using AuralizeBlazor.Options
 
+<button @onclick="() => _gradientApply = AutoGradientFrom.MetaCoverImage">Apply Gradients from Cover Image</button>
 <Auralizer @ref=_vis
            @bind-Features="_features"
            InitialPreset="AuralizerPreset.RadialSpectrumScale"
@@ -12,6 +13,7 @@
            TrackList="@TracksService.EyirishTracks"
            Height="700px"        
            ClickAction="VisualizerAction.TogglePlayPause"
+           AutoApplyGradient="_gradientApply"
            ApplyBackgroundImageFromTrack="true"
            ContextMenuAction="VisualizerAction.None"
            FullPaged="_fullPaged"
@@ -20,19 +22,25 @@
            MetaInfosChanged="@MetaChanged"
            Overlay="false">
     <center>
-        <audio class="audio-main mud-ex-animate-all-properties" autoplay="true" preload="metadata" loading="lazy" controls="true" src="@TracksService.EyirishTracks[0].Url"></audio>
+        <audio class="audio-main mud-ex-animate-all-properties" autoplay="true" preload="metadata" loading="lazy" controls="true" src="@_file"></audio>
     </center>
 </Auralizer>
 
 @code {
+    [Inject] IJSRuntime _jsRuntime { get; set; }
+
+    private AutoGradientFrom _gradientApply;
+    string _file;
     bool _fullPaged = false;
     private Auralizer _vis;
     private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = string.Empty, Position = TextPosition.CenterCenter }];
 
-    protected override void OnInitialized()
+
+    protected override async Task OnInitializedAsync()
     {
+        _file = TracksService.EyirishTracks[0].Url;
         _fullPaged = Navigation.FullPaged();
-        base.OnInitialized();
+        await base.OnInitializedAsync();
     }
 
     private void OnPresetApplied(AppliedPresetEventArgs arg)

@@ -25,6 +25,11 @@
         <member name="M:AuralizeBlazor.Auralizer.ComponentJsInitializeMethodName">
             <inheritdoc />
         </member>
+        <member name="P:AuralizeBlazor.Auralizer.AutoPlayNextTrackOnEnd">
+            <summary>
+            If a tracklist is provided next track will be played when the current track ends.
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.IsAnyToggleableListOpen">
             <summary>
             Returns true if any toggleable list is open.
@@ -233,6 +238,11 @@
             Determines whether the name of the preset is shown when it is changed.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Auralizer.RandomColorUpdateDelay">
+            <summary>
+            If <see cref="P:AuralizeBlazor.Auralizer.AutoApplyGradient"/> is set to Random the visualizer will change the gradient randomly and waits for each change this time delay.
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.InitialPreset">
             <summary>
             Specifies the initial preset to be applied to the visualizer.
@@ -246,6 +256,12 @@
         <member name="P:AuralizeBlazor.Auralizer.BackgroundImage">
             <summary>
             Sets the background image of the visualizer component.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Auralizer.AutoApplyGradient">
+            <summary>
+            Experimental:
+            With this setting you can overwrite the gradient of the visualizer to use colors from an image.
             </summary>
         </member>
         <member name="P:AuralizeBlazor.Auralizer.BackgroundSize">
@@ -283,7 +299,7 @@
             Meta data of the current track.
             </summary>
         </member>
-        <member name="M:AuralizeBlazor.Auralizer.UpdateMetaInfos(System.Boolean)">
+        <member name="M:AuralizeBlazor.Auralizer.UpdateMetaInfos(System.String,System.Boolean)">
             <summary>
             Updates the meta information of the current track.
             </summary>
@@ -721,6 +737,13 @@
             Toggles the track list visibility
             </summary>
         </member>
+        <member name="M:AuralizeBlazor.Auralizer.GetAbsoluteUrlAsync(System.String)">
+            <summary>
+            Returns the given url absolute. If given url is null current track url is returned
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
         <member name="M:AuralizeBlazor.Auralizer.TogglePictureInPicture">
             <summary>
             Toggles the picture in picture mode and returns true if the current state is picture in picture otherwise false.
@@ -814,6 +837,11 @@
         <member name="M:AuralizeBlazor.Auralizer.HandleIsPlayingChanged(System.Boolean)">
             <summary>
             Called playing status changed
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Auralizer.BeforeGradientChange(AuralizeBlazor.Options.AudioMotionGradient)">
+            <summary>
+            Called before the gradient is changed.
             </summary>
         </member>
         <member name="M:AuralizeBlazor.Auralizer.HandleOnGradientChanged(AuralizeBlazor.Options.AudioMotionGradient)">
@@ -1125,6 +1153,34 @@
         <member name="T:AuralizeBlazor.Options.AudioMotionGradient">
             <summary>
             Gradient for the audio motion visualizer.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Options.AudioMotionGradient.RandomColorStop">
+            <summary>
+            Returns a random color stop.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuralizeBlazor.Options.AudioMotionGradient.RandomColorHex">
+            <summary>
+            Returns a random color hex.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuralizeBlazor.Options.AudioMotionGradient.RandomGradient">
+            <summary>
+            Returns a random gradient.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuralizeBlazor.Options.AudioMotionGradient.FromImage(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Returns a gradient from an image.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Options.AudioMotionGradient.FromColors(System.String,System.Collections.Generic.List{SixLabors.ImageSharp.PixelFormats.Rgba32},AuralizeBlazor.Options.AudioMotionGradient)">
+            <summary>
+            Returns a gradient from a list of colors.
             </summary>
         </member>
         <member name="P:AuralizeBlazor.Options.AudioMotionGradient.Name">

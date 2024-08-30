@@ -1,28 +1,29 @@
 ﻿using System;
-using System.Buffers.Text;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AuralizeBlazor.Extensions;
 using AuralizeBlazor.Features;
 using AuralizeBlazor.Options;
 using BlazorJS;
 using BlazorJS.Attributes;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Nextended.Blazor.Models;
 using Nextended.Core.Extensions;
-using Nextended.Core.Helper;
-using Nextended.Core.Types;
-using static System.Net.Mime.MediaTypeNames;
-using File = TagLib.File;
+using SixLabors.ImageSharp.PixelFormats;
+
+
 
 namespace AuralizeBlazor;
 
@@ -36,13 +37,15 @@ public partial class Auralizer
     /// </summary>
     public static string SuggestedWebComponentName => string.Join("-", typeof(Auralizer).FullName.Replace(".", "").SplitByUpperCase()).ToLower();
 
+    [Inject] protected IServiceProvider ServiceProvider { get; set; }
+
     private const bool Minify = true;
     private string _backgroundImageToApply;
     private string _id = Guid.NewGuid().ToFormattedId();
 
     /// <inheritdoc />
     protected override string ComponentJsFile() => Minify ? "./_content/AuralizeBlazor/js/auralize.min.js" : "./_content/AuralizeBlazor/js/components/auralizer.js";
-    
+
     /// <summary>
     /// Library path for the AudioMotionAnalyzer library.
     /// </summary>
@@ -93,6 +96,12 @@ public partial class Auralizer
     [Parameter] public string MouseOverMessageClass { get; set; }
     [Parameter] public bool PreviewImageInPresetList { get; set; }
 
+    /// <summary>
+    /// If a tracklist is provided next track will be played when the current track ends.
+    /// </summary>
+    [Parameter]
+    public bool AutoPlayNextTrackOnEnd { get; set; } = true;
+
     public bool IsMouseOver { get; private set; }
 
     /// <summary>
@@ -142,27 +151,27 @@ public partial class Auralizer
     /// Specify a Translations function to translate or localize texts with.
     /// </summary>
     [Parameter] public Func<string, string> TranslateFn { get; set; } = s => s;
-    
+
     /// <summary>
     /// Position for the track list if the list is filled and should be shown.
     /// </summary>
     [Parameter] public Position TrackListPosition { get; set; }
-    
+
     /// <summary>
     /// The position of the track list toggle button if the <see cref="TrackListBehaviour"/> is toggleable.
     /// </summary>
     [Parameter] public Position TrackListToggleButtonPosition { get; set; }
-    
+
     /// <summary>
     /// Defines the behavior of the track list.
     /// </summary>
     [Parameter] public SelectionListBehaviour TrackListBehaviour { get; set; } = SelectionListBehaviour.Toggleable;
-    
+
     /// <summary>
     /// The mode how the track list should be displayed.
     /// </summary>
     [Parameter] public SelectionListMode TrackListMode { get; set; }
-    
+
     /// <summary>
     /// This class will be added to the track list.
     /// </summary>
@@ -180,7 +189,7 @@ public partial class Auralizer
     /// Also, if in <see cref="InitialRender"/> a simulation is set the simulation will be always running when no audio is playing.
     /// </summary>
     [Parameter, ForJs] public bool KeepState { get; set; }
-    
+
     /// <summary>
     /// Position for the preset list if the list is filled and should be shown.
     /// </summary>
@@ -195,12 +204,12 @@ public partial class Auralizer
     /// Defines the behavior of the preset list.
     /// </summary>
     [Parameter] public SelectionListBehaviour PresetListBehaviour { get; set; } = SelectionListBehaviour.Toggleable;
-    
+
     /// <summary>
     /// Defines the mode how the preset list should be displayed.
     /// </summary>
     [Parameter] public SelectionListMode PresetListMode { get; set; }
-    
+
     /// <summary>
     /// This class will be added to the preset list.
     /// </summary>
@@ -210,7 +219,7 @@ public partial class Auralizer
     /// <summary>
     /// All possible actions for the visualizer.
     /// </summary>
-    public VisualizerAction[] Actions => _actions ??= Nextended.Core.Helper.Enum<VisualizerAction>.Values.Except(new []{VisualizerAction.None, VisualizerAction.DisplayActionMenu}).ToArray();
+    public VisualizerAction[] Actions => _actions ??= Nextended.Core.Helper.Enum<VisualizerAction>.Values.Except(new[] { VisualizerAction.None, VisualizerAction.DisplayActionMenu }).ToArray();
 
 
     /// <summary>
@@ -251,7 +260,7 @@ public partial class Auralizer
     /// <summary>
     /// Invoked when meta data are changed
     /// </summary>
-    [Parameter] public EventCallback<File?> MetaInfosChanged { get; set; }
+    [Parameter] public EventCallback<TagLib.File?> MetaInfosChanged { get; set; }
 
     /// <summary>
     /// Invoked when the gradient used by the visualizer is changed.
@@ -319,6 +328,11 @@ public partial class Auralizer
     [Parameter] public bool ShowPresetNameOnChange { get; set; }
 
     /// <summary>
+    /// If <see cref="AutoApplyGradient"/> is set to Random the visualizer will change the gradient randomly and waits for each change this time delay.
+    /// </summary>
+    [Parameter] public TimeSpan RandomColorUpdateDelay { get; set; } = TimeSpan.FromMilliseconds(200);
+
+    /// <summary>
     /// Specifies the initial preset to be applied to the visualizer.
     /// </summary>
     [Parameter] public AuralizerPreset InitialPreset { get; set; }
@@ -336,6 +350,105 @@ public partial class Auralizer
     public string BackgroundImage { get; set; }
 
     /// <summary>
+    /// Experimental:
+    /// With this setting you can overwrite the gradient of the visualizer to use colors from an image.
+    /// </summary>
+    [Parameter]
+    public AutoGradientFrom AutoApplyGradient
+    {
+        get => _autoApplyGradient;
+        set
+        {
+            if (_autoApplyGradient == value)
+                return;
+            _autoApplyGradient = value;
+            _ = UpdateColors(BackgroundImage, AutoGradientFrom.BackgroundImage);
+            _ = UpdateColors(Meta?.Tag?.Pictures?.FirstOrDefault()?.Data?.Data, AutoGradientFrom.MetaCoverImage);
+        }
+    }
+
+    private ConcurrentDictionary<string, List<Rgba32>> _colorCache = new();
+    private Task _updateColorsTask;
+    private string _trackImage;
+    
+    Task UpdateColors() => Task.WhenAll(
+         UpdateColors(BackgroundImage, AutoGradientFrom.BackgroundImage),
+         UpdateColors(_trackImage, AutoGradientFrom.TrackListCoverImage),
+         UpdateColors(Meta?.Tag?.Pictures?.FirstOrDefault()?.Data?.Data, AutoGradientFrom.MetaCoverImage)
+        );
+
+    private Task ResetColors()
+    {
+        if (_currentPreset != null && AutoApplyGradient == AutoGradientFrom.None)
+        {
+            return ApplyPresetAsync(_currentPreset);
+        }
+        return Task.CompletedTask;
+    }
+
+    async Task UpdateColors(byte[] image, AutoGradientFrom from)
+    {
+        SetUpdateColorTask(AutoApplyGradient == AutoGradientFrom.Random);
+        if (image is not { Length: > 0 } || AutoApplyGradient == AutoGradientFrom.None || AutoApplyGradient != from)
+        {
+            await ResetColors();
+            return;
+        }
+
+        var hash = image.GetHashSHA1();
+        if (_colorCache.TryGetValue(hash, out var colors))
+            Gradient = AudioMotionGradient.FromColors(hash, colors, Gradient);
+        else
+        {
+            var rgbs = await ImageHelper.ExtractMainColorsFromImageAsync(image, 50);
+            _colorCache.TryAdd(hash, rgbs);
+            Gradient = AudioMotionGradient.FromColors(hash, rgbs, Gradient);
+        }
+        _ = UpdateGradientInJs();
+    }
+
+    private void SetUpdateColorTask(bool start)
+    {
+        if (start)
+        {
+            _updateColorsTask ??= Task.Run(async () =>
+            {
+                while (AutoApplyGradient == AutoGradientFrom.Random)
+                {
+                    await Task.Delay(RandomColorUpdateDelay);
+                    SetGradient(AudioMotionGradient.RandomGradient());
+                    _ = UpdateGradientInJs();
+                }
+            });
+        }
+        else
+        {
+            try
+            {
+                if(_updateColorsTask != null)
+                    _updateColorsTask.Dispose();
+                _updateColorsTask = null;
+            }
+            catch { /*Ignored */ }
+        }
+    }
+    
+    Task UpdateGradientInJs() => JsReference?.InvokeVoidAsync("updateGradient", Gradient, GradientLeft, GradientRight).AsTask();
+
+    async Task UpdateColors(string image, AutoGradientFrom from)
+    { 
+        SetUpdateColorTask(AutoApplyGradient == AutoGradientFrom.Random);
+        if (string.IsNullOrWhiteSpace(image) || AutoApplyGradient == AutoGradientFrom.None || AutoApplyGradient != from)
+        { 
+            await ResetColors();
+            return;
+        }
+
+        var bytes = await ReadBytesAsync(await GetAbsoluteUrlAsync(image));
+        await UpdateColors(bytes, from);
+    }
+
+    /// <summary>
     /// Background size
     /// </summary>
     [Parameter, ForJs]
@@ -345,7 +458,7 @@ public partial class Auralizer
     /// Background repeat
     /// </summary>
     [Parameter, ForJs]
-    public string BackgroundRepeat { get; set; }  
+    public string BackgroundRepeat { get; set; }
 
     /// <summary>
     /// Background position
@@ -372,25 +485,31 @@ public partial class Auralizer
     /// <summary>
     /// Meta data of the current track.
     /// </summary>
-    public TagLib.File Meta {get; protected set;}
+    public TagLib.File Meta { get; protected set; }
 
     protected bool ShowMeta = false;
     private ConcurrentDictionary<string, TagLib.File> _metaCache = new();
+    private AudioMotionGradient _gradientLeft = null;
+    private AudioMotionGradient _gradientRight = null;
+    private AutoGradientFrom _autoApplyGradient = AutoGradientFrom.None;
 
     /// <summary>
     /// Updates the meta information of the current track.
     /// </summary>
-    protected virtual async Task UpdateMetaInfos(bool force = false)
+    protected virtual async Task UpdateMetaInfos(string? uri = null, bool force = false)
     {
-        if (_metaCache.TryGetValue(_currentTrack, out var cachedFile))
+        var currentTrack = uri ?? _currentTrack;
+        if (string.IsNullOrWhiteSpace(currentTrack))
+            return;
+        if (_metaCache.TryGetValue(currentTrack, out var cachedFile))
         {
             Meta = cachedFile;
             await ApplyMetaIf();
             return;
         }
-   
-        string url = await GetCurrentAbsoluteTrackUrlAsync();
-        if(string.IsNullOrWhiteSpace(url) || (!force && !ApplyBackgroundImageFromTrack && !ShowTrackInfosOnPlay))
+
+        string url = await GetAbsoluteUrlAsync(currentTrack);
+        if (string.IsNullOrWhiteSpace(url) || (!force && !ApplyBackgroundImageFromTrack && !ShowTrackInfosOnPlay))
             return;
         var bytes = await ReadBytesAsync(url);
         if (bytes == null)
@@ -398,13 +517,19 @@ public partial class Auralizer
             return;
         }
 
+        
+        Meta = GetMeta(bytes);
+        _metaCache[currentTrack] = Meta;
+        await ApplyMetaIf();
+    }
+
+    protected virtual TagLib.File GetMeta(byte[] bytes)
+    {
         using var ms = new MemoryStream(bytes);
         ms.Position = 0;
         ms.Seek(0, SeekOrigin.Begin);
-        var file = File.Create(new StreamFileAbstraction(_currentTrack.Split("/").LastOrDefault() ?? string.Empty, ms, null));
-        Meta = file;
-        _metaCache[_currentTrack] = file; 
-        await ApplyMetaIf();
+        var name = _currentTrack.Split("/").LastOrDefault() ?? "Unknown.mp3";
+        return TagLib.File.Create(new StreamFileAbstraction(name.EnsureEndsWith(".mp3"), ms, null));
     }
 
     /// <summary>
@@ -412,14 +537,17 @@ public partial class Auralizer
     /// </summary>
     protected virtual async Task<byte[]> ReadBytesAsync(string url)
     {
+        if(string.IsNullOrWhiteSpace(url))
+            return null;
         if (DataUrl.TryParse(url, out var data)) // If not but given url is a data url we can use the bytes from it
             return data.Bytes;
-        if (url.StartsWith("blob:")) 
+        if (!RunsOnClientSide && url.StartsWith("blob:"))
             return await JsReference.InvokeAsync<byte[]>("readBlobAsByteArray", url);
-        
+
         return await new HttpClient().GetByteArrayAsync(url);
     }
 
+    public static bool RunsOnClientSide => RuntimeInformation.OSDescription == "Browser"; // WASM
 
     private void ToggleTagsVisibility()
     {
@@ -443,11 +571,14 @@ public partial class Auralizer
         ShowMeta = ShowTrackInfosOnPlay && !string.IsNullOrEmpty(Meta?.Tag?.Title);
 
         var image = Meta?.Tag?.Pictures.FirstOrDefault();
+        await UpdateColors(image?.Data?.Data, AutoGradientFrom.MetaCoverImage);
         CoverImage = image != null ? $"data:{image.MimeType};base64,{Convert.ToBase64String(image.Data.Data)}" : null;
         if (ApplyBackgroundImageFromTrack && CoverImage != null)
         {
             await SetBackgroundImage(CoverImage);
-        } else         {
+        }
+        else
+        {
             await SetBackgroundImage(null);
         }
 
@@ -456,8 +587,6 @@ public partial class Auralizer
 
     private async Task SetBackgroundImage(string url)
     {
-        //if(_backgroundImageToApply == url)
-        //    return;
         _backgroundImageToApply = url;
         await UpdateJsOptions();
         await InvokeAsync(StateHasChanged);
@@ -610,10 +739,14 @@ public partial class Auralizer
         preset.Apply(this, settings.ResetFirst);
         _currentPreset = preset;
         HandleOnPresetApplied(preset, settings);
+        if (AutoApplyGradient != AutoGradientFrom.None)
+        {
+            _= UpdateColors();
+        }
 
         return this;
     }
-    
+
     /// <summary>
     /// Displays a message on the visualizer for the specified duration.
     /// </summary>
@@ -879,7 +1012,16 @@ public partial class Auralizer
     public AudioMotionGradient Gradient
     {
         get => _gradient;
-        set => GradientLeft = GradientRight = (_gradient = CheckGradientChange(value));
+        set
+        {
+            value = BeforeGradientChange(value);
+            SetGradient(value);
+        }
+    }
+
+    private AudioMotionGradient SetGradient(AudioMotionGradient value, bool checkChange = true)
+    {
+        return GradientLeft = GradientRight = (_gradient = checkChange ? CheckGradientChange(value) : value);
     }
 
     private AudioMotionGradient CheckGradientChange(AudioMotionGradient value)
@@ -892,12 +1034,22 @@ public partial class Auralizer
     /// <summary>
     /// Specifies the color gradient for the left channel (dual layouts only).
     /// </summary>
-    [Parameter, ForJs(IgnoreOnParams = true)] public AudioMotionGradient? GradientLeft { get; set; } = null;
+    [Parameter, ForJs(IgnoreOnParams = true)]
+    public AudioMotionGradient? GradientLeft
+    {
+        get => _gradientLeft;
+        set => _gradientLeft = BeforeGradientChange(value);
+    }
 
     /// <summary>
     /// Specifies the color gradient for the right channel (dual layouts only).
     /// </summary>
-    [Parameter, ForJs(IgnoreOnParams = true)] public AudioMotionGradient? GradientRight { get; set; } = null;
+    [Parameter, ForJs(IgnoreOnParams = true)]
+    public AudioMotionGradient? GradientRight
+    {
+        get => _gradientRight;
+        set => _gradientRight = BeforeGradientChange(value);
+    }
 
     /// <summary>
     /// Enables or disables alpha transparency for the bars based on their amplitude.
@@ -1105,17 +1257,28 @@ public partial class Auralizer
         return res;
     }
 
-    public async Task<string> GetCurrentAbsoluteTrackUrlAsync()
+    /// <summary>
+    /// Returns the given url absolute. If given url is null current track url is returned
+    /// </summary>
+    /// <param name="url"></param>
+    /// <returns></returns>
+    public virtual async Task<string> GetAbsoluteUrlAsync(string? url = null)
     {
-        string url = _currentTrack ?? (JsReference != null ? await JsReference.InvokeAsync<string>("currentTrack") : null);
+        url ??= _currentTrack ?? (JsReference != null ? await JsReference.InvokeAsync<string>("currentTrack") : null);
         if (string.IsNullOrWhiteSpace(url))
             return url;
-        if(url.StartsWith("blob:") || url.StartsWith("data:"))
+        if (url.StartsWith("blob:") || url.StartsWith("data:"))
             return url;
         if (!url.StartsWith("http"))
         {
-            if(JsRuntime == null)
-                return null; // TODO: Fallback 
+            if (JsRuntime == null)
+            {
+                var nav = ServiceProvider.GetService<NavigationManager>();
+                if (nav != null)
+                    return nav.ToAbsoluteUri(url).ToString();
+                return null;
+            }
+
             var host = await JsRuntime.DInvokeAsync<string>(w => w.location.origin);
             url = host + url.EnsureStartsWith("/");
         }
@@ -1158,7 +1321,7 @@ public partial class Auralizer
     /// </summary>
     /// <returns>A task that is completed directly after the simulation has started</returns>
     public Task SimulateRandomAudioSpectrumAsync() => JsReference?.InvokeVoidAsync("simulateRandomAudioSpectrum").AsTask();
-    
+
     /// <summary>
     /// Simulates a full audio spectrum visualization.
     /// Notice: If you use endless you need manually to stop or pause the simulation and this task will never be completed and should be discarded.
@@ -1168,12 +1331,12 @@ public partial class Auralizer
     /// <param name="endless">if true simulation will not end and automatic restarted but notice then the task will never be completed</param>
     /// <returns>A task that will be completed when the simulation is done</returns>
     public Task SimulateFullAudioSpectrumAsync(string audioFileUrl = "", double speedFactor = 1, bool endless = false) => JsReference?.InvokeVoidAsync("simulateFullAudioSpectrum", audioFileUrl, speedFactor, endless).AsTask();
-    
+
     /// <summary>
     /// Simulates a full audio spectrum visualization but while data is loading a random simulation is running .
     /// </summary>
     public Task SimulateFullAudioSpectrumWithRandomLoadingDataAsync(string audioFileUrl = "", double speedFactor = 1, bool endless = false) => JsReference?.InvokeVoidAsync("simulateRandomAudioSpectrumContinueWithFullSpectrum", audioFileUrl, speedFactor, endless).AsTask();
-    
+
     /// <summary>
     /// Returns true if a simulation is running otherwise false.
     /// </summary>
@@ -1188,12 +1351,12 @@ public partial class Auralizer
     /// If a simulation is running it will be paused otherwise nothing happens.
     /// </summary>
     public Task PauseSimulationAsync() => JsReference?.InvokeVoidAsync("pauseSimulation").AsTask();
-    
+
     /// <summary>
     /// If a simulation is paused it will be resumed otherwise nothing happens.
     /// </summary>
     public Task ResumeSimulationAsync() => JsReference?.InvokeVoidAsync("resumeSimulation").AsTask();
-    
+
     /// <summary>
     /// If a simulation is running it will be stopped otherwise nothing happens.
     /// </summary>
@@ -1204,6 +1367,8 @@ public partial class Auralizer
     /// </summary>
     public async Task PlayTrackAsync(IAuralizerTrack track)
     {
+        await UpdateColors(track?.Image, AutoGradientFrom.TrackListCoverImage);
+        _trackImage = track?.Image;
         if (ApplyBackgroundImageFromTrack && !string.IsNullOrEmpty(track.Image))
         {
             await SetBackgroundImage(track.Image);
@@ -1287,6 +1452,10 @@ public partial class Auralizer
     public void HandleOnEnded()
     {
         UpdateIsPlaying(-1);
+        if (AutoPlayNextTrackOnEnd && TrackList is { Length: > 1 })
+        {
+            _ = NextTrackAsync(_currentTrack);
+        }
     }
 
     private void UpdateIsPlaying(int c)
@@ -1299,7 +1468,7 @@ public partial class Auralizer
             HandleIsPlayingChanged(_isPlaying);
         }
     }
- 
+
     [JSInvokable]
     public async Task HandleOnInputConnected()
     {
@@ -1326,7 +1495,7 @@ public partial class Auralizer
     public async Task UpdateCurrentTrack(string track = null)
     {
         var currentTrack = track;
-        if (track == null && JsReference != null)
+        if (string.IsNullOrWhiteSpace(track) && JsReference != null)
         {
             currentTrack = await JsReference.InvokeAsync<string>("currentTrack");
         }
@@ -1334,7 +1503,7 @@ public partial class Auralizer
         if (_currentTrack != currentTrack)
         {
             _currentTrack = currentTrack;
-            _= UpdateMetaInfos().ContinueWith(_ => InvokeAsync(StateHasChanged));
+            _ = UpdateMetaInfos().ContinueWith(_ => InvokeAsync(StateHasChanged));
         }
     }
 
@@ -1403,6 +1572,14 @@ public partial class Auralizer
     }
 
     /// <summary>
+    /// Called before the gradient is changed.
+    /// </summary>
+    protected virtual AudioMotionGradient BeforeGradientChange(AudioMotionGradient gradient)
+    {
+        return gradient;
+    }
+
+    /// <summary>
     /// Called when the gradient is changed.
     /// </summary>
     protected virtual void HandleOnGradientChanged(AudioMotionGradient value)
@@ -1417,11 +1594,11 @@ public partial class Auralizer
         IsMouseOver = true;
         _containerMouseOverCls = "mouse-over";
         if (SimulateOnHover && JsReference is not null && !IsPlaying)
-        {           
+        {
             var simulating = await IsSimulationRunning();
             if (!simulating)
-            {                
-                _ = SimulateFullAudioSpectrumWithRandomLoadingDataAsync(null, 1, true);                
+            {
+                _ = SimulateFullAudioSpectrumWithRandomLoadingDataAsync(null, 1, true);
             }
             else
             {
@@ -1509,6 +1686,8 @@ public partial class Auralizer
 
     private async Task UpdateJsOptions()
     {
+        if(AutoApplyGradient != AutoGradientFrom.None && AutoApplyGradient == AutoGradientFrom.BackgroundImage)
+            await UpdateColors(_backgroundImageToApply ?? BackgroundImage, AutoGradientFrom.BackgroundImage);
         if (JsReference != null)
             await JsReference.InvokeVoidAsync("setOptions", JsOptions());
     }

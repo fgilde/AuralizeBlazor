@@ -31,6 +31,14 @@
     </div>
 <script src="_framework/blazor.webassembly.js"></script>
 <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+<script>
+    window.TEST = {
+        createBlobUrlFromByteArray(byteArray, mimeType) {
+            const blob = new Blob([new Uint8Array(byteArray)], { type: mimeType });
+            return URL.createObjectURL(blob);
+        }
+    }      
+</script>
 </body>
 
 </html>

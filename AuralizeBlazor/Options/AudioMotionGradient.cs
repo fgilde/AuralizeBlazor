@@ -1,5 +1,9 @@
-﻿using System;
+﻿using SixLabors.ImageSharp.PixelFormats;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using AuralizeBlazor.Extensions;
+using Nextended.Core.Extensions;
 
 namespace AuralizeBlazor.Options;
 
@@ -8,26 +12,106 @@ namespace AuralizeBlazor.Options;
 /// </summary>
 public class AudioMotionGradient : IEquatable<AudioMotionGradient>
 {
+    private static readonly Random _random = new();
+
+    /// <summary>
+    /// Returns a random color stop.
+    /// </summary>
+    /// <returns></returns>
+    public static ColorStop RandomColorStop()
+    {
+        return new ColorStop { 
+            Color = RandomColorHex(), 
+            Position = _random.NextDouble()
+        };
+    }
+
+    /// <summary>
+    /// Returns a random color hex.
+    /// </summary>
+    /// <returns></returns>
+    public static string RandomColorHex()
+    {
+        return $"#{_random.Next(0x1000000):X6}";
+    }
+
+    /// <summary>
+    /// Returns a random gradient.
+    /// </summary>
+    /// <returns></returns>
+    public static AudioMotionGradient RandomGradient()
+    {
+        var stops = new List<ColorStop>();
+        for (int i = 0; i < _random.Next(3, 20); i++)
+        {
+            stops.Add(RandomColorStop());
+        }
+        return new AudioMotionGradient()
+        {
+            Name = $"Random{Guid.NewGuid().ToFormattedId()}",
+            ColorStops = stops.ToArray()
+        };
+    }
+
+    /// <summary>
+    /// Returns a gradient from an image.
+    /// </summary>
+    public static AudioMotionGradient FromImage(byte[] imageBytes, int maxColors = 16, int sampleInterval = 10)
+    {
+        var colors = ImageHelper.ExtractMainColorsFromImage(imageBytes, maxColors, sampleInterval);
+        return FromColors(imageBytes.GetHashSHA1(), colors);
+    }
+
+    /// <summary>
+    /// Returns a gradient from a list of colors.
+    /// </summary>
+    public static AudioMotionGradient FromColors(string name, List<Rgba32> colors, AudioMotionGradient? mergeWith = null)
+    {
+        if (mergeWith == null)
+        {
+            return new AudioMotionGradient()
+            {
+                Name = name,
+                ColorStops = (from color in colors
+                              select new ColorStop()
+                              {
+                                  //Position = _random.NextDouble(),
+                                  Color = $"#{color.ToHex()}"
+                              }).ToArray(),
+            };
+        }
+        return new AudioMotionGradient()
+        {
+            Name = name,
+            BgColor = mergeWith.BgColor,
+            ColorStops = (from t in mergeWith.ColorStops let color = $"#{colors[_random.Next(colors.Count)].ToHex()}" select new ColorStop()
+            {
+                Position = t.Position, 
+                Color = color
+            }).ToArray(),
+        };
+    }
+
     /// <summary>
     /// Name of the gradient.
     /// </summary>
     public string Name { get; set; }
-    
+
     /// <summary>
     /// Background color of the gradient.
     /// </summary>
     public string BgColor { get; set; }
-    
+
     /// <summary>
     /// Is this is true, the gradient is predefined and will not force the register call for audioMotion.
     /// </summary>
     public bool IsPredefined { get; set; }
-    
+
     /// <summary>
     /// Color stops for the gradient.
     /// </summary>
     public ColorStop[] ColorStops { get; set; }
-    
+
     // PREDEFINED GRADIENTS
     public static AudioMotionGradient Classic => new()
     {
@@ -36,8 +120,8 @@ public class AudioMotionGradient : IEquatable<AudioMotionGradient>
         ColorStops = new[]
         {
             new ColorStop { Color = "red" },
-            new ColorStop { Color = "yellow"}, 
-            new ColorStop { Color = "lime" } 
+            new ColorStop { Color = "yellow"},
+            new ColorStop { Color = "lime" }
         }
     };
 
@@ -91,7 +175,7 @@ public class AudioMotionGradient : IEquatable<AudioMotionGradient>
             new ColorStop { Color = "#639" }
         }
     };
-    
+
     public static AudioMotionGradient Steelblue => new()
     {
         Name = nameof(Steelblue),
@@ -102,7 +186,7 @@ public class AudioMotionGradient : IEquatable<AudioMotionGradient>
             new ColorStop { Color = "SteelBlue" }
         }
     };
-    
+
 
     // CUSTOM GRADIENTS
     public static AudioMotionGradient Greyscale => new()
@@ -261,7 +345,7 @@ public class AudioMotionGradient : IEquatable<AudioMotionGradient>
         }
     };
 
-    public static AudioMotionGradient PacificDream => new ()
+    public static AudioMotionGradient PacificDream => new()
     {
         Name = "PacificDream",
         BgColor = "#051319",
