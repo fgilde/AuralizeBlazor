@@ -33,14 +33,17 @@
                        ConnectionMode="ConnectionMode.Stream"
                        GradientChanged="@MainLayout.Instance.ColorsChanged"
                        Presets="@AuralizerPreset.All"
+                       IgnoredPropertiesForReset="@(new []{nameof(Auralizer.ShowScaleX)})"
                        Height="400px"
+                       ShowScaleX="false"
+                
                        AudioElements="@(new[] { _audio })"
                        Overlay="true">
             </Auralizer>
         </MudExGridSection>
         <MudExGridSection Column="2" Row="2">
             <Auralizer InitialPreset="AuralizerPreset.AuroraDreams"            
-            ConnectionMode="ConnectionMode.Stream"
+                       ConnectionMode="ConnectionMode.Stream"
             GradientChanged="@MainLayout.Instance.ColorsChanged"
             Presets="@AuralizerPreset.All"
             Height="400px"
