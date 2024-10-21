@@ -20,10 +20,12 @@
             this.visualizer = options.visualizer,
             this.options = this.prepareOptions(options)
         );
-        this.visualizer.addEventListener('click', this.onVisualizerClick.bind(this));
-        this.visualizer.addEventListener('dblclick', this.onVisualizerDblClick.bind(this));
-        this.visualizer.addEventListener('contextmenu', this.onVisualizerCtxMenu.bind(this));
-        this.visualizer.addEventListener('mousemove', this.onVisualizerMouseMove.bind(this));
+        if (this.visualizer) {
+            this.visualizer.addEventListener('click', this.onVisualizerClick.bind(this));
+            this.visualizer.addEventListener('dblclick', this.onVisualizerDblClick.bind(this));
+            this.visualizer.addEventListener('contextmenu', this.onVisualizerCtxMenu.bind(this));
+            this.visualizer.addEventListener('mousemove', this.onVisualizerMouseMove.bind(this));
+        }
         this.reconnectInputs();
         this.dotnet.invokeMethodAsync('HandleOnCreated');
 
