@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <Authors>Florian Gilde</Authors>
     <PackageIconUrl />
     <RepositoryUrl>https://github.com/fgilde/AuralizeBlazor</RepositoryUrl>
@@ -10,10 +10,10 @@
     <Description>AuralizeBlazor is a wrapper component for audioMotion-analyzer.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Version>1.1.4</Version>
+    <Version>2.0.0</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <AssemblyVersion>1.1.4</AssemblyVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,10 +39,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlazorJS" Version="2.1.6" />
-    <PackageReference Include="Nextended.Core" Version="7.0.55" />
-    <PackageReference Include="Nextended.Blazor" Version="7.0.38" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
+    <PackageReference Include="BlazorJS" Version="2.2.0" />
+    <PackageReference Include="Nextended.Core" Version="9.0.3" />    
+    <PackageReference Include="Nextended.Blazor" Version="9.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 
