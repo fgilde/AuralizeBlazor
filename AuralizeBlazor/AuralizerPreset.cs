@@ -66,6 +66,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
                 nameof(Auralizer.KeepState),
                 nameof(Auralizer.InitialRender),
                 nameof(Auralizer.ConnectMicrophone),
+                nameof(Auralizer.ConnectToCapture),
                 nameof(Auralizer.ConnectionMode),
             };
             

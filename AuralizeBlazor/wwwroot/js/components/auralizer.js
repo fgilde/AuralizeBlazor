@@ -13,6 +13,7 @@
         this.options = options;
         this.visualizerAction = visualizerAction;
         this.createVisualizer(options);
+        window['AuralizeBlazor'].instance = this;
     }
 
     createVisualizer(options) {
@@ -60,6 +61,59 @@
             this.simulateFullAudioSpectrum(audioElements[0], 1, true);
         }
     }
+
+    disableOutput() {
+        this.audioMotion.volume = 0; // AT least important for stream connections
+    }
+
+    _captureStream = null;
+    _isSelecting = false;
+    async connectToCapture(preferCurrentTab = false) {
+        if (this._isSelecting)
+            return;
+        try {
+            if (!this._captureStream) {
+                this._isSelecting = true;
+                const constraints = {
+                    audio: true, // oder { systemAudio: 'include' } in Chrome
+                    displaySurface: 'browser',
+                    selfBrowserSurface: 'include',
+                    surfaceSwitching: 'include',
+                    logicalSurface: true,
+                    systemAudio: 'include',
+                    preferCurrentTab: preferCurrentTab
+                };
+                this._captureStream = await navigator.mediaDevices.getDisplayMedia(constraints);
+            }
+            const source = this.audioMotion.audioCtx.createMediaStreamSource(this._captureStream);
+            source.stream = this._captureStream;
+
+            const onInactiveHandler = () => {
+                if (this._captureStream) {
+                    this._captureStream.removeEventListener('inactive', onInactiveHandler);
+                }
+                const idx = this.connectedStreams.indexOf(source);
+                if (idx >= 0) {
+                    this.connectedStreams.splice(idx, 1);
+                }
+                this._captureStream = null;
+                this.reconnectInputs();
+            };
+            this._captureStream.addEventListener('inactive', onInactiveHandler);
+            this.connectedStreams.push(source);
+            this.audioMotion.connectInput(source);
+            this.disableOutput();
+            if (!this.audioMotion.isOn) {
+                this.audioMotion.toggleAnalyzer(true);
+            }
+
+        } catch (err) {
+            console.error('getDisplayMedia failed or cancelled:', err);
+        } finally {
+            this._isSelecting = false;
+        }
+    }
+
 
     //#region Frequency Data helpers
     // TODO: Move to separate class
@@ -621,6 +675,7 @@
 
         this.connectedStreams.push(s);
         this.audioMotion.connectInput(s);
+        this.disableOutput();
     }
 
 
@@ -662,6 +717,10 @@
         const audioElements = this.getAudioElements();
 
         this.disconnectInputs();
+
+        if (this.options.connectToCapture && this.options.connectToCapture !== 0) {
+            this.connectToCapture(this.options.connectToCapture === 2); // 2 = CaptureConnection.ConnectCurrentTab
+        }
 
         this.connectToMic(this.options.connectMicrophone);
 

@@ -374,6 +374,11 @@
             Connects the microphone to the visualizer.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Auralizer.ConnectToCapture">
+            <summary>
+            Set this to allow connection to a capture source
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.ConnectionMode">
             <summary>
             The mode, how auralizer should connect to the source.

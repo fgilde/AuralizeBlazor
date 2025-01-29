@@ -37,7 +37,7 @@ public partial class Auralizer
 
     [Inject] protected IServiceProvider ServiceProvider { get; set; }
 
-    private const bool Minify = true;
+    private const bool Minify = false;
 
     private string _backgroundImageToApply;
     private string _id = Guid.NewGuid().ToFormattedId();
@@ -694,6 +694,12 @@ public partial class Auralizer
     /// </summary>
     [Parameter, ForJs]
     public bool ConnectMicrophone { get; set; }
+
+    /// <summary>
+    /// Set this to allow connection to a capture source
+    /// </summary>
+    [Parameter, ForJs]
+    public CaptureConnection ConnectToCapture { get; set; } = CaptureConnection.None;
 
     /// <summary>
     /// The mode, how auralizer should connect to the source.
