@@ -38,7 +38,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         var currentFeatures = visualizer.Features?.ToList() ?? new List<IVisualizerFeature>();
         _action(visualizer);
         var newFeatures = visualizer.Features;
-        foreach (var feature in newFeatures ?? Array.Empty<IVisualizerFeature>())
+        foreach (var feature in newFeatures ?? [])
         {
             if (currentFeatures.Any(f => f.GetType() == feature.GetType())) continue;
             feature.AppliedFromPreset = true;
@@ -49,27 +49,12 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
 
     public static AuralizerPreset Default =>
         new(0, nameof(Default), visualizer =>
-        {
-            var ignore = new[] // This properties are not reset to default
-            {
-                nameof(Auralizer.Features), 
-                nameof(Auralizer.OverlayChildContent), 
-                nameof(Auralizer.ChildContent), 
-                nameof(Auralizer.AudioElements),
-                nameof(Auralizer.ClickAction),
-                nameof(Auralizer.ContextMenuAction),
-                nameof(Auralizer.DoubleClickAction),
-                nameof(Auralizer.ConnectAllAudioSources),
-                nameof(Auralizer.BackgroundImage),
-                nameof(Auralizer.Height),
-                nameof(Auralizer.Width),
-                nameof(Auralizer.KeepState),
-                nameof(Auralizer.InitialRender),
-                nameof(Auralizer.ConnectMicrophone),
-                nameof(Auralizer.ConnectToCapture),
-                nameof(Auralizer.ConnectionMode),
-            };
-            
+        {  
+            var ignored = typeof(Auralizer).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.GetCustomAttribute(typeof(IgnoreOnPresetAttribute)) != null)
+                .Select(p => p.Name)
+                .ToArray();
+
             visualizer.Features = (visualizer.Features ?? Array.Empty<IVisualizerFeature>()).Where(f => !f.AppliedFromPreset).ToArray();
             
             var defaultVisualizer = new Auralizer(); // Instance with default values
@@ -78,7 +63,7 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
 
             foreach (var prop in properties)
             {
-                if (!prop.CanRead || !prop.CanWrite || ignore.Contains(prop.Name) || prop.GetCustomAttribute(typeof(ForJs)) == null || visualizer?.IgnoredPropertiesForReset?.Contains(prop.Name) == true) 
+                if (!prop.CanRead || !prop.CanWrite || ignored.Contains(prop.Name) || prop.GetCustomAttribute(typeof(ForJs)) == null || visualizer?.IgnoredPropertiesForReset?.Contains(prop.Name) == true) 
                     continue;
                 var defaultValue = prop.GetValue(defaultVisualizer);
                 prop.SetValue(visualizer, defaultValue);

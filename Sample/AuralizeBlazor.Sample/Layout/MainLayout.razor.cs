@@ -9,8 +9,9 @@ public partial class MainLayout
 {
     private static readonly MudExColor[] defaultPalette = ["#0bc", "#2cb", "#0bc", "#09c", "#36b", "#2cb"];
     private MudExColor[] _palette = defaultPalette;
-    private MudTheme _currentTheme = CreateDefaultTheme();
+    internal MudTheme CurrentTheme = CreateDefaultTheme();
 
+    
     private static MudTheme CreateDefaultTheme() =>
         new()
         {
@@ -44,13 +45,13 @@ public partial class MainLayout
         if (arg.ColorStops is not { Length: > 0 })
         {
             _palette = defaultPalette;
-            _currentTheme = CreateDefaultTheme();
+            CurrentTheme = CreateDefaultTheme();
             return Task.CompletedTask;
         }
 
         _palette =  arg?.ColorStops?.Select(x => new MudExColor(x.Color))?.ToArray();
         //var randomColorFromStop = arg.ColorStops[new Random().Next(arg.ColorStops.Length)];
-        _currentTheme = new()
+        CurrentTheme = new()
         {
             PaletteDark = new PaletteDark
             {

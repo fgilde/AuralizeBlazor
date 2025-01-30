@@ -3,8 +3,10 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Text.RegularExpressions;
+using AuralizeBlazor.Sample.Layout;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using MudBlazor.Extensions.Helper;
 
 namespace AuralizeBlazor.Sample.Helper
 {
@@ -38,7 +40,14 @@ namespace AuralizeBlazor.Sample.Helper
 
         private async Task CopyTextToClipboard()
         {
-          //  await JsApiService.CopyToClipboardAsync(Snippets.GetCode(Code));
+            await JsApiService.CopyToClipboardAsync((Code));
+        }
+
+        private string StyleStr()
+        {
+            return "";
+            //var isActive = MainLayout.ActiveAuralizer?.IsPlaying == true && MainLayout.ActiveAuralizer?.IsActive == true;
+            //return MudExStyleBuilder.Default.WithAnimatedGradientBorder(3, MainLayout.Instance.CurrentTheme, true, isActive).ToString();
         }
 
         public void OnShowCode()

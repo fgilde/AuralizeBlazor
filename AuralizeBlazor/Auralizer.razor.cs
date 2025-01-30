@@ -181,13 +181,13 @@ public partial class Auralizer
     /// You can choose between random data, real data and full spectrum.
     /// But be careful with real audio data because it can take a while to load the data and for sure the full spectrum is having the most heavy loading time.
     /// </summary>
-    [Parameter, ForJs] public InitialRender InitialRender { get; set; } = InitialRender.None;
+    [Parameter, IgnoreOnPreset, ForJs] public InitialRender InitialRender { get; set; } = InitialRender.None;
 
     /// <summary>
     /// Set this to true to automatically activate the visualizer before play and deactivate before pause that means that the audio data is staying displayed when audio is paused.
     /// Also, if in <see cref="InitialRender"/> a simulation is set the simulation will be always running when no audio is playing.
     /// </summary>
-    [Parameter, ForJs] public bool KeepState { get; set; }
+    [Parameter, IgnoreOnPreset, ForJs] public bool KeepState { get; set; }
 
     /// <summary>
     /// Position for the preset list if the list is filled and should be shown.
@@ -294,22 +294,22 @@ public partial class Auralizer
     /// <summary>
     /// Indicates whether child content should be overlaid on the visualizer.
     /// </summary>
-    [Parameter, ForJs] public bool OverlayChildContent { get; set; }
+    [Parameter, IgnoreOnPreset, ForJs] public bool OverlayChildContent { get; set; }
 
     /// <summary>
     /// Defines the action taken when the visualizer is clicked.
     /// </summary>
-    [Parameter, ForJs("visualizerClickAction")] public VisualizerAction ClickAction { get; set; } = VisualizerAction.None;
+    [Parameter, IgnoreOnPreset, ForJs("visualizerClickAction")] public VisualizerAction ClickAction { get; set; } = VisualizerAction.None;
 
     /// <summary>
     /// Defines the action taken when the visualizer is double-clicked.
     /// </summary>
-    [Parameter, ForJs("visualizerDblClickAction")] public VisualizerAction DoubleClickAction { get; set; } = VisualizerAction.None;
+    [Parameter, IgnoreOnPreset, ForJs("visualizerDblClickAction")] public VisualizerAction DoubleClickAction { get; set; } = VisualizerAction.None;
 
     /// <summary>
     /// Defines the action taken when the context menu is invoked on the visualizer.
     /// </summary>
-    [Parameter, ForJs("visualizerCtxMenuAction")] public VisualizerAction ContextMenuAction { get; set; } = VisualizerAction.DisplayActionMenu;
+    [Parameter, IgnoreOnPreset, ForJs("visualizerCtxMenuAction")] public VisualizerAction ContextMenuAction { get; set; } = VisualizerAction.DisplayActionMenu;
 
     /// <summary>
     /// Defines the action taken when the mouse wheel is scrolled up over the visualizer.
@@ -345,7 +345,7 @@ public partial class Auralizer
     /// <summary>
     /// Sets the background image of the visualizer component.
     /// </summary>
-    [Parameter, ForJs]
+    [Parameter, IgnoreOnPreset, ForJs]
     public string BackgroundImage { get; set; }
 
     /// <summary>
@@ -617,7 +617,7 @@ public partial class Auralizer
     /// <summary>
     /// The content to be rendered within the visualizer component. All here containing audio and video elements will be connected to the visualizer.
     /// </summary>
-    [Parameter]
+    [Parameter, IgnoreOnPreset]
     public RenderFragment ChildContent
     {
         get => _childContent;
@@ -639,7 +639,7 @@ public partial class Auralizer
     /// <summary>
     /// Array of visualizer features to be applied to the visualizer.
     /// </summary>
-    [Parameter, ForJs(IgnoreOnParams = true)]
+    [Parameter, IgnoreOnPreset, ForJs(IgnoreOnParams = true)]
     public IVisualizerFeature[] Features
     {
         get => _features;
@@ -656,13 +656,13 @@ public partial class Auralizer
     /// <summary>
     /// An array of audio elements (e.g., audio or video tags) to be visualized.
     /// </summary>
-    [Parameter, ForJs]
+    [Parameter, IgnoreOnPreset, ForJs]
     public ElementReference[] AudioElements { get; set; }
 
     /// <summary>
     /// A flag indicating whether all audio sources should be connected to the visualizer.
     /// </summary>
-    [Parameter]
+    [Parameter, IgnoreOnPreset]
     public bool ConnectAllAudioSources { get; set; }
 
     /// <summary>
@@ -692,13 +692,13 @@ public partial class Auralizer
     /// <summary>
     /// Connects the microphone to the visualizer.
     /// </summary>
-    [Parameter, ForJs]
+    [Parameter, IgnoreOnPreset, ForJs]
     public bool ConnectMicrophone { get; set; }
 
     /// <summary>
     /// Set this to allow connection to a capture source
     /// </summary>
-    [Parameter, ForJs]
+    [Parameter, IgnoreOnPreset, ForJs]
     public CaptureConnection ConnectToCapture { get; set; } = CaptureConnection.None;
 
     /// <summary>
@@ -707,7 +707,7 @@ public partial class Auralizer
     /// Use Stream if you plan to use more than one visualizer at the same time connected to the same source
     /// Use Direct only if you are sure everything is rendered and connection will never change
     /// </summary>
-    [Parameter, ForJs]
+    [Parameter, IgnoreOnPreset, ForJs]
     public ConnectionMode ConnectionMode { get; set; } = ConnectionMode.Gain;
 
     /// <summary>
@@ -719,13 +719,13 @@ public partial class Auralizer
     /// <summary>
     /// Height of the visualizer component.
     /// </summary>
-    [Parameter]
+    [Parameter, IgnoreOnPreset]
     public string Height { get; set; } = "400px";
 
     /// <summary>
     /// Width of the visualizer component.
     /// </summary>
-    [Parameter]
+    [Parameter, IgnoreOnPreset]
     public string Width { get; set; } = "100%";
 
     /// <summary>
