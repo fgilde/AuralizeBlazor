@@ -37,7 +37,7 @@ public partial class Auralizer
 
     [Inject] protected IServiceProvider ServiceProvider { get; set; }
 
-    private const bool Minify = false;
+    private const bool Minify = true;
 
     private string _backgroundImageToApply;
     private string _id = Guid.NewGuid().ToFormattedId();
