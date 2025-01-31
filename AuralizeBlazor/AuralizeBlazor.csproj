@@ -10,10 +10,10 @@
     <Description>AuralizeBlazor is a wrapper component for audioMotion-analyzer.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Version>2.0.1</Version>
+    <Version>2.0.2</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <AssemblyVersion>2.0.1</AssemblyVersion>
+    <AssemblyVersion>2.0.2</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

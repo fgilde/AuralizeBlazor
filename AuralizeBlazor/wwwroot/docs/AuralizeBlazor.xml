@@ -828,6 +828,11 @@
             Hides all currently open toggable lists.
             </summary>
         </member>
+        <member name="M:AuralizeBlazor.Auralizer.RandomColor">
+            <summary>
+            Applies a one time random color.
+            </summary>
+        </member>
         <member name="M:AuralizeBlazor.Auralizer.RandomPreset(AuralizeBlazor.Options.PresetApplyReason)">
             <summary>
             Applies a random preset from the Presets to the visualizer.
@@ -1033,6 +1038,23 @@
         <member name="P:AuralizeBlazor.Features.SwitchPresetFeature.PickRandom">
             <summary>
             If true the preset will be picked randomly, otherwise the next preset will be selected.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.SwitchPresetFeature.OverridePresetColorsWithRandoms">
+            <summary>
+            If true random colors are applied
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.SwitchPresetFeature.MinDebounceForColorTimeInMs">
+            <summary>
+            If <see cref="P:AuralizeBlazor.Features.SwitchPresetFeature.OverridePresetColorsWithRandoms"/> is true , this value will be used as the minimum time in milliseconds between two consecutive color switch events.
+            If the value is null the <see cref="P:AuralizeBlazor.Features.SwitchPresetFeature.MinDebounceTimeInMs"/> value will be used.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.SwitchPresetFeature.MinEnergyForColor">
+            <summary>
+            if <see cref="P:AuralizeBlazor.Features.SwitchPresetFeature.OverridePresetColorsWithRandoms"/> is true , this value will be used as the minimum energy level required to trigger a color switch event.
+            If the value is null the <see cref="P:AuralizeBlazor.Features.SwitchPresetFeature.MinEnergy"/> value will be used.
             </summary>
         </member>
         <member name="T:AuralizeBlazor.Features.VisualizerFeatureBase">

@@ -35,20 +35,25 @@ public partial class Auralizer
     /// </summary>
     public static string SuggestedWebComponentName => string.Join("-", typeof(Auralizer).FullName.Replace(".", "").SplitByUpperCase()).ToLower();
 
-    [Inject] protected IServiceProvider ServiceProvider { get; set; }
+    public static Version Version => typeof(Auralizer).Assembly.GetName().Version;
+    public static string VersionString => Version.ToString(3);
 
     private const bool Minify = true;
+
+
+    [Inject] protected IServiceProvider ServiceProvider { get; set; }
+
 
     private string _backgroundImageToApply;
     private string _id = Guid.NewGuid().ToFormattedId();
 
     /// <inheritdoc />
-    protected override string ComponentJsFile() => Minify ? "./_content/AuralizeBlazor/js/auralize.min.js" : "./_content/AuralizeBlazor/js/components/auralizer.js";
+    protected override string ComponentJsFile() => Minify ? $"./_content/AuralizeBlazor/js/auralize.min.js?v={VersionString}" : $"./_content/AuralizeBlazor/js/components/auralizer.js?v={VersionString}";
 
     /// <summary>
     /// Library path for the AudioMotionAnalyzer library.
     /// </summary>
-    protected string AudioMotionLib() => "./_content/AuralizeBlazor/js/lib/audioMotion4.4.0.min.js"; // => "https://cdn.skypack.dev/audiomotion-analyzer?min";
+    protected string AudioMotionLib() => $"./_content/AuralizeBlazor/js/lib/audioMotion4.4.0.min.js?v={VersionString}"; // => "https://cdn.skypack.dev/audiomotion-analyzer?min";
 
     /// <inheritdoc />
     protected override string ComponentJsInitializeMethodName() => "initializeAuralizer";
@@ -1428,6 +1433,16 @@ public partial class Auralizer
         _presetListVisible = false;
         _trackListVisible = false;
         InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// Applies a one time random color.
+    /// </summary>
+    [JSInvokable]
+    public Task RandomColor()
+    {
+        SetGradient(AudioMotionGradient.RandomGradient());
+        return UpdateGradientInJs();
     }
 
     /// <summary>

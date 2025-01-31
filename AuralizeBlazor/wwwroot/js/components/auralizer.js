@@ -558,7 +558,8 @@
             gradientLeft: this.registerGradientIfRequired(gradientLeft),
             gradientRight: this.registerGradientIfRequired(gradientRight)
         });
-        this.audioMotion.redraw();
+        if (this.audioMotion?.redraw)
+            this.audioMotion.redraw();
     }
 
     registerGradientIfRequired(gradient) {

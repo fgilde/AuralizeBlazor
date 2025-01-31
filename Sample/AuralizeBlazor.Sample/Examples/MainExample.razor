@@ -23,7 +23,7 @@
 
 @code {
     private Auralizer _vis;
-    private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, new SwitchPresetFeature { MinEnergy = .20 }];
+    private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = Const.AppName, Position = TextPosition.CenterCenter }, new SwitchPresetFeature { OverridePresetColorsWithRandoms = true, MinDebounceForColorTimeInMs = 123, MinEnergy = .20 }];
     
     private void OnPresetApplied(AppliedPresetEventArgs arg)
     {

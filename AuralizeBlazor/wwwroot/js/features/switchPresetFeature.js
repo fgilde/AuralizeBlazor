@@ -1,8 +1,22 @@
 ﻿window.AuralizeBlazor.features.switchPresetFeature = (() => {
     let lastChangeTime = 0;
+    let lastColorChangeTime = 0;
     
     const onCanvasDraw = (scope, auralizer, featureOptions, instance, info) => {
-        const currentTime = Date.now();
+        let minColorEnergy = featureOptions.minEnergyForColor ?? featureOptions.minEnergy;
+        let minDebounceForColorTimeInMs = featureOptions.minDebounceForColorTimeInMs ?? featureOptions.minDebounceTimeInMs;
+        let currentTime = Date.now();
+
+        if (featureOptions.overridePresetColorsWithRandoms && currentTime - lastColorChangeTime > minDebounceForColorTimeInMs) {
+            let energy = instance.getEnergy('bass');
+
+            if (energy > minColorEnergy) {
+                auralizer.dotnet.invokeMethodAsync('RandomColor');
+                lastColorChangeTime = currentTime;
+            }
+        }
+
+
         if (currentTime - lastChangeTime > featureOptions.minDebounceTimeInMs) {
             let energy = instance.getEnergy('bass');
             //if (auralizer.options.reflexRatio > 0) {
