@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Remove="compilerconfig.json" />
+    <Content Remove="wwwroot\Logo.png" />
     <Content Remove="wwwroot\web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +87,11 @@
     <None Include="compilerconfig.json" />
     <None Include="wwwroot\Auralizer%27s Beat.mp3" />
     <None Include="wwwroot\Digital Serenade.mp3" />
+    <None Include="wwwroot\Logo.png">
+      <PackagePath>\</PackagePath>
+      <Pack>True</Pack>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="wwwroot\web.config" />
   </ItemGroup>
   <ItemGroup>

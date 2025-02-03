@@ -2,6 +2,8 @@
 
 public static class AudioIcons
 {
+    public const string AuralizerLogo = "<svg width=\"300\" height=\"300\" viewBox=\"0 0 300 300\" xmlns=\"http://www.w3.org/2000/svg\">  \r\n  <defs>\r\n    <linearGradient id=\"grad1\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\r\n      <stop offset=\"0%\" style=\"stop-color:#00FFFF;stop-opacity:1\" />\r\n      <stop offset=\"100%\" style=\"stop-color:#8A2BE2;stop-opacity:1\" />\r\n    </linearGradient>\r\n  </defs>\r\n    \r\n  <path d=\"M150 30 L250 270 L50 270 Z\" fill=\"none\" stroke=\"url(#grad1)\" stroke-width=\"15\" stroke-linejoin=\"round\"/>\r\n    \r\n  <path d=\"M80 220 Q150 180 220 220\" fill=\"none\" stroke=\"url(#grad1)\" stroke-width=\"8\" stroke-linecap=\"round\"/>\r\n</svg>";
+
     public const string PlayPause = "▶❚❚";
     public const string Play = "▶";
     public const string Pause = "❚❚";

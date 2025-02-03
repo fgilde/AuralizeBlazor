@@ -10,14 +10,20 @@
     <Description>AuralizeBlazor is a wrapper component for audioMotion-analyzer.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Version>2.0.2</Version>
+    <PackageIcon>Logo.png</PackageIcon>
+    <Version>2.0.3</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <AssemblyVersion>2.0.2</AssemblyVersion>
+    <AssemblyVersion>2.0.3</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Remove="bundleconfig.json" />
+    <Content Remove="wwwroot\Logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Logo.svg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,7 +52,7 @@
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup>    
     <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -56,10 +62,10 @@
       <PackagePath>\</PackagePath>
     </None>
     <None Include="bundleconfig.json" />
-    <!--<None Include="wwwroot\avatar.jpeg">
+    <None Include="wwwroot\Logo.png" >
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>-->
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

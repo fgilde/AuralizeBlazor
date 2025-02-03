@@ -957,7 +957,27 @@
             Label to display.
             </summary>
         </member>
-        <member name="P:AuralizeBlazor.Features.ShowLogoFeature.Position">
+        <member name="P:AuralizeBlazor.Features.ShowLogoFeature.Image">
+            <summary>
+            Label to display.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.ShowLogoFeature.ImageScale">
+            <summary>
+            Scale size for image
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.ShowLogoFeature.TextScale">
+            <summary>
+            Scale size for text
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.ShowLogoFeature.LabelPosition">
+            <summary>
+            Position of the label.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.ShowLogoFeature.ImagePosition">
             <summary>
             Position of the label.
             </summary>
@@ -965,56 +985,6 @@
         <member name="P:AuralizeBlazor.Features.ShowLogoFeature.LabelColor">
             <summary>
             Color of the label, if not set the default color from gradient will be used.
-            </summary>
-        </member>
-        <member name="T:AuralizeBlazor.Features.TextPosition">
-            <summary>
-            Text position.
-            </summary>
-        </member>
-        <member name="F:AuralizeBlazor.Features.TextPosition.TopLeft">
-            <summary>
-            Text will be displayed Top left.
-            </summary>
-        </member>
-        <member name="F:AuralizeBlazor.Features.TextPosition.TopCenter">
-            <summary>
-            Text will be displayed Top center.
-            </summary>
-        </member>
-        <member name="F:AuralizeBlazor.Features.TextPosition.TopRight">
-            <summary>
-            Text will be displayed Top right.
-            </summary>
-        </member>
-        <member name="F:AuralizeBlazor.Features.TextPosition.CenterLeft">
-            <summary>
-            Text will be displayed Center left.
-            </summary>
-        </member>
-        <member name="F:AuralizeBlazor.Features.TextPosition.CenterCenter">
-            <summary>
-            Text will be displayed in center.
-            </summary>
-        </member>
-        <member name="F:AuralizeBlazor.Features.TextPosition.CenterRight">
-            <summary>
-            Text will be displayed Center right.
-            </summary>
-        </member>
-        <member name="F:AuralizeBlazor.Features.TextPosition.BottomLeft">
-            <summary>
-            Text will be displayed bottom left.
-            </summary>
-        </member>
-        <member name="F:AuralizeBlazor.Features.TextPosition.BottomCenter">
-            <summary>
-            Text will be displayed bottom center.
-            </summary>
-        </member>
-        <member name="F:AuralizeBlazor.Features.TextPosition.BottomRight">
-            <summary>
-            Text will be displayed bottom right.
             </summary>
         </member>
         <member name="T:AuralizeBlazor.Features.SwitchPresetFeature">
@@ -1115,6 +1085,71 @@
         <member name="M:AuralizeBlazor.Features.IVisualizerFeature.GetJsOptions">
             <summary>
             JavaScript options for the feature.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.VisualPosition.RandomChangeDebounce">
+            <summary>
+            If position is random, this will be the minimum and maximum time to change the position.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.VisualPosition.RandomMinEnergy">
+            <summary>
+            If position is random, this will be the minimum energy to change the position.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Features.PositionInCanvas">
+            <summary>
+            position.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.PositionInCanvas.TopLeft">
+            <summary>
+            Text will be displayed Top left.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.PositionInCanvas.TopCenter">
+            <summary>
+            Text will be displayed Top center.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.PositionInCanvas.TopRight">
+            <summary>
+            Text will be displayed Top right.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.PositionInCanvas.CenterLeft">
+            <summary>
+            Text will be displayed Center left.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.PositionInCanvas.CenterCenter">
+            <summary>
+            Text will be displayed in center.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.PositionInCanvas.CenterRight">
+            <summary>
+            Text will be displayed Center right.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.PositionInCanvas.BottomLeft">
+            <summary>
+            Text will be displayed bottom left.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.PositionInCanvas.BottomCenter">
+            <summary>
+            Text will be displayed bottom center.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.PositionInCanvas.BottomRight">
+            <summary>
+            Text will be displayed bottom right.
+            </summary>
+        </member>
+        <member name="F:AuralizeBlazor.Features.PositionInCanvas.Random">
+            <summary>
+            Random position will change based on energy
             </summary>
         </member>
         <member name="T:AuralizeBlazor.Features.WaveNodeFeature">

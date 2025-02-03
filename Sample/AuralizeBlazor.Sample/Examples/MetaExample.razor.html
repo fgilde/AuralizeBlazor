@@ -37,7 +37,7 @@
     <span class="keyword">string</span> _file;
     <span class="keyword">bool</span> _fullPaged = <span class="keyword">false</span>;
     <span class="keyword">private</span> Auralizer _vis;
-    <span class="keyword">private</span> IVisualizerFeature[] _features = [<span class="keyword">new</span> ShowLogoFeature { Label = <span class="keyword">string</span>.Empty, Position = TextPosition.CenterCenter }];
+    <span class="keyword">private</span> IVisualizerFeature[] _features = [<span class="keyword">new</span> ShowLogoFeature { Label = <span class="keyword">string</span>.Empty, LabelPosition = VisualPosition.CenterCenter }];
 
 
     <span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">async</span> Task OnInitializedAsync()
