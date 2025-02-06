@@ -30,6 +30,11 @@
             If a tracklist is provided next track will be played when the current track ends.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Auralizer.Lyrics">
+            <summary>
+            Get or set the active lyrics for current song
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Auralizer.IsAnyToggleableListOpen">
             <summary>
             Returns true if any toggleable list is open.
@@ -936,6 +941,54 @@
             The text to show for the treble energy bar.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Features.LyricsDisplayFeature.TextPosition">
+            <summary>
+            The position of the lyrics on the screen.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.LyricsDisplayFeature.Colors">
+            <summary>
+            The colors you want to use for the gradient. Leave null to use the applied colors to auralizer.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.LyricsDisplayFeature.FontSize">
+            <summary>
+            Font size for the lyrics.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.LyricsDisplayFeature.LineSpacing">
+            <summary>
+            Line spacing for the lyrics.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.LyricsDisplayFeature.EnableWordAnimation">
+            <summary>
+            Set to true to animate each word instead of line
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.LyricsDisplayFeature.WordAnimationMaxX">
+            <summary>
+            Maximum dispersion offsets for word animation X (in pixels; reference values)
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.LyricsDisplayFeature.WordAnimationMaxY">
+            <summary>
+            Maximum dispersion offsets for word animation Y (in pixels; reference values)
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Features.PredefinedFeature">
+            <summary>
+            This feature allows to visualize the wave node as a separate line.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Features.PredefinedFeature.#ctor(System.String)">
+            <summary>
+            This feature allows to visualize the wave node as a separate line.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Features.PredefinedFeature.FullJsNamespace">
+            <inheritdoc />
+        </member>
         <member name="T:AuralizeBlazor.Features.RadialRadiusFeature">
             <summary>
             Radial radius feature.
@@ -1180,6 +1233,11 @@
             The URL of the image to display for the track.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.IAuralizerTrack.Lyrics">
+            <summary>
+            The lyrics for the track.
+            </summary>
+        </member>
         <member name="T:AuralizeBlazor.AuralizerTrack">
             <summary>
             Track class for track selection in the Auralizer component.
@@ -1198,6 +1256,11 @@
         <member name="P:AuralizeBlazor.AuralizerTrack.Image">
             <summary>
             The URL of the image to display for the track.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.AuralizerTrack.Lyrics">
+            <summary>
+            The lyrics for the track.
             </summary>
         </member>
         <member name="T:AuralizeBlazor.Options.AppliedPresetEventArgs">
@@ -1388,6 +1451,104 @@
         <member name="F:AuralizeBlazor.Options.VisualizerAction.DisplayActionMenu">
             <summary>
             Open/close action menu
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Types.LyricData">
+            <summary>
+            Contains the entire lyric data and provides methods for adding, removing, and retrieving.
+            Also contains static factory methods for parsing different formats.
+            </summary>
+        </member>
+        <member name="P:AuralizeBlazor.Types.LyricData.Lines">
+             <summary>
+            All lines in the lyric data.
+             </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.Add(AuralizeBlazor.Types.LyricLine)">
+            <summary>
+            Adds a single line.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.Remove(AuralizeBlazor.Types.LyricLine)">
+            <summary>
+            Removes a single line.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.Remove(AuralizeBlazor.Types.RangeOf{System.TimeSpan})">
+            <summary>
+            Removes all lines within the specified range.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.GetLines(AuralizeBlazor.Types.RangeOf{System.TimeSpan})">
+            <summary>
+            Retrieves all lines within the specified range.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromLrcFile(System.String)">
+            <summary>
+            Factory method to create a LyricData object from an LRC file.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromLrc(System.IO.Stream)">
+            <summary>
+            Factory method to create a LyricData object from an LRC stream.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromLrc(System.Byte[])">
+            <summary>
+            Factory method to create a LyricData object from an LRC byte array.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromLrc(System.String)">
+            <summary>
+            Factory method to create a LyricData object from an LRC string.
+            Format: [mm:ss.xx] Text of the line
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.TryParseLrcTime(System.String,System.TimeSpan@)">
+            <summary>
+            Parses an LRC time stamp (e.g., "03:15.67" or "03:15").
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromSrtFile(System.String)">
+            <summary>
+            Factory method to create a LyricData object from an SRT file.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromSrt(System.IO.Stream)">
+            <summary>
+            Factory method to create a LyricData object from an SRT stream.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromSrt(System.Byte[])">
+            <summary>
+            Factory method to create a LyricData object from an SRT byte array.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromSrt(System.String)">
+            <summary>
+            Factory method to create a LyricData object from an SRT string.
+            Each block in the SRT file must contain at least three lines: index, time stamps, and text.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromTtmlFile(System.String)">
+            <summary>
+            Factory method to create a LyricData object from a TTML file.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromTtml(System.IO.Stream)">
+            <summary>
+            Factory method to create a LyricData object from a TTML stream.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromTtml(System.Byte[])">
+            <summary>
+            Factory method to create a LyricData object from a TTML byte array.
+            </summary>
+        </member>
+        <member name="T:AuralizeBlazor.Types.LyricLine">
+            <summary>
+            Represents a line of lyrics.
             </summary>
         </member>
     </members>

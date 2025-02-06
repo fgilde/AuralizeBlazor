@@ -4,6 +4,8 @@
     "inputFiles": [
       "wwwroot/js/components/auralizer.js",
       "wwwroot/js/features/energyMeterFeature.js",
+      "wwwroot/js/features/lyricDisplayFeature.js",
+      "wwwroot/js/features/baseFeatures.js",
       "wwwroot/js/features/radialRadiusFeature.js",
       "wwwroot/js/features/showLogoFeature.js",
       "wwwroot/js/features/switchPresetFeature.js",

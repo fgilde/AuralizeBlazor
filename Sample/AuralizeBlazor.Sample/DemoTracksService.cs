@@ -1,7 +1,31 @@
-﻿namespace AuralizeBlazor.Sample;
+﻿using AuralizeBlazor.Types;
+using Microsoft.AspNetCore.Components;
+using Newtonsoft.Json;
+
+namespace AuralizeBlazor.Sample;
 
 public class DemoTracksService
 {
+    private readonly NavigationManager _navigationManager;
+    private List<IAuralizerTrack> _eyirishTracks = null;
+
+    public DemoTracksService(NavigationManager navigationManager)
+    {
+        _navigationManager = navigationManager;
+    }
+
+
+    private async Task<LyricData?> LoadLyricsAsync(string file)
+    {
+        try
+        {            
+            var bytes = await new HttpClient().GetByteArrayAsync(_navigationManager.ToAbsoluteUri(file));
+            return bytes is { Length: > 0 } ? (file.EndsWith("ttml") ? LyricData.FromTtml(bytes) : LyricData.FromLrc(bytes)) : null;
+        }
+        catch (Exception e) { }
+        return null;
+    }
+
     public IAuralizerTrack MainDemoTrack => DemoTracks[2];
     public IAuralizerTrack[] DemoTracks => GetDemoTracks().ToArray();
     public IAuralizerTrack[] EyirishTracks => GetEyirish().ToArray();
@@ -17,6 +41,15 @@ public class DemoTracksService
         yield return new AuralizerTrack("/sample3.mp3", "Simple Demo 3");
         yield return new AuralizerTrack("/sample4.mp3", "Simple Demo 4");
         yield return GetEyirish().First();
+    }
+
+    public async Task<List<IAuralizerTrack>> GetEyirishAsync()
+    {
+        if (_eyirishTracks != null)
+            return _eyirishTracks;
+        var tracks = GetEyirish().Cast<AuralizerTrack>().ToList();
+        tracks[0].Lyrics = await LoadLyricsAsync("Anthem with flo.ttml");
+        return _eyirishTracks = tracks.Cast<IAuralizerTrack>().ToList();
     }
 
     public IEnumerable<IAuralizerTrack> GetEyirish()

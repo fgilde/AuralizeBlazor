@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using AuralizeBlazor.Types;
 
 namespace AuralizeBlazor;
 
@@ -21,6 +22,11 @@ public interface IAuralizerTrack
     /// The URL of the image to display for the track.
     /// </summary>
     public string Image { get; }
+
+    /// <summary>
+    /// The lyrics for the track.
+    /// </summary>
+    public LyricData? Lyrics { get; }
 }
 
 /// <summary>
@@ -55,6 +61,11 @@ public class AuralizerTrack: IAuralizerTrack
     /// The URL of the image to display for the track.
     /// </summary>
     public string Image { get; set; }
+
+    /// <summary>
+    /// The lyrics for the track.
+    /// </summary>
+    public LyricData Lyrics { get; set; }
 
     public override string ToString() => Label;
 

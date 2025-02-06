@@ -1,7 +1,7 @@
 ﻿@using AuralizeBlazor.Features
 @using AuralizeBlazor.Options
+@using AuralizeBlazor.Types
 
-<button @onclick="() => _gradientApply = AutoGradientFrom.MetaCoverImage">Apply Gradients from Cover Image</button>
 <Auralizer @ref=_vis
            @bind-Features="_features"
            InitialPreset="AuralizerPreset.RadialSpectrumScale"
@@ -11,14 +11,15 @@
            GradientChanged="@MainLayout.Instance.ColorsChanged"
            Presets="@AuralizerPreset.All.Except(new List<AuralizerPreset>{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()"
            OnPresetApplied="OnPresetApplied"
-           TrackList="@TracksService.EyirishTracks"
+           TrackList="@_tracks"
            Height="700px"        
            ClickAction="VisualizerAction.TogglePlayPause"
-           AutoApplyGradient="_gradientApply"
+           AutoApplyGradient="AutoGradientFrom.MetaCoverImage"
            ApplyBackgroundImageFromTrack="true"
            ContextMenuAction="VisualizerAction.None"
            FullPaged="_fullPaged"
            ShowTrackInfosOnPlay="true"
+           Lyrics="@_lyrics"
            BackgroundSize="contain"
            MetaInfosChanged="@MetaChanged"
            Overlay="false">
@@ -30,16 +31,21 @@
 @code {
     [Inject] IJSRuntime _jsRuntime { get; set; }
 
-    private AutoGradientFrom _gradientApply;
     string _file;
     bool _fullPaged = false;
     private Auralizer _vis;
-    private IVisualizerFeature[] _features = [new ShowLogoFeature { Label = string.Empty, LabelPosition = VisualPosition.CenterCenter }];
-
+    private IVisualizerFeature[] _features = [
+        new ShowLogoFeature { Label = string.Empty, LabelPosition = VisualPosition.CenterCenter },
+        new LyricsDisplayFeature() {TextPosition = LyricsPosition.Top, FontSize = 28, Colors = ["#ffffff"]}
+    ];
+    IAuralizerTrack[]? _tracks = null;
+    private LyricData? _lyrics;
 
     protected override async Task OnInitializedAsync()
     {
-        _file = TracksService.EyirishTracks[0].Url;
+        _tracks ??= (await TracksService.GetEyirishAsync()).ToArray();
+        _file = _tracks[0].Url;
+        _lyrics = _tracks[0].Lyrics;
         _fullPaged = Navigation.FullPaged();
         await base.OnInitializedAsync();
     }

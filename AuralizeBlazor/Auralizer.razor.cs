@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using AuralizeBlazor.Extensions;
 using AuralizeBlazor.Features;
 using AuralizeBlazor.Options;
+using AuralizeBlazor.Types;
 using BlazorJS;
 using BlazorJS.Attributes;
 using Microsoft.AspNetCore.Components;
@@ -103,8 +104,14 @@ public partial class Auralizer
     /// <summary>
     /// If a tracklist is provided next track will be played when the current track ends.
     /// </summary>
-    [Parameter]
-    public bool AutoPlayNextTrackOnEnd { get; set; } = true;
+    [Parameter] public bool AutoPlayNextTrackOnEnd { get; set; } = true;
+
+
+    /// <summary>
+    /// Get or set the active lyrics for current song
+    /// </summary>
+    [Parameter, IgnoreOnPreset, ForJs] public LyricData? Lyrics { get; set; }
+
 
     public bool IsMouseOver { get; private set; }
 
@@ -837,7 +844,7 @@ public partial class Auralizer
     /// </summary>
     public Auralizer AddFeature<T>(T feature) where T : IVisualizerFeature
     {
-        Features = _features.Concat(new IVisualizerFeature[] { feature }).ToArray();
+        Features = _features.Concat([feature]).ToArray();
         return this;
     }
 
@@ -1400,6 +1407,7 @@ public partial class Auralizer
         }
 
         ShowMessage(track.Label, TimeSpan.FromSeconds(2));
+        Lyrics = track?.Lyrics;
         await UpdateJsOptions();
         await PlayTrackAsync(track.Url);
     }

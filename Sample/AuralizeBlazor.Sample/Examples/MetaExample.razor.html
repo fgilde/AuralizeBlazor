@@ -2,8 +2,8 @@
 <div class="html"><pre>
 <span class="atSign">&#64;</span>using AuralizeBlazor.Features
 <span class="atSign">&#64;</span>using AuralizeBlazor.Options
+<span class="atSign">&#64;</span>using AuralizeBlazor.Types
 
-<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">button</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>onclick</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">() =&gt; _gradientApply = AutoGradientFrom.MetaCoverImage</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>Apply Gradients from Cover Image<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">button</span><span class="htmlTagDelimiter">&gt;</span>
 <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>ref</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">_vis</span>
            <span class="htmlAttributeName"><span class="atSign">&#64;</span>bind-Features</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_features</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">InitialPreset</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">AuralizerPreset</span><span class="enumValue">.RadialSpectrumScale</span><span class="quot">&quot;</span>
@@ -13,14 +13,15 @@
            <span class="htmlAttributeName">GradientChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>MainLayout.Instance.ColorsChanged</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">Presets</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>AuralizerPreset.All.Except(new List&lt;AuralizerPreset&gt;{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">OnPresetApplied</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">OnPresetApplied</span><span class="quot">&quot;</span>
-           <span class="htmlAttributeName">TrackList</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>TracksService.EyirishTracks</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">TrackList</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>_tracks</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">700px</span><span class="quot">&quot;</span>        
            <span class="htmlAttributeName">ClickAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.TogglePlayPause</span><span class="quot">&quot;</span>
-           <span class="htmlAttributeName">AutoApplyGradient</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_gradientApply</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">AutoApplyGradient</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">AutoGradientFrom</span><span class="enumValue">.MetaCoverImage</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">ApplyBackgroundImageFromTrack</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">ContextMenuAction</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">VisualizerAction</span><span class="enumValue">.None</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">FullPaged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_fullPaged</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">ShowTrackInfosOnPlay</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span>
+           <span class="htmlAttributeName">Lyrics</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>_lyrics</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">BackgroundSize</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">contain</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">MetaInfosChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="sharpVariable"><span class="atSign">&#64;</span>MetaChanged</span><span class="quot">&quot;</span>
            <span class="htmlAttributeName">Overlay</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">false</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>
@@ -33,16 +34,21 @@
 <span class="atSign">&#64;</span>code {
     [Inject] IJSRuntime _jsRuntime { <span class="keyword">get</span>; <span class="keyword">set</span>; }
 
-    <span class="keyword">private</span> AutoGradientFrom _gradientApply;
     <span class="keyword">string</span> _file;
     <span class="keyword">bool</span> _fullPaged = <span class="keyword">false</span>;
     <span class="keyword">private</span> Auralizer _vis;
-    <span class="keyword">private</span> IVisualizerFeature[] _features = [<span class="keyword">new</span> ShowLogoFeature { Label = <span class="keyword">string</span>.Empty, LabelPosition = VisualPosition.CenterCenter }];
-
+    <span class="keyword">private</span> IVisualizerFeature[] _features = [
+        <span class="keyword">new</span> ShowLogoFeature { Label = <span class="keyword">string</span>.Empty, LabelPosition = VisualPosition.CenterCenter },
+        <span class="keyword">new</span> LyricsDisplayFeature() {TextPosition = LyricsPosition.Top, FontSize = <span class="number">28</span>, Colors = [<span class="string">&quot;#ffffff&quot;</span>]}
+    ];
+    IAuralizerTrack[]? _tracks = <span class="keyword">null</span>;
+    <span class="keyword">private</span> LyricData? _lyrics;
 
     <span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">async</span> Task OnInitializedAsync()
     {
-        _file = TracksService.EyirishTracks[<span class="number">0</span>].Url;
+        _tracks ??= (<span class="keyword">await</span> TracksService.GetEyirishAsync()).ToArray();
+        _file = _tracks[<span class="number">0</span>].Url;
+        _lyrics = _tracks[<span class="number">0</span>].Lyrics;
         _fullPaged = Navigation.FullPaged();
         <span class="keyword">await</span> <span class="keyword">base</span>.OnInitializedAsync();
     }

@@ -552,6 +552,31 @@
         return options;
     }
 
+    getCurrentColors() {
+        return [...new Set(this.getColorsFromGradient(this.audioMotion.gradient)
+            .concat(this.getColorsFromGradient(this.audioMotion.gradientLeft))
+            .concat(this.getColorsFromGradient(this.audioMotion.gradientRight)))];
+    }
+
+    getCurrentColorStops() {
+        return [...new Set(this.getColorStopsFromGradient(this.audioMotion.gradient)
+            .concat(this.getColorStopsFromGradient(this.audioMotion.gradientLeft))
+            .concat(this.getColorStopsFromGradient(this.audioMotion.gradientRight)))];
+    }
+
+    getColorsFromGradient(gradientName) {
+        return this.getColorStopsFromGradient(gradientName).map(c => c.color);
+    }
+
+    getColorStopsFromGradient(gradientName) {
+        if (!gradientName)
+            return [];
+        var colors = this.audioMotion._gradients[gradientName]?.colorStops;
+        if (!colors)
+            return [];
+        return colors;
+    }
+
     updateGradient(gradient, gradientLeft, gradientRight) {
         this.audioMotion.setOptions({
             gradient: this.registerGradientIfRequired(gradient),
