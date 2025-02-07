@@ -397,6 +397,63 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
         visualizer.ShowScaleX = true;
     });
 
+    // New
+    public static AuralizerPreset VortexSpiral => new(23, nameof(VortexSpiral).Format(), visualizer =>
+    {
+        visualizer.Features = new[] { new VortexParticleFeature() };
+        visualizer.Mode = VisualizationMode.LineAreaGraph;
+        visualizer.Radial = true;
+        visualizer.SpinSpeed = 3.0;
+        visualizer.Gradient = AudioMotionGradient.Outrun;
+        visualizer.FillAlpha = 0.4;
+        visualizer.LineWidth = 1.2;
+        visualizer.MaxFrequency = 20000;
+        visualizer.MinFrequency = 30;
+        visualizer.Mirror = MirrorMode.None;
+    });
+
+    public static AuralizerPreset SolarFlare => new(24, nameof(SolarFlare).Format(), visualizer =>
+    {
+        visualizer.Mode = VisualizationMode.DiscreteFrequencies;
+        visualizer.Gradient = AudioMotionGradient.Sunrise;
+        visualizer.FillAlpha = 0.6;
+        visualizer.LineWidth = 1.0;
+        visualizer.Radial = false;
+        visualizer.MaxFrequency = 18000;
+        visualizer.MinFrequency = 50;
+        visualizer.LinearAmplitude = true;
+        visualizer.LinearBoost = 1.5;
+    });
+
+
+    public static AuralizerPreset ElectricDreams => new(25, nameof(ElectricDreams).Format(), visualizer =>
+    {
+        visualizer.Mode = VisualizationMode.LineAreaGraph;
+        visualizer.Gradient = AudioMotionGradient.Electric;
+        visualizer.Mirror = MirrorMode.Left;
+        visualizer.FillAlpha = 0.55;
+        visualizer.LineWidth = 2.0;
+        visualizer.LinearAmplitude = false;
+        visualizer.MaxFrequency = 14000;
+        visualizer.MinFrequency = 30;
+        visualizer.ReflexAlpha = 0.8;
+        visualizer.ReflexRatio = 0.4;
+    });
+
+    public static AuralizerPreset FunkyFusion => new(26, nameof(FunkyFusion).Format(), visualizer =>
+    {
+        visualizer.Mode = VisualizationMode.LineAreaGraph;
+        visualizer.ChannelLayout = ChannelLayout.DualVertical;
+        visualizer.GradientLeft = AudioMotionGradient.Candy;
+        visualizer.GradientRight = AudioMotionGradient.Miami;
+        visualizer.FillAlpha = 0.35;
+        visualizer.BarSpacing = 0.15;
+        visualizer.LinearAmplitude = true;
+        visualizer.LinearBoost = 1.4;
+        visualizer.MaxFrequency = 20000;
+        visualizer.MinFrequency = 20;
+        visualizer.Mirror = MirrorMode.None;
+    });
 
 }
 

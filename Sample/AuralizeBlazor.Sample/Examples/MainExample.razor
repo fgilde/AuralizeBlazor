@@ -1,44 +1,28 @@
 ﻿@using AuralizeBlazor.Features
 @using AuralizeBlazor.Options
-@using AuralizeBlazor.Types
-@using Newtonsoft.Json
 
-<Auralizer 
-    @ref=_vis
-    @bind-Features="_features"
-    InitialPreset="AuralizerPreset.ReflexMirror"
-    PreviewImageInPresetList="true"
-    InitialRender="InitialRender.WithRandomData"
-    GradientChanged="@MainLayout.Instance.ColorsChanged"
-    Presets="@AuralizerPreset.All.Except(new List<AuralizerPreset>{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()"
-    OnPresetApplied="OnPresetApplied"
-    TrackList="@TracksService.DemoTracks"
-    Height="700px"
-    BackgroundImage="/bg1.jpg"
-    OnReady="@(() => _vis.ShowMessage("Welcome to Auralizer, press play !", TimeSpan.FromSeconds(2)))"
-    DoubleClickAction="VisualizerAction.ToggleFullscreen"
-    ClickAction="VisualizerAction.TogglePlayPause"
-    Overlay="true">
+<Auralizer @ref=_vis
+           @bind-Features="_features"
+           InitialPreset="AuralizerPreset.ReflexMirror"
+           PreviewImageInPresetList="true"
+           InitialRender="InitialRender.WithRandomData"
+           GradientChanged="@MainLayout.Instance.ColorsChanged"
+           Presets="@AuralizerPreset.All.Except(new List<AuralizerPreset>{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()"
+           OnPresetApplied="OnPresetApplied"
+           TrackList="@TracksService.DemoTracks"
+           Height="700px"
+           BackgroundImage="/bg1.jpg"
+           OnReady="@(() => _vis.ShowMessage("Welcome to Auralizer, press play !", TimeSpan.FromSeconds(2)))"
+           DoubleClickAction="VisualizerAction.ToggleFullscreen"
+           ClickAction="VisualizerAction.TogglePlayPause"
+           ApplyBackgroundImageFromTrack="false"
+           Overlay="true">
     <center>
-        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="@TracksService.DemoTracks[8].Url"></audio>
+        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="@TracksService.DemoTracks[0].Url"></audio>
     </center>
 </Auralizer>
 
 @code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            var c = new HttpClient();
-            var bytes = await c.GetByteArrayAsync(Navigation.ToAbsoluteUri("Anthem with Flo.ttml"));
-            Console.WriteLine("Loaded " + bytes.Length);
-            var data = LyricData.FromTtml(bytes);
-            var asJson = JsonConvert.SerializeObject(data);
-            Console.WriteLine(asJson);
-            _vis.Lyrics = data;
-        }
-    }
 
     private Auralizer _vis;
     private IVisualizerFeature[] _features = [
@@ -50,13 +34,12 @@
             LabelPosition = VisualPosition.CenterCenter,
             ImagePosition = VisualPosition.CenterCenter.WithMarginBottom(80)
         },
-    new SwitchPresetFeature
-        {
-            OverridePresetColorsWithRandoms = true,
-            MinDebounceForColorTimeInMs = 123,
-            MinEnergy = .20
-        },
-  //  new LyricsDisplayFeature(),
+        new SwitchPresetFeature
+            {
+                OverridePresetColorsWithRandoms = true,
+                MinDebounceForColorTimeInMs = 123,
+                MinEnergy = .20
+            }
     ];
 
     private void OnPresetApplied(AppliedPresetEventArgs arg)

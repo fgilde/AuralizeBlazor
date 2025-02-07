@@ -1,0 +1,22 @@
+﻿@page "/predefined-features"
+@using AuralizeBlazor.Features
+@using Nextended.Core.Extensions
+
+
+<PageTitle>Predefined Features</PageTitle>
+
+
+<DocsPageSection>
+    <SectionHeader Title="Custom Features">
+        <Description>
+            <CodeInline>@nameof(Auralizer)</CodeInline> by default comes with a set of predefined features that can be added to the visualizer.
+            These features are designed to be easily added to the visualizer and can be customized to fit your needs.<br/><br/>
+            Our predefined features: @((MarkupString)string.Join(", ", typeof(IVisualizerFeature).GetAllImplementations(typeof(IVisualizerFeature).Assembly).Distinct().Select(a => $"<a href=\"api/{a.Name}\">{a.Name}</a>")))
+        </Description>
+    </SectionHeader>
+    <SectionContent Outlined="true" FullWidth="true">
+        <PredefinedFeaturesExample />
+    </SectionContent>
+    <SectionSource Code="@nameof(PredefinedFeaturesExample)" />
+</DocsPageSection>
+

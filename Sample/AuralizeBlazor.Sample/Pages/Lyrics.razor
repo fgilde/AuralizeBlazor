@@ -1,0 +1,28 @@
+﻿@page "/lyrics-display"
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Types
+
+<PageTitle>Lyrics</PageTitle>
+
+<DocsPageSection>
+    <SectionHeader Title="Lyrics display Sample">
+        <Description>
+            This sample show how to display Lyrics.
+            First of all you need to add the <b>@nameof(LyricsDisplayFeature)</b> to the <b>@nameof(Auralizer.Features)</b> property. <br />
+            Then you need to set the <b>@nameof(Auralizer.Lyrics)</b> property on the <b>@nameof(Auralizer) component</b> <br />
+            Important: The <b>@nameof(Auralizer.Lyrics)</b> property must be set to the lyrics of the current track. 
+            And the <b>@nameof(IAuralizerTrack)</b> has also a property <b>@nameof(IAuralizerTrack.Lyrics)</b>. If a track from @nameof(Auralizer.TrackList) is applied always 
+            the track entry lyrics property overrides the <b>@nameof(Auralizer.Lyrics)</b> property 
+            <br /> <br />
+            The <b>@nameof(Auralizer.Lyrics)</b> needs to be set to a <b>@nameof(LyricData)</b> object.
+            <a style="text-decoration: underline;" href="/api/@nameof(LyricData)">@nameof(LyricData)</a> is a class that contains the lyrics of a track. It has a property <b>@nameof(LyricData.Lines)</b> that is a list of <b>@nameof(LyricLine)</b> objects.
+            However @nameof(LyricData) provides some static methods like <b>@nameof(LyricData.FromLrc)</b> to create a <b>@nameof(LyricData)</b> .ttml, .srt and .lrc files with overloads to pass string, stream, or byte array.
+            <br /><br /> To create lyrics files you can use the free service from <a style="text-decoration: underline;" href="https://lyricpotato.com/" target="_blank">https://lyricpotato.com/</a>
+        </Description>
+    </SectionHeader>
+    <SectionContent Outlined="true" FullWidth="true">
+        <LyricsExample />
+    </SectionContent>
+    <SectionSource Code="@nameof(LyricsExample)" />
+</DocsPageSection>
+

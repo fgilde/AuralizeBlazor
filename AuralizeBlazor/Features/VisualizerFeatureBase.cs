@@ -43,7 +43,7 @@ public interface IVisualizerFeature
     /// <summary>
     /// Will be set to true if the feature is applied from a preset.
     /// </summary>
-    internal bool AppliedFromPreset { get; set; }
+    public bool AppliedFromPreset { get; set; }
     
     /// <summary>
     /// Method name to be called when the canvas is drawn.

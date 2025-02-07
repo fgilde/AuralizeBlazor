@@ -1,0 +1,87 @@
+<div class="mud-codeblock">
+<div class="html"><pre>
+<span class="atSign">&#64;</span>using System.Reflection
+<span class="atSign">&#64;</span>using AuralizeBlazor.Features
+<span class="atSign">&#64;</span>using MudBlazor.Extensions.Components.ObjectEdit.Options
+<span class="atSign">&#64;</span>using MudBlazor.Extensions.Options
+<span class="atSign">&#64;</span>using Nextended.Core.Extensions
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExSelect</span> <span class="htmlAttributeName">Value</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>_appliedFeatures.FirstOrDefault()</span><span class="quot">&quot;</span> <span class="htmlAttributeName">Label</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">Select a Feature to test</span><span class="quot">&quot;</span> <span class="htmlAttributeName">Variant</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">Variant</span><span class="enumValue">.Outlined</span><span class="quot">&quot;</span> <span class="htmlAttributeName">T</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">IVisualizerFeature</span><span class="quot">&quot;</span> <span class="htmlAttributeName">ValueChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="sharpVariable"><span class="atSign">&#64;</span>FeatureSelected</span><span class="quot">&quot;</span> <span class="htmlAttributeName">ItemCollection</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_availableFeatures</span><span class="quot">&quot;</span> <span class="htmlAttributeName">ToStringFunc</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>(x =&gt; x.ToString().Split(&quot;.&quot;).Last())</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExSelect</span><span class="htmlTagDelimiter">&gt;</span>
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName"><span class="atSign">&#64;</span>ref</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">_vis</span>
+<span class="htmlAttributeName">InitialPreset</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">AuralizerPreset</span><span class="enumValue">.DeepSeaDive</span><span class="quot">&quot;</span>
+<span class="htmlAttributeName">TrackList</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_tracks</span><span class="quot">&quot;</span>
+<span class="htmlAttributeName">GradientChanged</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>MainLayout.Instance.ColorsChanged</span><span class="quot">&quot;</span>
+<span class="htmlAttributeName">ApplyBackgroundImageFromTrack</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">false</span><span class="quot">&quot;</span>
+<span class="htmlAttributeName">ShowTrackInfosOnPlay</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">false</span><span class="quot">&quot;</span>
+<span class="htmlAttributeName">Presets</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="enum">AuralizerPreset</span><span class="enumValue">.All</span><span class="quot">&quot;</span>
+<span class="htmlAttributeName"><span class="atSign">&#64;</span>bind-Features</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">_appliedFeatures</span><span class="quot">&quot;</span>
+<span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">700px</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">audio-main mud-ex-animate-all-properties</span><span class="quot">&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">metadata</span><span class="quot">&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue">lazy</span><span class="quot">&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="keyword">true</span><span class="quot">&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="quot">&quot;</span><span class="htmlAttributeValue"><span class="atSign">&#64;</span>TracksService.DemoTracks[1].Url</span><span class="quot">&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+</pre></div>
+<div class="csharp"><pre>
+<span class="atSign">&#64;</span>code {
+    Auralizer _vis;
+    [Inject] <span class="keyword">private</span> IDialogService DialogService { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">private</span> IVisualizerFeature[] _availableFeatures;
+    <span class="keyword">private</span> IAuralizerTrack[] _tracks;
+    <span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">async</span> Task OnInitializedAsync()
+    {
+        _availableFeatures = <span class="keyword">typeof</span>(IVisualizerFeature).GetAllImplementations(<span class="keyword">typeof</span>(IVisualizerFeature).Assembly).Distinct().Select(t =&gt; t.CreateInstance()).Cast&lt;IVisualizerFeature&gt;().ToArray();
+        <span class="keyword">var</span> tracks = <span class="keyword">await</span> TracksService.GetEyirishAsync();
+        _tracks = [TracksService.DemoTracks[<span class="number">1</span>], tracks[<span class="number">0</span>]];
+        <span class="keyword">await</span> <span class="keyword">base</span>.OnInitializedAsync();
+    }
+
+    <span class="keyword">private</span> IVisualizerFeature[] _appliedFeatures =
+    [
+        <span class="keyword">new</span> LineParticleFeature() {ParticleCount = <span class="number">555</span>, Text = <span class="string">&quot;To test display lyrics feature select the other song left in the track select&quot;</span>, ConnectionThreshold = <span class="number">180</span>}
+    ];
+
+
+    <span class="keyword">private</span> <span class="keyword">async</span> Task FeatureSelected(IVisualizerFeature obj)
+    {
+        <span class="keyword">if</span> (obj == <span class="keyword">null</span>)
+        {
+            _appliedFeatures = [];
+            <span class="keyword">return</span>;
+        }
+
+        <span class="keyword">if</span> (obj == _appliedFeatures.FirstOrDefault())
+            <span class="keyword">return</span>;
+
+        <span class="keyword">var</span> propertyInfos = obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+        <span class="keyword">if</span> (!propertyInfos.Any(p =&gt; p.CanWrite))
+        {
+            <span class="comment">// Nothing to edit</span>
+            _appliedFeatures = [obj];
+            <span class="keyword">return</span>;
+        }
+
+        <span class="keyword">var</span> res = <span class="keyword">await</span> DialogService.EditObject(obj, $<span class="string">&quot;Specify {obj.GetType().Name.Split(&quot;</span>.<span class="string">&quot;).Last()} Options&quot;</span>, metaConfig: MetaConfig, options: DialogOptionsEx.DefaultDialogOptions.SetProperties(d =&gt;
+        {
+            d.DragMode = MudDialogDragMode.Simple;
+            d.Resizeable = <span class="keyword">true</span>;
+            d.Animation = AnimationType.Fade;
+        }));
+        <span class="keyword">if</span> (res.Cancelled)
+            <span class="keyword">return</span>;
+        _appliedFeatures = [res.Result];
+    }
+
+    <span class="keyword">private</span> <span class="keyword">void</span> MetaConfig(ObjectEditMeta&lt;IVisualizerFeature&gt; meta)
+    {
+        meta.Properties(
+            m =&gt; m.FullJsNamespace,
+            m =&gt; m.RequiredJsFiles,
+            m =&gt; m.AppliedFromPreset,
+            m =&gt; m.OnCanvasDrawCallbackName).Ignore();
+        meta.WrapEachInMudItem();
+    }
+
+}
+</pre></div>
+</div>

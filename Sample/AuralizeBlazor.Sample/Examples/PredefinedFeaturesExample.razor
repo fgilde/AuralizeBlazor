@@ -1,0 +1,84 @@
+﻿@using System.Reflection
+@using AuralizeBlazor.Features
+@using MudBlazor.Extensions.Components.ObjectEdit.Options
+@using MudBlazor.Extensions.Options
+@using Nextended.Core.Extensions
+
+<MudExSelect Value="@_appliedFeatures.FirstOrDefault()" Label="Select a Feature to test" Variant="Variant.Outlined" T="IVisualizerFeature" ValueChanged="@FeatureSelected" ItemCollection="_availableFeatures" ToStringFunc="@(x => x.ToString().Split(".").Last())"></MudExSelect>
+
+<Auralizer @ref=_vis
+InitialPreset="AuralizerPreset.DeepSeaDive"
+TrackList="_tracks"
+GradientChanged="@MainLayout.Instance.ColorsChanged"
+ApplyBackgroundImageFromTrack="false"
+ShowTrackInfosOnPlay="false"
+Presets="AuralizerPreset.All"
+@bind-Features="_appliedFeatures"
+Height="700px">
+    <center>
+        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="@TracksService.DemoTracks[1].Url"></audio>
+    </center>
+</Auralizer>
+
+
+@code {
+    Auralizer _vis;
+    [Inject] private IDialogService DialogService { get; set; }
+    private IVisualizerFeature[] _availableFeatures;
+    private IAuralizerTrack[] _tracks;
+    protected override async Task OnInitializedAsync()
+    {
+        _availableFeatures = typeof(IVisualizerFeature).GetAllImplementations(typeof(IVisualizerFeature).Assembly).Distinct().Select(t => t.CreateInstance()).Cast<IVisualizerFeature>().ToArray();
+        var tracks = await TracksService.GetEyirishAsync();
+        _tracks = [TracksService.DemoTracks[1], tracks[0]];
+        await base.OnInitializedAsync();
+    }
+
+    private IVisualizerFeature[] _appliedFeatures =
+    [
+        new LineParticleFeature() {ParticleCount = 555, Text = "To test display lyrics feature select the other song left in the track select", ConnectionThreshold = 180}
+    ];
+
+
+    private async Task FeatureSelected(IVisualizerFeature obj)
+    {
+        if (obj == null)
+        {
+            _appliedFeatures = [];
+            return;
+        }
+
+        if (obj == _appliedFeatures.FirstOrDefault())
+            return;
+
+        var propertyInfos = obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+        if (!propertyInfos.Any(p => p.CanWrite))
+        {
+            // Nothing to edit
+            _appliedFeatures = [obj];
+            return;
+        }
+
+        var res = await DialogService.EditObject(obj, $"Specify {obj.GetType().Name.Split(".").Last()} Options", metaConfig: MetaConfig, options: DialogOptionsEx.DefaultDialogOptions.SetProperties(d =>
+        {
+            d.DragMode = MudDialogDragMode.Simple;
+            d.Resizeable = true;
+            d.Animation = AnimationType.Fade;
+        }));
+        if (res.Cancelled)
+            return;
+        _appliedFeatures = [res.Result];
+    }
+
+    private void MetaConfig(ObjectEditMeta<IVisualizerFeature> meta)
+    {
+        meta.Properties(
+            m => m.FullJsNamespace,
+            m => m.RequiredJsFiles,
+            m => m.AppliedFromPreset,
+            m => m.OnCanvasDrawCallbackName).Ignore();
+        meta.WrapEachInMudItem();
+    }
+
+}
+

@@ -1,17 +1,16 @@
 ﻿@page "/spotify"
-@using AuralizeBlazor.Options
-<MudDivider Class="mt-5 mb-5"></MudDivider>
 
-<p>Spotify sample</p>
+<PageTitle>Capture Connect</PageTitle>
 
 
-<Auralizer ConnectToCapture="CaptureConnection.ConnectCurrentTab"
-           InitialPreset="AuralizerPreset.NeonBars"
-           Presets="@AuralizerPreset.All"
-           Overlay="false">
-</Auralizer>
-
-<br/>
-<br/>
-
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/3lP2LMh70fB7imwIhMZFbm?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+<DocsPageSection>
+    <SectionHeader Title="Capture Connect">
+        <Description>
+            You can connect directly to a capture source by setting <CodeInline>ConnectToCapture</CodeInline> property<br />
+        </Description>
+    </SectionHeader>
+    <SectionContent Outlined="true" FullWidth="true">
+        <CaptureConnectExample />
+    </SectionContent>
+    <SectionSource Code="@nameof(CaptureConnectExample)" />
+</DocsPageSection>

@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Analyzers" Version="8.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Components.CustomElements" Version="8.0.12" />
-    <PackageReference Include="MudBlazor.Extensions" Version="8.0.1" />
+    <PackageReference Include="MudBlazor.Extensions" Version="8.0.2-prev-2501302211-main" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.12" PrivateAssets="all" />
   </ItemGroup>
@@ -96,6 +96,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Update="Examples\AutoGradientsExample.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Update="Examples\CaptureConnectExample.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
   </ItemGroup>

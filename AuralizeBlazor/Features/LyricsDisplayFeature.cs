@@ -2,7 +2,7 @@
 using BlazorJS.Attributes;
 
 namespace AuralizeBlazor.Features;
-
+//https://lyricpotato.com/
 public sealed class LyricsDisplayFeature : VisualizerFeatureBase
 {
     public override string FullJsNamespace => $"window.AuralizeBlazor.features.lyricsDisplay";

@@ -14,14 +14,6 @@
             Name of the web component.
             </summary>
         </member>
-        <member name="M:AuralizeBlazor.Auralizer.ComponentJsFile">
-            <inheritdoc />
-        </member>
-        <member name="M:AuralizeBlazor.Auralizer.AudioMotionLib">
-            <summary>
-            Library path for the AudioMotionAnalyzer library.
-            </summary>
-        </member>
         <member name="M:AuralizeBlazor.Auralizer.ComponentJsInitializeMethodName">
             <inheritdoc />
         </member>
@@ -975,19 +967,6 @@
             <summary>
             Maximum dispersion offsets for word animation Y (in pixels; reference values)
             </summary>
-        </member>
-        <member name="T:AuralizeBlazor.Features.PredefinedFeature">
-            <summary>
-            This feature allows to visualize the wave node as a separate line.
-            </summary>
-        </member>
-        <member name="M:AuralizeBlazor.Features.PredefinedFeature.#ctor(System.String)">
-            <summary>
-            This feature allows to visualize the wave node as a separate line.
-            </summary>
-        </member>
-        <member name="P:AuralizeBlazor.Features.PredefinedFeature.FullJsNamespace">
-            <inheritdoc />
         </member>
         <member name="T:AuralizeBlazor.Features.RadialRadiusFeature">
             <summary>

@@ -35,30 +35,19 @@ public partial class Auralizer
     /// Name of the web component.
     /// </summary>
     public static string SuggestedWebComponentName => string.Join("-", typeof(Auralizer).FullName.Replace(".", "").SplitByUpperCase()).ToLower();
-
     public static Version Version => typeof(Auralizer).Assembly.GetName().Version;
     public static string VersionString => Version.ToString(3);
+    protected override string ComponentJsFile() => Minify ? $"./_content/AuralizeBlazor/js/auralize.min.js?v={VersionString}" : $"./_content/AuralizeBlazor/js/components/auralizer.js?v={VersionString}";
+    protected string AudioMotionLib() => $"./_content/AuralizeBlazor/js/lib/audioMotion4.4.0.min.js?v={VersionString}"; // => "https://cdn.skypack.dev/audiomotion-analyzer?min";
 
     private const bool Minify = true;
 
 
-    [Inject] protected IServiceProvider ServiceProvider { get; set; }
-
-
+    private LyricData? _lyrics;
+    private bool _trackFromListAppilied = false;
     private string _backgroundImageToApply;
     private string _id = Guid.NewGuid().ToFormattedId();
-
-    /// <inheritdoc />
-    protected override string ComponentJsFile() => Minify ? $"./_content/AuralizeBlazor/js/auralize.min.js?v={VersionString}" : $"./_content/AuralizeBlazor/js/components/auralizer.js?v={VersionString}";
-
-    /// <summary>
-    /// Library path for the AudioMotionAnalyzer library.
-    /// </summary>
-    protected string AudioMotionLib() => $"./_content/AuralizeBlazor/js/lib/audioMotion4.4.0.min.js?v={VersionString}"; // => "https://cdn.skypack.dev/audiomotion-analyzer?min";
-
-    /// <inheritdoc />
-    protected override string ComponentJsInitializeMethodName() => "initializeAuralizer";
-
+    
     private bool _metaCollapsed = false;
     private bool _metaTagsHidden = false;
     private bool _initialPresetApplied;
@@ -88,6 +77,11 @@ public partial class Auralizer
     private VisualizerAction[] _actions;
     private MouseEventArgs _lastMouseEventArgs;
 
+    /// <inheritdoc />
+    protected override string ComponentJsInitializeMethodName() => "initializeAuralizer";
+
+    [Inject] protected IServiceProvider ServiceProvider { get; set; }
+
 
     [Parameter]
     public string InitialMessage { get; set; }
@@ -106,13 +100,13 @@ public partial class Auralizer
     /// </summary>
     [Parameter] public bool AutoPlayNextTrackOnEnd { get; set; } = true;
 
-
     /// <summary>
     /// Get or set the active lyrics for current song
     /// </summary>
-    [Parameter, IgnoreOnPreset, ForJs] public LyricData? Lyrics { get; set; }
+    [Parameter, IgnoreOnPreset]
+    public LyricData? Lyrics { get; set; }
 
-
+    
     public bool IsMouseOver { get; private set; }
 
     /// <summary>
@@ -388,6 +382,8 @@ public partial class Auralizer
          UpdateColors(Meta?.Tag?.Pictures?.FirstOrDefault()?.Data?.Data, AutoGradientFrom.MetaCoverImage)
         );
 
+    LyricData? ActiveLyrics() => _trackFromListAppilied ? _lyrics : Lyrics;
+
     private Task ResetColors()
     {
         if (_currentPreset != null && AutoApplyGradient == AutoGradientFrom.None)
@@ -462,19 +458,19 @@ public partial class Auralizer
     /// <summary>
     /// Background size
     /// </summary>
-    [Parameter, ForJs]
+    [Parameter, ForJs, IgnoreOnPreset]
     public string BackgroundSize { get; set; }
 
     /// <summary>
     /// Background repeat
     /// </summary>
-    [Parameter, ForJs]
+    [Parameter, ForJs, IgnoreOnPreset]
     public string BackgroundRepeat { get; set; }
 
     /// <summary>
     /// Background position
     /// </summary>
-    [Parameter, ForJs]
+    [Parameter, ForJs, IgnoreOnPreset]
     public string BackgroundPosition { get; set; }
 
     /// <summary>
@@ -835,6 +831,13 @@ public partial class Auralizer
     public Auralizer RemoveFeature(params IVisualizerFeature[] feature)
     {
         _features = _features.Except(feature).ToArray();
+        FeaturesChanged.InvokeAsync(Features);
+        return this;
+    }
+
+    public Auralizer RemoveAllFeatures()
+    {
+        _features = [];
         FeaturesChanged.InvokeAsync(Features);
         return this;
     }
@@ -1407,7 +1410,8 @@ public partial class Auralizer
         }
 
         ShowMessage(track.Label, TimeSpan.FromSeconds(2));
-        Lyrics = track?.Lyrics;
+        _trackFromListAppilied = true;
+        _lyrics = track?.Lyrics;
         await UpdateJsOptions();
         await PlayTrackAsync(track.Url);
     }
@@ -1744,6 +1748,7 @@ public partial class Auralizer
     {
         return this.AsJsObject(new
         {
+            lyrics = ActiveLyrics(),
             gradientLeft = GradientLeft ?? Gradient,
             gradientRight = GradientRight ?? Gradient,
             connectAll = ConnectAllAudioSources || ChildContent != null,

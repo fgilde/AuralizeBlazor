@@ -4,7 +4,7 @@
 {
     @if (type != null && !string.IsNullOrEmpty(TypeName))
     {
-        <MudExApiView ApiLinkPath="api" Search="@Search" ShowHeader="false" IsInitiallyExpanded="true" Type="@type"></MudExApiView>
+        <MudExApiView ApiLinkPath="api" Search="@Search" ShowHeader="false" Expanded="true" Type="@type"></MudExApiView>
     }
 }
 else

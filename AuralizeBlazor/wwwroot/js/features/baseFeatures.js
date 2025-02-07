@@ -15,11 +15,11 @@
             treble = instance.getEnergy ? instance.getEnergy('treble') : 0,
             time = performance.now() / 1000; // Zeit in Sekunden
 
-        if (!scope.particles) {
-            scope.particles = [];
-            const particleCount = featureOptions.particleCount || 200;
+        if (!scope.lineParticles || scope.lineParticles.length !== featureOptions.particleCount) {
+            scope.lineParticles = [];
+            const particleCount = featureOptions.particleCount;
             for (let i = 0; i < particleCount; i++) {
-                scope.particles.push({
+                scope.lineParticles.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
                     vx: (Math.random() - 0.5) * 1.5,
@@ -31,7 +31,7 @@
             }
         }
 
-        for (let particle of scope.particles) {
+        for (let particle of scope.lineParticles) {
             particle.x += particle.vx * (1 + energy * 2);
             particle.y += particle.vy * (1 + energy * 2);
 
@@ -53,10 +53,10 @@
         }
 
         const connectionThreshold = featureOptions.connectionThreshold || 50;
-        for (let i = 0; i < scope.particles.length; i++) {
-            for (let j = i + 1; j < scope.particles.length; j++) {
-                const p1 = scope.particles[i],
-                    p2 = scope.particles[j],
+        for (let i = 0; i < scope.lineParticles.length; i++) {
+            for (let j = i + 1; j < scope.lineParticles.length; j++) {
+                const p1 = scope.lineParticles[i],
+                    p2 = scope.lineParticles[j],
                     dx = p1.x - p2.x,
                     dy = p1.y - p2.y,
                     dist = Math.sqrt(dx * dx + dy * dy);
@@ -134,9 +134,9 @@ window.AuralizeBlazor.features.vortexParticle = {
             treble = instance.getEnergy ? instance.getEnergy('treble') : 0;
 
         // Partikelsystem initialisieren (nur einmal)
-        if (!scope.particles) {
-            scope.particles = [];
-            const particleCount = featureOptions.particleCount || 200;
+        if (!scope.vortexParticles || scope.vortexParticles.length !== featureOptions.particleCount) {
+            scope.vortexParticles = [];
+            const particleCount = featureOptions.particleCount;
             const maxZ = 200; // maximale Tiefe (willkürlicher Wert)
             for (let i = 0; i < particleCount; i++) {
                 const angle = Math.random() * Math.PI * 2;
@@ -145,7 +145,7 @@ window.AuralizeBlazor.features.vortexParticle = {
                 const z = Math.random() * maxZ - maxZ / 2;
                 // Zufällige Geschwindigkeit in Z-Richtung
                 const zSpeed = (Math.random() - 0.5) * 0.5;
-                scope.particles.push({
+                scope.vortexParticles.push({
                     angle: angle,              // aktueller Winkel
                     radius: radius,            // aktueller Abstand vom globalen Mittelpunkt
                     speed: 0.005 + Math.random() * 0.01, // Drehgeschwindigkeit
@@ -161,7 +161,7 @@ window.AuralizeBlazor.features.vortexParticle = {
         const focalLength = 300;
 
         // Partikel aktualisieren und zeichnen
-        scope.particles.forEach(particle => {
+        scope.vortexParticles.forEach(particle => {
             // Aktualisiere Winkel und Radius – die Audioenergie verstärkt die Drehung
             particle.angle += particle.speed * (1 + energy * 5);
             particle.radius += Math.sin(time * 2 + particle.angle) * 0.5 * energy;
