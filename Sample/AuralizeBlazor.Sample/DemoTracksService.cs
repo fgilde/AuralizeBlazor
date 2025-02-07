@@ -20,7 +20,7 @@ public class DemoTracksService
         try
         {            
             var bytes = await new HttpClient().GetByteArrayAsync(_navigationManager.ToAbsoluteUri(file));
-            return bytes is { Length: > 0 } ? (file.EndsWith("ttml") ? LyricData.FromTtml(bytes) : LyricData.FromLrc(bytes)) : null;
+            return bytes is { Length: > 0 } ? (file.EndsWith("ttml") || file.EndsWith("xml") ? LyricData.FromTtml(bytes) : LyricData.FromLrc(bytes)) : null;
         }
         catch (Exception e) { }
         return null;
@@ -48,7 +48,7 @@ public class DemoTracksService
         if (_eyirishTracks != null)
             return _eyirishTracks;
         var tracks = GetEyirish().Cast<AuralizerTrack>().ToList();
-        tracks[0].Lyrics = await LoadLyricsAsync("Anthem with flo.ttml");
+        tracks[0].Lyrics = await LoadLyricsAsync("Anthem with flo.xml");
         return _eyirishTracks = tracks.Cast<IAuralizerTrack>().ToList();
     }
 
