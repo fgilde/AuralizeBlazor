@@ -40,7 +40,7 @@
 
     <span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">async</span> Task OnInitializedAsync()
     {
-        _tracks ??= (<span class="keyword">await</span> TracksService.GetEyirishAsync()).ToArray();
+        _tracks ??= (<span class="keyword">await</span> TracksService.GetEyirishAsync()).Where(t =&gt; t.Lyrics != <span class="keyword">null</span>).Concat([<span class="keyword">await</span> TracksService.LebenWieImFilmAsync()]).ToArray();
         _file = _tracks[<span class="number">0</span>].Url;
         _lyrics = _tracks[<span class="number">0</span>].Lyrics;
         <span class="keyword">await</span> <span class="keyword">base</span>.OnInitializedAsync();

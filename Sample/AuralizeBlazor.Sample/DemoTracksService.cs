@@ -1,4 +1,5 @@
-﻿using AuralizeBlazor.Types;
+﻿using System.Collections.Concurrent;
+using AuralizeBlazor.Types;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
 
@@ -8,6 +9,7 @@ public class DemoTracksService
 {
     private readonly NavigationManager _navigationManager;
     private List<IAuralizerTrack> _eyirishTracks = null;
+    private ConcurrentDictionary<string, LyricData> _lyricsCache = new ConcurrentDictionary<string, LyricData>();
 
     public DemoTracksService(NavigationManager navigationManager)
     {
@@ -17,10 +19,15 @@ public class DemoTracksService
 
     private async Task<LyricData?> LoadLyricsAsync(string file)
     {
+        if (_lyricsCache.TryGetValue(file, out var cached))
+            return cached;
         try
         {            
             var bytes = await new HttpClient().GetByteArrayAsync(_navigationManager.ToAbsoluteUri(file));
-            return bytes is { Length: > 0 } ? (file.EndsWith("ttml") || file.EndsWith("xml") ? LyricData.FromTtml(bytes) : LyricData.FromLrc(bytes)) : null;
+            var result = bytes is { Length: > 0 } ? (file.EndsWith("ttml") || file.EndsWith("xml") ? LyricData.FromTtml(bytes) : LyricData.FromLrc(bytes)) : null;
+            if (result != null)
+                _lyricsCache[file] = result;
+            return result;
         }
         catch (Exception e) { }
         return null;
@@ -29,6 +36,13 @@ public class DemoTracksService
     public IAuralizerTrack MainDemoTrack => DemoTracks[2];
     public IAuralizerTrack[] DemoTracks => GetDemoTracks().ToArray();
     public IAuralizerTrack[] EyirishTracks => GetEyirish().ToArray();
+
+    public async Task<IAuralizerTrack> LebenWieImFilmAsync()
+    {
+        var res = new AuralizerTrack("/Leben wie im Film.mp3");
+        res.Lyrics = await LoadLyricsAsync("Wir leben wie im film.xml");
+        return res;
+    }
     
     public IEnumerable<IAuralizerTrack> GetDemoTracks()
     {

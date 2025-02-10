@@ -8,6 +8,11 @@ public sealed class LyricsDisplayFeature : VisualizerFeatureBase
     public override string FullJsNamespace => $"window.AuralizeBlazor.features.lyricsDisplay";
 
     /// <summary>
+    /// If true a timer will be shown when the next line starts.
+    /// </summary>
+    [ForJs] public bool ShowTimer { get; set; } = true;
+
+    /// <summary>
     /// The position of the lyrics on the screen.
     /// </summary>
     [ForJs]

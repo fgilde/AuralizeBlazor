@@ -37,7 +37,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _tracks ??= (await TracksService.GetEyirishAsync()).ToArray();
+        _tracks ??= (await TracksService.GetEyirishAsync()).Where(t => t.Lyrics != null).Concat([await TracksService.LebenWieImFilmAsync()]).ToArray();
         _file = _tracks[0].Url;
         _lyrics = _tracks[0].Lyrics;
         await base.OnInitializedAsync();

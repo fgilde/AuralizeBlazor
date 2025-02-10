@@ -933,6 +933,11 @@
             The text to show for the treble energy bar.
             </summary>
         </member>
+        <member name="P:AuralizeBlazor.Features.LyricsDisplayFeature.ShowTimer">
+            <summary>
+            If true a timer will be shown when the next line starts.
+            </summary>
+        </member>
         <member name="P:AuralizeBlazor.Features.LyricsDisplayFeature.TextPosition">
             <summary>
             The position of the lyrics on the screen.

@@ -96,18 +96,32 @@
                 break;
             }
         }
+        // Falls noch keine Zeile gestartet hat, nehmen wir die erste
         if (currentIndex === -1) {
             currentIndex = 0;
         }
 
         // Determine which lines to display: previous (if exists), current, and next (if exists)
         var displayIndices = [];
-        if (currentIndex > 0) {
-            displayIndices.push(currentIndex - 1);
+        if (lines[0].timeSeconds > currentTime) {
+            // Falls noch keine Zeile gestartet wurde, zeigen wir nur die erste Zeile.
+            displayIndices = [0];
+        } else {
+            if (currentIndex > 0) {
+                displayIndices.push(currentIndex - 1);
+            }
+            displayIndices.push(currentIndex);
+            if (currentIndex < lines.length - 1) {
+                displayIndices.push(currentIndex + 1);
+            }
         }
-        displayIndices.push(currentIndex);
-        if (currentIndex < lines.length - 1) {
-            displayIndices.push(currentIndex + 1);
+
+        // Bestimme den upcomingIndex – also die Zeile, die als nächstes starten wird.
+        var upcomingIndex = null;
+        if (lines[0].timeSeconds > currentTime) {
+            upcomingIndex = 0;
+        } else if (currentIndex < lines.length - 1) {
+            upcomingIndex = currentIndex + 1;
         }
 
         // Determine base Y position based on textPosition option
@@ -145,7 +159,7 @@
             if (diff === 1) return 0.7;
             if (diff === -1) {
                 var baseAlpha = 0.7;
-                var mod = (progress - 0.5) * 2; // for progress from 0.5 to 1: mod 0 to 1
+                var mod = (progress - 0.5) * 2; // für progress von 0.5 bis 1: mod 0 bis 1
                 mod = Math.min(1, Math.max(0, mod));
                 return baseAlpha * (1 - mod);
             }
@@ -153,50 +167,50 @@
         }
 
         // Helper function to create a gradient for the text.
-        // For the current line, modify the gradient based on energy.
+        // Für die aktuelle Zeile wird der Gradient basierend auf der Energie modifiziert.
         function createGradient(xCenter, textWidth, isCurrent) {
             var grad = ctx.createLinearGradient(xCenter - textWidth / 2, 0, xCenter + textWidth / 2, 0);
             try {
                 if (isCurrent && energy > 0.5) {
                     grad.addColorStop(0, gradientColors[0]);
-                    grad.addColorStop(0.5, "#ffffff"); // middle stop set to white
+                    grad.addColorStop(0.5, "#ffffff"); // mittlerer Stopp in Weiß
                     grad.addColorStop(1, gradientColors[gradientColors.length - 1]);
                 } else {
                     gradientColors.forEach(function (col, index) {
                         grad.addColorStop(index / (gradientColors.length - 1), col);
                     });
                 }
-            }catch(e) {}
+            } catch (e) { }
             return grad;
         }
 
-        // Render the selected lines
+        // Render the ausgewählten Zeilen
         displayIndices.forEach(function (index) {
             var line = lines[index];
-            var diff = index - currentIndex; // -1: previous, 0: current, 1: next
+            var diff = index - currentIndex; // -1: vorherige, 0: aktuell, 1: nächste
 
-            // Base vertical offset: diff * lineSpacing.
+            // Basis-Versatz vertikal: diff * lineSpacing.
             var offset = diff * lineSpacing;
-            // For the current line, shift upward gradually based on progress.
+            // Für die aktuelle Zeile: allmählich nach oben verschieben basierend auf progress.
             if (diff === 0) {
                 offset -= progress * lineSpacing;
             }
-            // For the previous line, add additional upward shift based on progress.
+            // Für die vorherige Zeile: zusätzlichen Versatz basierend auf progress.
             if (diff === -1) {
                 offset -= progress * lineSpacing;
             }
 
             var alpha = calcAlpha(diff);
 
-            // Calculate font size; current line is slightly larger.
+            // Berechne die Schriftgröße; die aktuelle Zeile ist etwas größer.
             var fontSize = baseFontSize;
             if (diff === 0) {
                 fontSize = baseFontSize * 1.2;
             }
-            // Modulate font size slightly with audio energy
+            // Leicht modulierte Schriftgröße basierend auf der Audioenergie
             fontSize *= 1 + energy * 0.1;
 
-            // Set font properties (bold for current line)
+            // Schriftstil (fett für die aktuelle Zeile)
             var fontWeight = (diff === 0) ? "bold" : "normal";
             ctx.font = fontWeight + " " + fontSize + "px sans-serif";
             ctx.textAlign = 'center';
@@ -204,11 +218,28 @@
 
             var xCenter = width / 2;
 
-            // If word-based animation is enabled, render the line word-by-word for smooth transition
+            // Wenn es sich um die nächste (upcoming) Zeile handelt und showTimer aktiviert ist,
+            // wird ein kleiner Countdown oberhalb der Zeile gerendert.
+            if (featureOptions.showTimer && index === upcomingIndex && line.timeSeconds > currentTime) {
+                var remainingTime = Math.ceil(line.timeSeconds - currentTime);
+                var countdownText = "(starts in " + remainingTime + "s)";
+                // Countdown etwas kleiner rendern
+                var countdownFontSize = fontSize * 0.7;
+                var prevFont = ctx.font;
+                ctx.font = fontWeight + " " + countdownFontSize + "px sans-serif";
+                ctx.fillStyle = "#ffffff";
+                ctx.globalAlpha = alpha;
+                // Positioniere den Countdown ein wenig oberhalb der eigentlichen Zeile.
+                var countdownY = baseY + offset - countdownFontSize - 5;
+                ctx.fillText(countdownText, xCenter, countdownY);
+                ctx.font = prevFont;
+            }
+
+            // Falls word-based animation aktiviert ist, rendern wir Wort für Wort.
             if (enableWordAnimation) {
-                // Split the line into words
+                // Zerlege die Zeile in Wörter
                 var words = line.text.split(" ");
-                // Measure the widths of all words (including spaces) to center the entire line
+                // Ermittle die Breiten aller Wörter (inklusive Leerzeichen), um die gesamte Zeile zu zentrieren
                 var wordWidths = [];
                 var totalTextWidth = 0;
                 words.forEach(function (word, i) {
@@ -219,33 +250,30 @@
                 });
                 var startX = xCenter - totalTextWidth / 2;
                 var currentX = startX;
-                // Compute dispersion factor using easing for smooth transition
+                // Berechne den Dispersionseffekt mittels easing
                 var dispersion = easeOutQuad(progress);
-                // Render each word individually
+                // Render jedes Wort einzeln
                 words.forEach(function (word, i) {
                     var wordWithSpace = word + (i < words.length - 1 ? " " : "");
                     var wordWidth = wordWidths[i];
                     var wordCenter = currentX + wordWidth / 2;
                     currentX += wordWidth;
-                    // For smooth transition, apply dispersion offsets regardless of diff,
-                    // but adjust intensity based on diff (for previous line, effect is stronger)
+                    // Für einen sanften Übergang: wende Dispersion offsets an (stärker für vorherige Zeile)
                     var offsetX = 0, offsetY = 0;
                     if (diff === -1) {
-                        var angle = ((i / words.length) - 0.5) * Math.PI; // from -pi/2 to pi/2
+                        var angle = ((i / words.length) - 0.5) * Math.PI; // von -pi/2 bis pi/2
                         offsetX = Math.cos(angle) * wordAnimationMaxX * dispersion;
                         offsetY = -Math.sin(angle) * wordAnimationMaxY * dispersion;
                     }
-                    // Final word position
                     var wordX = wordCenter + offsetX;
                     var wordY = baseY + offset + offsetY;
-                    // Create gradient for the word
                     var wordGrad = createGradient(wordCenter, wordWidth, diff === 0);
                     ctx.fillStyle = wordGrad;
                     ctx.globalAlpha = alpha;
-                    ctx.fillText(word, wordCenter + offsetX, wordY);
+                    ctx.fillText(word, wordX, wordY);
                 });
             } else {
-                // Otherwise, render the full line as a block.
+                // Andernfalls rendern wir die ganze Zeile als Block.
                 var textWidth = ctx.measureText(line.text).width;
                 var grad = createGradient(xCenter, textWidth, diff === 0);
                 ctx.fillStyle = grad;
