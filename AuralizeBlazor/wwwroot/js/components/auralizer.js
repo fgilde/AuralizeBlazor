@@ -38,6 +38,135 @@
             this.renderOneTimeStatic();
         }
     }
+    
+    record({ duration = 5000, fps = 30 } = {}) {
+        const audioCtx = this.audioMotion.audioCtx;
+        const canvas = this.audioMotion.canvas;
+
+        if (audioCtx.state === "suspended") {
+            audioCtx.resume();
+        }
+
+        const canvasStream = canvas.captureStream(fps);
+        const dest = audioCtx.createMediaStreamDestination();
+        const masterGain = audioCtx.createGain();
+        masterGain.gain.value = 1.0;
+        masterGain.connect(dest);
+
+        let hasAudio = false;
+
+        const tryConnect = (node, name) => {
+            try {
+                node.connect(masterGain);
+                console.log(`Audioquelle verbunden: ${name}`);
+                hasAudio = true;
+            } catch (e) {
+                console.warn(`Fehler beim Verbinden von ${name}:`, e);
+            }
+        };
+
+        if (this.connectedStreams && this.connectedStreams.length > 0) {
+            this.connectedStreams.forEach((node, i) => {
+                tryConnect(node, `connectedStreams[${i}]`);
+            });
+        }
+
+        if (this.audioMotion.connectedSources && this.audioMotion.connectedSources.length > 0) {
+            this.audioMotion.connectedSources.forEach((source, i) => {
+                if (source.audioSourceNode) {
+                    tryConnect(source.audioSourceNode, `connectedSources[${i}]`);
+                }
+            });
+        }
+
+        if (this.micStream) {s
+            tryConnect(this.micStream, "micStream");
+        }
+
+        if (!hasAudio) {
+            const mediaElements = this.getAudioElements();
+            if (mediaElements && mediaElements.length > 0) {
+                mediaElements.forEach((el, i) => {
+                    // Wir verbinden nur Elemente, die gerade wiedergegeben werden (nicht pausiert)
+                    if (!el.paused) {
+                        try {
+                            let audioNode;
+                            // Verhindere, dass für dasselbe Element mehrfach ein MediaElementAudioSourceNode erstellt wird.
+                            if (!el.__auralizerAudioSource) {
+                                audioNode = audioCtx.createMediaElementSource(el);
+                                el.__auralizerAudioSource = audioNode;
+                            } else {
+                                audioNode = el.__auralizerAudioSource;
+                            }
+                            tryConnect(audioNode, `getAudioElements[${i}]`);
+                        } catch (e) {
+                            console.warn(`Fehler beim Verbinden von MediaElement ${i}:`, e);
+                        }
+                    }
+                });
+            }
+        }
+
+        // Debug: Ausgabe der Audio-Tracks im Destination-Stream
+        setTimeout(() => {
+            console.log("Audio Destination Tracks:", dest.stream.getAudioTracks());
+        }, 100);
+
+        const combinedStream = new MediaStream([
+            ...canvasStream.getVideoTracks(),
+            ...dest.stream.getAudioTracks()
+        ]);
+
+        const options = {
+            mimeType: "video/webm; codecs=vp9",
+            videoBitsPerSecond: 8_000_000, // 8 Mbit/s
+            audioBitsPerSecond: 320_000    // 320 kbit/s
+        };
+
+        const recordedChunks = [];
+        let mediaRecorder;
+
+        try {
+            mediaRecorder = new MediaRecorder(combinedStream, options);
+        } catch (e) {
+            console.error("MediaRecorder konnte nicht erstellt werden:", e);
+            return;
+        }
+
+        mediaRecorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) {
+                recordedChunks.push(e.data);
+            }
+        };
+
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunks, { type: options.mimeType });
+            console.log("Aufgezeichneter Blob:", blob, "Größe:", blob.size);
+            if (blob.size === 0) {
+                console.warn("Der Blob ist leer – es wurde kein Audio oder Video aufgezeichnet.");
+            }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "recording.webm";
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        };
+
+        mediaRecorder.start();
+
+        setTimeout(() => {
+            mediaRecorder.stop();
+            console.log("Aufnahme gestoppt.");
+        }, duration);
+    }
+
+
+
 
     async renderOneTimeStatic() {
         const audioElements = this.getAudioElements();

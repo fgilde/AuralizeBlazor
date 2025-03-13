@@ -11,10 +11,10 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>Logo.png</PackageIcon>
-    <Version>2.0.4</Version>
+    <Version>2.0.5</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <AssemblyVersion>2.0.4</AssemblyVersion>
+    <AssemblyVersion>2.0.5</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -46,9 +46,9 @@
 
   <ItemGroup>
     <PackageReference Include="BlazorJS" Version="2.2.0" />
-    <PackageReference Include="Nextended.Core" Version="9.0.3" />    
-    <PackageReference Include="Nextended.Blazor" Version="9.0.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
+    <PackageReference Include="Nextended.Core" Version="9.0.9" />    
+    <PackageReference Include="Nextended.Blazor" Version="9.0.9" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 
@@ -62,7 +62,7 @@
       <PackagePath>\</PackagePath>
     </None>
     <None Include="bundleconfig.json" />
-    <None Include="wwwroot\Logo.png" >
+    <None Include="wwwroot\Logo.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
