@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.NET Core app to Azure Web App - AuralizeBlazor
+name: Build and deploy ASP.Net Core app to Azure Web App - AuralizeBlazor
 
 on:
   push:
@@ -9,55 +9,50 @@ on:
       - master
   workflow_dispatch:
 
-env:
-  PROJECT_PATH: Sample/AuralizeBlazor.Sample/AuralizeBlazor.Sample.csproj
-  PUBLISH_DIR: ${{ runner.temp }}/publish
-
 jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read
+      contents: read #This is required for actions/checkout
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up .NET SDK
+      - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
-        with:          
-          dotnet-version: '8.0.x'
+        with:
+          dotnet-version: '8.0.x' 
 
       - name: Restore
-        run: dotnet restore "${{ env.PROJECT_PATH }}"
+        run: dotnet restore "Sample/AuralizeBlazor.Sample/AuralizeBlazor.Sample.csproj"
 
-      - name: Build (Release)
-        run: dotnet build "${{ env.PROJECT_PATH }}" --configuration Release --no-restore
+      - name: Build with dotnet
+        run: dotnet build "Sample/AuralizeBlazor.Sample/AuralizeBlazor.Sample.csproj" --configuration Release --no-restore
 
-      - name: Publish
-        run: dotnet publish "${{ env.PROJECT_PATH }}" -c Release -o "${{ env.PUBLISH_DIR }}" --no-build
+      - name: dotnet publish
+        run: dotnet publish "Sample/AuralizeBlazor.Sample/AuralizeBlazor.Sample.csproj" -c Release -o "./publish" --no-build
 
-      - name: Upload artifact for deployment
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: dotnet-publish
-          path: ${{ env.PUBLISH_DIR }}
+          name: .net-app
+          path: ./publish
 
   deploy:
     runs-on: windows-latest
     needs: build
     permissions:
-      id-token: write
-      contents: read
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
-      - name: Download build artifact
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: dotnet-publish
+          name: .net-app
           path: ./publish
-
-      - name: Login to Azure (OIDC)
+      
+      - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_5966A2E7DF5A439C8FF34EA3A3FEA2F7 }}
@@ -65,6 +60,7 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_098A55B73585475DB51124C1729752A8 }}
 
       - name: Deploy to Azure Web App
+        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'AuralizeBlazor'
