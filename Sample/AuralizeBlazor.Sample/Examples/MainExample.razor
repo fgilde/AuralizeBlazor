@@ -34,6 +34,8 @@
             LabelPosition = VisualPosition.CenterCenter,
             ImagePosition = VisualPosition.CenterCenter.WithMarginBottom(80)
         },
+        //new LyricsDisplayFeature(),
+        new LyricsDisplayFeature() {ShowTimer = false, TextPosition = LyricsPosition.Top, FontSize = 28, Colors = ["#ffffff"]},
         new SwitchPresetFeature
             {
                 OverridePresetColorsWithRandoms = true,

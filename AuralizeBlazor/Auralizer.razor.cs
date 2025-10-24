@@ -44,6 +44,7 @@ public partial class Auralizer
 
 
     private LyricData? _lyrics;
+    private LyricData? _lyricsFromMeta;
     private bool _trackFromListAppilied = false;
     private string _backgroundImageToApply;
     private string _id = Guid.NewGuid().ToFormattedId();
@@ -382,7 +383,7 @@ public partial class Auralizer
          UpdateColors(Meta?.Tag?.Pictures?.FirstOrDefault()?.Data?.Data, AutoGradientFrom.MetaCoverImage)
         );
 
-    LyricData? ActiveLyrics() => _trackFromListAppilied ? _lyrics : Lyrics;
+    LyricData? ActiveLyrics() => (_trackFromListAppilied ? _lyrics : Lyrics) ?? _lyricsFromMeta;
 
     private Task ResetColors()
     {
@@ -495,11 +496,11 @@ public partial class Auralizer
     public TagLib.File Meta { get; protected set; }
 
     protected bool ShowMeta = false;
-    private ConcurrentDictionary<string, TagLib.File> _metaCache = new();
+    private ConcurrentDictionary<string, (TagLib.File Meta, LyricData? LyricData)> _metaCache = new();
     private AudioMotionGradient _gradientLeft = null;
     private AudioMotionGradient _gradientRight = null;
     private AutoGradientFrom _autoApplyGradient = AutoGradientFrom.None;
-
+    
     /// <summary>
     /// Updates the meta information of the current track.
     /// </summary>
@@ -510,7 +511,8 @@ public partial class Auralizer
             return;
         if (_metaCache.TryGetValue(currentTrack, out var cachedFile))
         {
-            Meta = cachedFile;
+            Meta = cachedFile.Meta;
+            _lyricsFromMeta = cachedFile.LyricData;
             await ApplyMetaIf();
             return;
         }
@@ -525,8 +527,9 @@ public partial class Auralizer
         }
 
         
-        Meta = GetMeta(bytes);
-        _metaCache[currentTrack] = Meta;
+        Meta = GetMeta(bytes); 
+        _lyricsFromMeta = LyricData.FromAudioBytes(bytes);
+        _metaCache[currentTrack] = (Meta, _lyricsFromMeta);
         await ApplyMetaIf();
     }
 

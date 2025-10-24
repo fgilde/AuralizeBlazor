@@ -2,6 +2,7 @@
 using AuralizeBlazor.Types;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
+using Nextended.Core;
 
 namespace AuralizeBlazor.Sample;
 
@@ -24,12 +25,14 @@ public class DemoTracksService
         try
         {            
             var bytes = await new HttpClient().GetByteArrayAsync(_navigationManager.ToAbsoluteUri(file));
+            if(MimeType.AudioTypes.Any(m => MimeType.GetExtension(m) == Path.GetExtension(file)))
+                return LyricData.FromAudioBytes(bytes); 
             var result = bytes is { Length: > 0 } ? (file.EndsWith("ttml") || file.EndsWith("xml") ? LyricData.FromTtml(bytes) : LyricData.FromLrc(bytes)) : null;
             if (result != null)
                 _lyricsCache[file] = result;
             return result;
         }
-        catch (Exception e) { }
+        catch (Exception) { }
         return null;
     }
 
@@ -37,19 +40,15 @@ public class DemoTracksService
     public IAuralizerTrack[] DemoTracks => GetDemoTracks().ToArray();
     public IAuralizerTrack[] EyirishTracks => GetEyirish().ToArray();
 
-    public async Task<IAuralizerTrack> LebenWieImFilmAsync()
-    {
-        var res = new AuralizerTrack("/Leben wie im Film.mp3");
-        res.Lyrics = await LoadLyricsAsync("Wir leben wie im film.xml");
-        return res;
-    }
-    
+    public IAuralizerTrack LebenWieImFilm() => new AuralizerTrack("/Leben wie im Film.mp3");
+
     public IEnumerable<IAuralizerTrack> GetDemoTracks()
     {
         yield return new AuralizerTrack("/Auralizer Celtic.mp3");
         yield return new AuralizerTrack("/Auralizer Dreamy rock.mp3");
         yield return new AuralizerTrack("/Auralizer's Beat.mp3");
         yield return new AuralizerTrack("/Digital Serenade.mp3");
+        yield return LebenWieImFilm();
         yield return new AuralizerTrack("/sample.mp3", "Simple Demo 1");
         yield return new AuralizerTrack("/sample2.mp3", "Simple Demo 2");
         yield return new AuralizerTrack("/sample3.mp3", "Simple Demo 3");

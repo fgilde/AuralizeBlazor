@@ -1468,6 +1468,22 @@
             Retrieves all lines within the specified range.
             </summary>
         </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromAudioFile(System.String)">
+            <summary>
+            Factory method to create a LyricData object from an audio file's embedded lyrics.
+            Supports synchronized lyrics (SYLT) and falls back to unsynchronized lyrics (USLT).
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromAudioStream(System.IO.Stream,System.String)">
+            <summary>
+            Factory method to create a LyricData object from an audio stream's embedded lyrics.
+            </summary>
+        </member>
+        <member name="M:AuralizeBlazor.Types.LyricData.FromAudioBytes(System.Byte[],System.String)">
+            <summary>
+            Factory method to create a LyricData object from audio file bytes.
+            </summary>
+        </member>
         <member name="M:AuralizeBlazor.Types.LyricData.FromLrcFile(System.String)">
             <summary>
             Factory method to create a LyricData object from an LRC file.

@@ -1,5 +1,11 @@
-﻿using System.IO;
-using AuralizeBlazor.Types;
+﻿using AuralizeBlazor.Types;
+using Microsoft.AspNetCore.Components;
+using Nextended.Core;
+using System;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace AuralizeBlazor;
 
@@ -67,6 +73,7 @@ public class AuralizerTrack: IAuralizerTrack
     /// </summary>
     public LyricData Lyrics { get; set; }
 
+    
     public override string ToString() => Label;
 
 }

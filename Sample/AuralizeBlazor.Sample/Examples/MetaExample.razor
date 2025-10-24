@@ -42,7 +42,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _tracks ??= (await TracksService.GetEyirishAsync()).Concat([await TracksService.LebenWieImFilmAsync()]).ToArray();
+        _tracks ??= (await TracksService.GetEyirishAsync()).Concat([TracksService.LebenWieImFilm()]).ToArray();
         _file = _tracks[0].Url;
         _lyrics = _tracks[0].Lyrics;
         _fullPaged = Navigation.FullPaged();

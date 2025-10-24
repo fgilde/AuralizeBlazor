@@ -63,10 +63,9 @@
         }
 
         // Parse lyric timestamps (in seconds) if not already done
-        if (!auralizer.options.lyrics._parsed) {
+        if (auralizer.options?.lyrics?.lines && !auralizer.options.lyrics._parsed) {
             auralizer.options.lyrics.lines.forEach(function (line) {
-                if (!line.timeSeconds) {
-                    // Expected format e.g. "00:00:18.4510000"
+                if (line && !line.timeSeconds) {
                     var parts = line.timeStamp.split(":");
                     if (parts.length === 3) {
                         line.timeSeconds = parseInt(parts[0], 10) * 3600 +
@@ -79,7 +78,7 @@
             });
             // Sort lines by time
             auralizer.options.lyrics.lines.sort(function (a, b) {
-                return a.timeSeconds - b.timeSeconds;
+                return a?.timeSeconds - b?.timeSeconds;
             });
             auralizer.options.lyrics._parsed = true;
         }
@@ -90,7 +89,7 @@
         // Search for the last line with timeSeconds <= currentTime.
         var currentIndex = -1;
         for (var i = 0; i < lines.length; i++) {
-            if (lines[i].timeSeconds <= currentTime) {
+            if (lines[i]?.timeSeconds <= currentTime) {
                 currentIndex = i;
             } else {
                 break;
@@ -103,7 +102,7 @@
 
         // Determine which lines to display: previous (if exists), current, and next (if exists)
         var displayIndices = [];
-        if (lines[0].timeSeconds > currentTime) {
+        if (lines[0]?.timeSeconds > currentTime) {
             // Falls noch keine Zeile gestartet wurde, zeigen wir nur die erste Zeile.
             displayIndices = [0];
         } else {
@@ -118,7 +117,7 @@
 
         // Bestimme den upcomingIndex – also die Zeile, die als nächstes starten wird.
         var upcomingIndex = null;
-        if (lines[0].timeSeconds > currentTime) {
+        if (lines[0]?.timeSeconds > currentTime) {
             upcomingIndex = 0;
         } else if (currentIndex < lines.length - 1) {
             upcomingIndex = currentIndex + 1;
@@ -142,7 +141,7 @@
         if (currentIndex < lines.length - 1) {
             var cur = lines[currentIndex],
                 nxt = lines[currentIndex + 1];
-            progress = (currentTime - cur.timeSeconds) / (nxt.timeSeconds - cur.timeSeconds);
+            progress = (currentTime - cur?.timeSeconds) / (nxt?.timeSeconds - cur?.timeSeconds);
             progress = Math.min(1, Math.max(0, progress));
         }
 
@@ -220,7 +219,7 @@
 
             // Wenn es sich um die nächste (upcoming) Zeile handelt und showTimer aktiviert ist,
             // wird ein kleiner Countdown oberhalb der Zeile gerendert.
-            if (featureOptions.showTimer && index === upcomingIndex && line.timeSeconds > currentTime) {
+            if (featureOptions.showTimer && index === upcomingIndex && line && line.timeSeconds && line.timeSeconds > currentTime) {
                 var remainingTime = Math.ceil(line.timeSeconds - currentTime);
                 var countdownText = "(starts in " + remainingTime + "s)";
                 // Countdown etwas kleiner rendern
@@ -236,7 +235,7 @@
             }
 
             // Falls word-based animation aktiviert ist, rendern wir Wort für Wort.
-            if (enableWordAnimation) {
+            if (enableWordAnimation && line?.text) {
                 // Zerlege die Zeile in Wörter
                 var words = line.text.split(" ");
                 // Ermittle die Breiten aller Wörter (inklusive Leerzeichen), um die gesamte Zeile zu zentrieren
@@ -272,7 +271,7 @@
                     ctx.globalAlpha = alpha;
                     ctx.fillText(word, wordX, wordY);
                 });
-            } else {
+            } else if(line?.text) {
                 // Andernfalls rendern wir die ganze Zeile als Block.
                 var textWidth = ctx.measureText(line.text).width;
                 var grad = createGradient(xCenter, textWidth, diff === 0);

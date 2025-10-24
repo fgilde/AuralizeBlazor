@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using SixLabors.ImageSharp.PixelFormats;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using System;
+using TagLib.Id3v2;
 
 namespace AuralizeBlazor.Types;
 
@@ -60,6 +62,117 @@ public class LyricData
     #region Fabrikmethoden zum Parsen
 
     // --- LRC-Parser ---
+
+    // --- ID3-Tag Parser (MP3, FLAC, etc.) ---
+    // Requires NuGet package: TagLibSharp
+
+    /// <summary>
+    /// Factory method to create a LyricData object from an audio file's embedded lyrics.
+    /// Supports synchronized lyrics (SYLT) and falls back to unsynchronized lyrics (USLT).
+    /// </summary>
+    public static LyricData FromAudioFile(string path)
+    {
+        if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
+
+        try
+        {
+            var file = TagLib.File.Create(path);
+            return FromAudioTags(file);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to read audio file: {ex.Message}", ex);
+        }
+    }
+
+    /// <summary>
+    /// Factory method to create a LyricData object from an audio stream's embedded lyrics.
+    /// </summary>
+    public static LyricData FromAudioStream(Stream stream, string mimeType = "taglib/mp3")
+    {
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+        try
+        {
+            var file = TagLib.File.Create(new StreamFileAbstraction("stream", stream, stream), mimeType, TagLib.ReadStyle.Average);
+            return FromAudioTags(file);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to read audio stream: {ex.Message}", ex);
+        }
+    }
+
+    /// <summary>
+    /// Factory method to create a LyricData object from audio file bytes.
+    /// </summary>
+    public static LyricData FromAudioBytes(byte[] bytes, string mimeType = "taglib/mp3")
+    {
+        if (bytes == null) throw new ArgumentNullException(nameof(bytes));
+        using var ms = new MemoryStream(bytes);
+        return FromAudioStream(ms, mimeType);
+    }
+
+
+    public static LyricData FromAudioTags(TagLib.File file)
+    {
+        var lyricData = new LyricData();
+
+        if (file.GetTag(TagLib.TagTypes.Id3v2) is TagLib.Id3v2.Tag id3v2)
+        {
+            var allSylt = id3v2.GetFrames<TagLib.Id3v2.SynchronisedLyricsFrame>();
+            var sylt = allSylt
+                .FirstOrDefault(f =>
+                    f.Type == TagLib.Id3v2.SynchedTextType.Lyrics &&
+                    string.Equals(f.Language, "deu", StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(f.Description ?? "", "Lyrics", StringComparison.OrdinalIgnoreCase))
+                ?? allSylt.FirstOrDefault(f => f.Type == TagLib.Id3v2.SynchedTextType.Lyrics);
+
+            if (sylt is { Text.Length: > 0 })
+            {
+                foreach (var st in sylt.Text)
+                {
+                    var timeStamp = TimeSpan.FromMilliseconds(st.Time);
+                    lyricData.Add(new LyricLine(timeStamp, st.Text));
+                }
+                return lyricData;
+            }
+
+            var allUslt = id3v2.GetFrames<UnsynchronisedLyricsFrame>();
+            var uslt = allUslt
+                .FirstOrDefault(f =>
+                    string.Equals(f.Language, "deu", StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(f.Description ?? "", "Lyrics", StringComparison.OrdinalIgnoreCase))
+                ?? allUslt.FirstOrDefault();
+
+            if (uslt != null && !string.IsNullOrWhiteSpace(uslt.Text))
+            {
+                var text = uslt.Text;
+                if (text.Contains("[") && text.Contains("]"))
+                {
+                    try { return FromLrc(text); } catch { /* ignorieren, weiter unten Block */ }
+                }
+                lyricData.Add(new LyricLine(TimeSpan.Zero, text));
+                return lyricData;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(file.Tag.Lyrics))
+        {
+            var l = file.Tag.Lyrics;
+            if (l.Contains("[") && l.Contains("]"))
+            {
+                try { return FromLrc(l); } catch { }
+            }else if (l.Contains("<?xml"))
+            {
+                try { return FromTtml(XDocument.Parse(l)); } catch { }
+            }
+            lyricData.Add(new LyricLine(TimeSpan.Zero, l));
+        }
+
+        return lyricData;
+    }
+
 
     /// <summary>
     /// Factory method to create a LyricData object from an LRC file.
