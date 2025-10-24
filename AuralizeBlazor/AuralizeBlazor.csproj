@@ -11,10 +11,10 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>Logo.png</PackageIcon>
-    <Version>2.0.7</Version>
+    <Version>2.0.8</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <AssemblyVersion>2.0.6</AssemblyVersion>
+    <AssemblyVersion>2.0.8</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -24,6 +24,9 @@ public sealed class LyricsDisplayFeature : VisualizerFeatureBase
     [ForJs("gradientColors")]
     public string[]? Colors { get; set; }
 
+    [ForJs("countDownFormatStr")]
+    public string CountDownFormatStr { get; set; } = "(starts in {0} s)";
+
     /// <summary>
     /// Font size for the lyrics.
     /// </summary>

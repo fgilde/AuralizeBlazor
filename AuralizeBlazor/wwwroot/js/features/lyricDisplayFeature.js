@@ -221,9 +221,11 @@
             // wird ein kleiner Countdown oberhalb der Zeile gerendert.
             if (featureOptions.showTimer && index === upcomingIndex && line && line.timeSeconds && line.timeSeconds > currentTime) {
                 var remainingTime = Math.ceil(line.timeSeconds - currentTime);
-                var countdownText = "(starts in " + remainingTime + "s)";
-                // Countdown etwas kleiner rendern
-                var countdownFontSize = fontSize * 0.7;
+
+                const format = featureOptions?.countDownFormatStr || "{0}";
+                var countdownText = format.replace('{0}', remainingTime);
+                
+                var countdownFontSize = fontSize * 0.6;
                 var prevFont = ctx.font;
                 ctx.font = fontWeight + " " + countdownFontSize + "px sans-serif";
                 ctx.fillStyle = "#ffffff";
