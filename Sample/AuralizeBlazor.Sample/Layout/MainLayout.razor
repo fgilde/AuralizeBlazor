@@ -23,11 +23,11 @@
                 <MudIconButton Href="https://www.nuget.org/packages/AuralizeBlazor/" Target="_blank" Icon="@MudExIcons.Custom.Brands.Nuget" Color="Color.Primary" Edge="Edge.End"/>
             </MudTooltip>
         </MudAppBar>
-        <MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Temporary" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Responsive" ClipMode="DrawerClipMode.Always" Elevation="2">
             <NavMenu></NavMenu>
         </MudDrawer>
     }
-    <MudMainContent Style="height: 100%">
+    <MudMainContent Class="p-5" Style="height: 100%">
         @Body
     </MudMainContent>
 </MudLayout>

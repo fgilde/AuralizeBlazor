@@ -26,7 +26,7 @@ public partial class MainLayout
             }
         };
 
-    bool _drawerOpen;
+    bool _drawerOpen = true;
     internal static MainLayout Instance;
 
     void DrawerToggle()

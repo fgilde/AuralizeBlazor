@@ -13,7 +13,7 @@
          </MudToolBar>
     }
     
-    <MudExpansionPanel Text="Code">
+    <MudExpansionPanel Class="mt-2" Style="border: 1px var(--mud-palette-primary) solid" Text="Code">
         <div class="docs-source-code @(ShowCode? "docs-show-code" : "docs-hide-code")">
             @CodeComponent(CurrentCode)
         </div>
