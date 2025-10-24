@@ -36,13 +36,18 @@
   </PropertyGroup>
 
   <!--Execute the code generator-->
+  <PropertyGroup>
+    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..'))</RepoRoot>
+    <DocsCompilerCsproj>$(RepoRoot)\DocsCompiler\DocsCompiler.csproj</DocsCompilerCsproj>
+    <DocsCompilerCmd>dotnet run --configuration Release --project "$(DocsCompilerCsproj)"</DocsCompilerCmd>
+  </PropertyGroup>
+
   <Target Name="CompileDocs" BeforeTargets="BeforeBuild">
-    <!--Command-line for the code generator-->
-    <Message Text="Generating Docs and Tests" Importance="high" />
+    <Message Text="Generating Docs and Tests via $(DocsCompilerCsproj)" Importance="high" />
     <Exec Command="dotnet &quot;$(BinDocsCompiler)&quot;" Condition="Exists('$(BinDocsCompiler)')" />
-    <!--<Exec Command="$(ProjectDocsCompiler)" Condition="!Exists('$(BinDocsCompiler)')" />-->
-    <Exec Command="$(ProjectDocsCompiler)" Condition="true" />
+    <Exec Command="$(DocsCompilerCmd)" Condition="Exists('$(DocsCompilerCsproj)')" />
   </Target>
+
 
   <!--This file contains any ExampleCode that is new and needs including in the build -->
   <Target Name="ReadFromFile" DependsOnTargets="CompileDocs">
