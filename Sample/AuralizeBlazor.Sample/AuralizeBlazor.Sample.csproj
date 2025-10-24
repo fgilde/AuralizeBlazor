@@ -37,15 +37,16 @@
 
   <!--Execute the code generator-->
   <PropertyGroup>
+    <!-- Repo-Root relativ vom Projektordner aus -->
     <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..'))</RepoRoot>
     <DocsCompilerCsproj>$(RepoRoot)\DocsCompiler\DocsCompiler.csproj</DocsCompilerCsproj>
     <DocsCompilerCmd>dotnet run --configuration Release --project "$(DocsCompilerCsproj)"</DocsCompilerCmd>
   </PropertyGroup>
 
-  <Target Name="CompileDocs" BeforeTargets="BeforeBuild">
+  <Target Name="CompileDocs" BeforeTargets="BeforeBuild" Condition=" '$(GITHUB_ACTIONS)' != 'true' ">
     <Message Text="Generating Docs and Tests via $(DocsCompilerCsproj)" Importance="high" />
-    <Exec Command="dotnet &quot;$(BinDocsCompiler)&quot;" Condition="Exists('$(BinDocsCompiler)')" />
-    <Exec Command="$(DocsCompilerCmd)" Condition="Exists('$(DocsCompilerCsproj)')" />
+    <Exec IgnoreExitCode="true" Command="dotnet &quot;$(BinDocsCompiler)&quot;" Condition="Exists('$(BinDocsCompiler)')" />
+    <Exec IgnoreExitCode="true" Command="$(DocsCompilerCmd)" Condition="Exists('$(DocsCompilerCsproj)')" />
   </Target>
 
 
