@@ -22,7 +22,7 @@ jobs:
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Restore
         run: dotnet restore "Sample/AuralizeBlazor.Sample/AuralizeBlazor.Sample.csproj"
@@ -67,3 +67,4 @@ jobs:
           app-name: 'AuralizeBlazor'
           slot-name: 'Production'
           package: ./publish
+
