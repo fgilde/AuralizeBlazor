@@ -169,8 +169,7 @@
 
 
     async renderOneTimeStatic() {
-        const audioElements = this.getAudioElements();
-
+        const audioElements = this.getAudioElements();        
         //render enum 2 means real data and 3 full spectrum
         if (this.options.initialRender === 1 || this.options.initialRender === 6) {
             const frequencyData = this.generateRandomAudioFrequencyData();

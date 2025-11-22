@@ -26,10 +26,14 @@
     private void OnInitialRenderChanged(InitialRender render)
     {
         _rendered = false;
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
         _initialRender = render;
-        _rendered = true;
-        StateHasChanged();
+
+        Task.Delay(200).ContinueWith(t =>
+        {
+            _rendered = true;
+            InvokeAsync(StateHasChanged);
+        });
     }
 
 }

@@ -30,10 +30,14 @@
     <span class="keyword">private</span> <span class="keyword">void</span> OnInitialRenderChanged(InitialRender render)
     {
         _rendered = <span class="keyword">false</span>;
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
         _initialRender = render;
-        _rendered = <span class="keyword">true</span>;
-        StateHasChanged();
+
+        Task.Delay(<span class="number">200</span>).ContinueWith(t =&gt;
+        {
+            _rendered = <span class="keyword">true</span>;
+            InvokeAsync(StateHasChanged);
+        });
     }
 
 }
