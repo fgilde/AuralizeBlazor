@@ -86,6 +86,17 @@ public class LyricData
     }
 
     /// <summary>
+    /// Factory method to create a LyricData object from audio file bytes.
+    /// </summary>
+    public static LyricData FromAudioBytes(byte[] bytes, string mimeType = "taglib/mp3")
+    {
+        if (bytes == null) throw new ArgumentNullException(nameof(bytes));
+        using var ms = new MemoryStream(bytes);
+        return FromAudioStream(ms, mimeType);
+    }
+
+
+    /// <summary>
     /// Factory method to create a LyricData object from an audio stream's embedded lyrics.
     /// </summary>
     public static LyricData FromAudioStream(Stream stream, string mimeType = "taglib/mp3")
@@ -103,30 +114,21 @@ public class LyricData
         }
     }
 
-    /// <summary>
-    /// Factory method to create a LyricData object from audio file bytes.
-    /// </summary>
-    public static LyricData FromAudioBytes(byte[] bytes, string mimeType = "taglib/mp3")
-    {
-        if (bytes == null) throw new ArgumentNullException(nameof(bytes));
-        using var ms = new MemoryStream(bytes);
-        return FromAudioStream(ms, mimeType);
-    }
-
-
     public static LyricData FromAudioTags(TagLib.File file)
     {
         var lyricData = new LyricData();
 
+        // 1. ID3v2 SYLT (Synchronised Lyrics) - wie bisher
         if (file.GetTag(TagLib.TagTypes.Id3v2) is TagLib.Id3v2.Tag id3v2)
         {
-            var allSylt = id3v2.GetFrames<TagLib.Id3v2.SynchronisedLyricsFrame>();
+            var allSylt = id3v2.GetFrames<TagLib.Id3v2.SynchronisedLyricsFrame>().ToList();
             var sylt = allSylt
                 .FirstOrDefault(f =>
                     f.Type == TagLib.Id3v2.SynchedTextType.Lyrics &&
                     string.Equals(f.Language, "deu", StringComparison.OrdinalIgnoreCase) &&
                     string.Equals(f.Description ?? "", "Lyrics", StringComparison.OrdinalIgnoreCase))
-                ?? allSylt.FirstOrDefault(f => f.Type == TagLib.Id3v2.SynchedTextType.Lyrics);
+                ?? allSylt.FirstOrDefault(f => f.Type == TagLib.Id3v2.SynchedTextType.Lyrics)
+                ?? allSylt.FirstOrDefault();
 
             if (sylt is { Text.Length: > 0 })
             {
@@ -138,7 +140,8 @@ public class LyricData
                 return lyricData;
             }
 
-            var allUslt = id3v2.GetFrames<UnsynchronisedLyricsFrame>();
+            // 2. ID3v2 USLT (Unsynchronised Lyrics) - wie bisher
+            var allUslt = id3v2.GetFrames<UnsynchronisedLyricsFrame>().ToList();
             var uslt = allUslt
                 .FirstOrDefault(f =>
                     string.Equals(f.Language, "deu", StringComparison.OrdinalIgnoreCase) &&
@@ -150,24 +153,145 @@ public class LyricData
                 var text = uslt.Text;
                 if (text.Contains("[") && text.Contains("]"))
                 {
-                    try { return FromLrc(text); } catch { /* ignorieren, weiter unten Block */ }
+                    try { return FromLrc(text); } catch { /* ignorieren */ }
                 }
                 lyricData.Add(new LyricLine(TimeSpan.Zero, text));
                 return lyricData;
             }
+
+            // 3. NEU: Alle TextInformationFrame durchsuchen (TXXX, TEXT, etc.)
+            var textFrames = id3v2.GetFrames<TagLib.Id3v2.TextInformationFrame>();
+            foreach (var frame in textFrames)
+            {
+                // Prüfe auf User-defined text frames (TXXX) mit Lyrics-Beschreibung
+                if (frame is TagLib.Id3v2.UserTextInformationFrame userFrame)
+                {
+                    var desc = userFrame.Description?.ToLowerInvariant() ?? "";
+                    if (desc.Contains("lyric") || desc.Contains("text"))
+                    {
+                        var text = string.Join("\n", userFrame.Text);
+                        if (!string.IsNullOrWhiteSpace(text))
+                        {
+                            if (text.Contains("[") && text.Contains("]"))
+                            {
+                                try { return FromLrc(text); } catch { }
+                            }
+                            else if (text.Contains("<?xml"))
+                            {
+                                try { return FromTtml(XDocument.Parse(text)); } catch { }
+                            }
+                            lyricData.Add(new LyricLine(TimeSpan.Zero, text));
+                            return lyricData;
+                        }
+                    }
+                }
+            }
+
+            // 4. NEU: Comment Frames (COMM) durchsuchen
+            var commentFrames = id3v2.GetFrames<TagLib.Id3v2.CommentsFrame>();
+            foreach (var comment in commentFrames)
+            {
+                var desc = comment.Description?.ToLowerInvariant() ?? "";
+                var text = comment.Text ?? "";
+
+                // Manche Tools speichern Lyrics in Comments mit bestimmten Descriptions
+                if ((desc.Contains("lyric") || desc.Contains("text") || desc == "")
+                    && !string.IsNullOrWhiteSpace(text))
+                {
+                    if (text.Contains("[") && text.Contains("]"))
+                    {
+                        try { return FromLrc(text); } catch { }
+                    }
+                    else if (text.Contains("<?xml"))
+                    {
+                        try { return FromTtml(XDocument.Parse(text)); } catch { }
+                    }
+                    lyricData.Add(new LyricLine(TimeSpan.Zero, text));
+                    return lyricData;
+                }
+            }
+
+            // 5. NEU: Private Frames (PRIV) - manchmal werden Lyrics dort gespeichert
+            var privateFrames = id3v2.GetFrames<TagLib.Id3v2.PrivateFrame>();
+            foreach (var priv in privateFrames)
+            {
+                var owner = priv.Owner?.ToLowerInvariant() ?? "";
+                if (owner.Contains("lyric") || owner.Contains("text"))
+                {
+                    try
+                    {
+                        var text = System.Text.Encoding.UTF8.GetString(priv.PrivateData.Data);
+                        if (!string.IsNullOrWhiteSpace(text))
+                        {
+                            if (text.Contains("[") && text.Contains("]"))
+                            {
+                                try { return FromLrc(text); } catch { }
+                            }
+                            else if (text.Contains("<?xml"))
+                            {
+                                try { return FromTtml(XDocument.Parse(text)); } catch { }
+                            }
+                            lyricData.Add(new LyricLine(TimeSpan.Zero, text));
+                            return lyricData;
+                        }
+                    }
+                    catch { /* Konnte nicht als Text dekodiert werden */ }
+                }
+            }
         }
 
+        // 6. ID3v1 Tags - manchmal in älteren MP3s
+        if (file.GetTag(TagLib.TagTypes.Id3v1) is TagLib.Id3v1.Tag id3v1)
+        {
+            if (!string.IsNullOrWhiteSpace(id3v1.Comment))
+            {
+                var text = id3v1.Comment;
+                // Lyrics können im Comment-Feld gespeichert sein
+                if (text.Length > 50) // Vermutlich Lyrics wenn länger als typischer Comment
+                {
+                    if (text.Contains("[") && text.Contains("]"))
+                    {
+                        try { return FromLrc(text); } catch { }
+                    }
+                    lyricData.Add(new LyricLine(TimeSpan.Zero, text));
+                    return lyricData;
+                }
+            }
+        }
+
+        // 7. Standard Tag.Lyrics Property - wie bisher
         if (!string.IsNullOrWhiteSpace(file.Tag.Lyrics))
         {
             var l = file.Tag.Lyrics;
             if (l.Contains("[") && l.Contains("]"))
             {
                 try { return FromLrc(l); } catch { }
-            }else if (l.Contains("<?xml"))
+            }
+            else if (l.Contains("<?xml"))
             {
                 try { return FromTtml(XDocument.Parse(l)); } catch { }
             }
             lyricData.Add(new LyricLine(TimeSpan.Zero, l));
+            return lyricData;
+        }
+
+        // 8. APE Tags (falls vorhanden)
+        if (file.GetTag(TagLib.TagTypes.Ape) is TagLib.Ape.Tag apeTag)
+        {
+            var lyricsItem = apeTag.GetItem("LYRICS") ?? apeTag.GetItem("UNSYNCEDLYRICS");
+            if (lyricsItem != null)
+            {
+                var text = lyricsItem.ToString();
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    if (text.Contains("[") && text.Contains("]"))
+                    {
+                        try { return FromLrc(text); } catch { }
+                    }
+                    lyricData.Add(new LyricLine(TimeSpan.Zero, text));
+                    return lyricData;
+                }
+            }
         }
 
         return lyricData;

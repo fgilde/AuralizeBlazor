@@ -48,6 +48,7 @@ public class DemoTracksService
         yield return new AuralizerTrack("/Auralizer Dreamy rock.mp3");
         yield return new AuralizerTrack("/Auralizer's Beat.mp3");
         yield return new AuralizerTrack("/Digital Serenade.mp3");
+        yield return new AuralizerTrack("/Leaving_of_Liverpool.mp3");
         yield return LebenWieImFilm();
         yield return new AuralizerTrack("/sample.mp3", "Simple Demo 1");
         yield return new AuralizerTrack("/sample2.mp3", "Simple Demo 2");
@@ -75,5 +76,6 @@ public class DemoTracksService
         yield return new AuralizerTrack("/6.Paddys_Roar.mp3");
         yield return new AuralizerTrack("/7.Rosalie.mp3");
         yield return new AuralizerTrack("/8.Fiona's Melody.mp3");
+        yield return new AuralizerTrack("/Leaving_of_Liverpool.mp3");
     }
 }
