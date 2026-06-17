@@ -1,87 +1,34 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Analyzers" Version="9.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.CustomElements" Version="9.0.10" />
-    <PackageReference Include="MudBlazor.Extensions" Version="8.13.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Analyzers" Version="10.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.CustomElements" Version="10.0.9" />
+    <PackageReference Include="MudBlazor.Extensions" Version="9.5.0" />
+    <PackageReference Include="Nextended.CodeGen" Version="10.1.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.9" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\AuralizeBlazor\AuralizeBlazor.csproj" />
   </ItemGroup>
 
-
-  <PropertyGroup>
-    <BinDocsCompiler>$(SolutionDir)DocsCompiler/bin/Debug/net6.0/DocsCompiler.dll</BinDocsCompiler>
-  </PropertyGroup>
-
-  <!--Project path for code generator-->
-  <PropertyGroup>
-    <ProjectDocsCompiler>dotnet run --configuration release --project "$(SolutionDir)DocsCompiler/DocsCompiler.csproj"</ProjectDocsCompiler>
-    <PublishAot>False</PublishAot>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <RunAOTCompilation>False</RunAOTCompilation>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <RunAOTCompilation>False</RunAOTCompilation>
-  </PropertyGroup>
-
-  <!--Execute the code generator-->
-  <PropertyGroup>
-    <!-- Repo-Root relativ vom Projektordner aus -->
-    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..'))</RepoRoot>
-    <DocsCompilerCsproj>$(RepoRoot)\DocsCompiler\DocsCompiler.csproj</DocsCompilerCsproj>
-    <DocsCompilerCmd>dotnet run --configuration Release --project "$(DocsCompilerCsproj)"</DocsCompilerCmd>
-  </PropertyGroup>
-
-  <Target Name="CompileDocs" BeforeTargets="BeforeBuild" Condition=" '$(GITHUB_ACTIONS)' != 'true' ">
-    <Message Text="Generating Docs and Tests via $(DocsCompilerCsproj)" Importance="high" />
-    <Exec IgnoreExitCode="true" Command="dotnet &quot;$(BinDocsCompiler)&quot;" Condition="Exists('$(BinDocsCompiler)')" />
-    <Exec IgnoreExitCode="true" Command="$(DocsCompilerCmd)" Condition="Exists('$(DocsCompilerCsproj)')" />
-  </Target>
-
-
-  <!--This file contains any ExampleCode that is new and needs including in the build -->
-  <Target Name="ReadFromFile" DependsOnTargets="CompileDocs">
-    <ItemGroup>
-      <NewFiles Include="NewFilesToBuild.txt" />
-    </ItemGroup>
-    <ReadLinesFromFile File="@(NewFiles)">
-      <Output TaskParameter="Lines" ItemName="NewExampleCodeToBuild" />
-    </ReadLinesFromFile>
-  </Target>
-
-  <!--Add Content that is being generated as part of the build cycle-->
-  <!--We need to do this because the project is not yet aware of files that were generated after the build started-->
-  <Target Name="IncludeGeneratedFiles" BeforeTargets="BeforeBuild" DependsOnTargets="CompileDocs;ReadFromFile">
-    <ItemGroup>
-      <!--<Compile Include="Models/Snippets.generated.cs" Condition="!Exists('Models/Snippets.generated.cs')" />-->
-      <!--<Compile Include="Models/DocStrings.generated.cs" Condition="!Exists('Models/DocStrings.generated.cs')" />-->
-      <EmbeddedResource Include="@(NewExampleCodeToBuild)" Condition="@(NewExampleCodeToBuild-&gt;Count()) != 0" />
-    </ItemGroup>
-  </Target>
+  <!-- Nextended.CodeGen reads this config to generate the example sources
+       (Examples\*.razor -> wwwroot\example-codes\*.md/*.html) at build time. -->
   <ItemGroup>
-    <EmbeddedResource Include="Examples\**\*.html" />
+    <AdditionalFiles Include="CodeGen.config.json" />
   </ItemGroup>
+
   <ItemGroup>
     <Content Remove="compilerconfig.json" />
     <Content Remove="wwwroot\Logo.png" />
     <Content Remove="wwwroot\web.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Examples\ConnectElementsExample - Copy.razor.html" />
-    <None Remove="Examples\MainExample - Copy.razor.html" />
-    <None Remove="Examples\PresetsExample - Copy.razor.html" />
-    <None Remove="Examples\SimulateExample - Copy.razor.html" />
   </ItemGroup>
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\web.config" />

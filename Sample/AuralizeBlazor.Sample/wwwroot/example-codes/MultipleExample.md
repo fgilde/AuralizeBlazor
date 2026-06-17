@@ -1,0 +1,72 @@
+```razor
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+<center>
+    <audio @ref="_audio" class="mb-2" preload="metadata" loading="lazy" controls="true" src="@TracksService.MainDemoTrack.Url"></audio>
+</center>
+
+@if (_rendered)
+{
+    <MudExGrid Column="2" Row="2">
+        <MudExGridSection Column="1" Row="1">
+            <Auralizer InitialPreset="AuralizerPreset.ReflexMirror"            
+            ConnectionMode="ConnectionMode.Stream"
+            GradientChanged="@MainLayout.Instance.ColorsChanged"
+            Presets="@AuralizerPreset.All"
+            Height="400px"
+            AudioElements="@(new[] { _audio })"
+            Overlay="true">
+            </Auralizer>
+        </MudExGridSection>               
+        <MudExGridSection Column="1" Row="2">
+            <Auralizer InitialPreset="AuralizerPreset.MiamiSpectrumOutline"            
+            ConnectionMode="ConnectionMode.Stream"
+            GradientChanged="@MainLayout.Instance.ColorsChanged"
+            Presets="@AuralizerPreset.All"
+            Height="400px"
+            AudioElements="@(new[] { _audio })"
+            Overlay="true">
+            </Auralizer>
+        </MudExGridSection>
+        <MudExGridSection Column="2" Row="1">
+            <Auralizer InitialPreset="AuralizerPreset.GalacticJourney"                               
+                       ConnectionMode="ConnectionMode.Stream"
+                       GradientChanged="@MainLayout.Instance.ColorsChanged"
+                       Presets="@AuralizerPreset.All"
+                       IgnoredPropertiesForReset="@(new []{nameof(Auralizer.ShowScaleX)})"
+                       Height="400px"
+                       ShowScaleX="false"
+                
+                       AudioElements="@(new[] { _audio })"
+                       Overlay="true">
+            </Auralizer>
+        </MudExGridSection>
+        <MudExGridSection Column="2" Row="2">
+            <Auralizer InitialPreset="AuralizerPreset.AuroraDreams"            
+                       ConnectionMode="ConnectionMode.Stream"
+            GradientChanged="@MainLayout.Instance.ColorsChanged"
+            Presets="@AuralizerPreset.All"
+            Height="400px"
+            AudioElements="@(new[] { _audio })"
+            Overlay="true">
+            </Auralizer>
+        </MudExGridSection>
+    </MudExGrid>
+}
+@code {
+    private ElementReference _audio;
+    private bool _rendered;
+    protected override void OnAfterRender(bool firstRender)
+    {        
+        base.OnAfterRender(firstRender);
+        if (firstRender){
+            Task.Delay(100).ContinueWith((_) => {
+                _rendered = true;
+                StateHasChanged();
+            });
+        }
+    }
+}
+
+```

@@ -1,0 +1,60 @@
+```razor
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+@using AuralizeBlazor.Types
+
+<Auralizer @ref=_vis
+           @bind-Features="_features"
+           InitialPreset="AuralizerPreset.DualChannelCombined"
+           InitialRender="InitialRender.WithRandomData"
+           KeepState="false"
+           PreviewImageInPresetList="true"
+           GradientChanged="@MainLayout.Instance.ColorsChanged"
+           Presets="@AuralizerPreset.All"
+           BackgroundSize="contain"
+           TrackList="@_tracks"
+           Height="700px"        
+           ClickAction="VisualizerAction.TogglePlayPause"
+           AutoApplyGradient="AutoGradientFrom.MetaCoverImage"
+           ApplyBackgroundImageFromTrack="true"
+           ContextMenuAction="VisualizerAction.None"
+           FullPaged="_fullPaged"
+           ShowTrackInfosOnPlay="true"
+           Lyrics="@_lyrics"
+           MetaInfosChanged="@MetaChanged"
+           Overlay="false">
+    <center>
+        <audio class="audio-main mud-ex-animate-all-properties" autoplay="true" preload="metadata" loading="lazy" controls="true" src="@_file"></audio>
+    </center>
+</Auralizer>
+
+@code {
+    [Inject] IJSRuntime _jsRuntime { get; set; }
+
+    string _file;
+    bool _fullPaged = false;
+    private Auralizer _vis;
+    private IVisualizerFeature[] _features = [
+        new ShowLogoFeature { Label = string.Empty, LabelPosition = VisualPosition.CenterCenter },
+        new LyricsDisplayFeature() {TextPosition = LyricsPosition.Top, FontSize = 28, Colors = ["#ffffff"]}
+    ];
+    IAuralizerTrack[]? _tracks = null;
+    private LyricData? _lyrics;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _tracks ??= (await TracksService.GetEyirishAsync()).Concat([TracksService.LebenWieImFilm()]).ToArray();
+        _file = _tracks[0].Url;
+        _lyrics = _tracks[0].Lyrics;
+        _fullPaged = Navigation.FullPaged();
+        await base.OnInitializedAsync();
+    }
+    
+    private void MetaChanged(TagLib.File f)
+    {
+        _vis.Feature<ShowLogoFeature>().Label = $"{string.Join(",", f.Tag.Performers)} - {f.Tag.Title}";
+    }
+
+}
+
+```

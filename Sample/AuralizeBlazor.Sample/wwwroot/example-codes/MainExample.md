@@ -1,0 +1,58 @@
+```razor
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+<Auralizer @ref=_vis
+           @bind-Features="_features"
+           InitialPreset="AuralizerPreset.ReflexMirror"
+           PreviewImageInPresetList="true"
+           InitialRender="InitialRender.WithRandomData"
+           GradientChanged="@MainLayout.Instance.ColorsChanged"
+           Presets="@AuralizerPreset.All.Except(new List<AuralizerPreset>{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()"
+           OnPresetApplied="OnPresetApplied"
+           TrackList="@TracksService.DemoTracks"
+           Height="700px"
+           BackgroundImage="/bg1.jpg"
+           OnReady="@(() => _vis.ShowMessage("Welcome to Auralizer, press play !", TimeSpan.FromSeconds(2)))"
+           DoubleClickAction="VisualizerAction.ToggleFullscreen"
+           ClickAction="VisualizerAction.TogglePlayPause"
+           ApplyBackgroundImageFromTrack="false"
+           Overlay="true">
+    <center>
+        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="@TracksService.DemoTracks[0].Url"></audio>
+    </center>
+</Auralizer>
+
+@code {
+
+    private Auralizer _vis;
+    private IVisualizerFeature[] _features = [
+        new ShowLogoFeature
+        {
+            Label = Const.AppName,
+            Image = "Logo.png",
+            ImageScale = .3f,
+            LabelPosition = VisualPosition.CenterCenter,
+            ImagePosition = VisualPosition.CenterCenter.WithMarginBottom(80)
+        },
+        //new LyricsDisplayFeature(),
+        new LyricsDisplayFeature() {ShowTimer = false, TextPosition = LyricsPosition.Top, FontSize = 28, Colors = ["#ffffff"]},
+        new SwitchPresetFeature
+            {
+                OverridePresetColorsWithRandoms = true,
+                MinDebounceForColorTimeInMs = 123,
+                MinEnergy = .20
+            }
+    ];
+
+    private void OnPresetApplied(AppliedPresetEventArgs arg)
+    {
+        if (arg.ApplySettings.Reason is PresetApplyReason.UserSelectedFromList or PresetApplyReason.UserSelectedAsAction)
+        {
+            _vis.RemoveFeature<SwitchPresetFeature>();
+        }
+    }
+
+}
+
+```

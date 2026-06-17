@@ -1,0 +1,7 @@
+```razor
+<auralize-blazor-auralizer background-image="/bg1.jpg" connect-all-audio-sources="true">
+</auralize-blazor-auralizer>
+
+<audio class="mt-2" preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+
+```

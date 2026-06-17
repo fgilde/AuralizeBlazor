@@ -1,0 +1,54 @@
+<div class="html"><pre>
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExSelect</span> <span class="htmlAttributeName">T</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;IAuralizerTrack&quot; @bind-Value=&quot;_track&quot;</span> <span class="htmlAttributeName">SelectedValuesChanged</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@((_) =&gt; TrackSelected())&quot;</span> <span class="htmlAttributeName">ItemCollection</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@TracksService.DemoTracks&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExSelect</span><span class="htmlTagDelimiter">&gt;</span>
+&lt;Auralizer @ref=_vis
+           OnContainerMouseOver=&quot;OnMouseIn&quot;
+           OnContainerMouseOut=&quot;OnMouseOut&quot;           
+           InitialPreset=&quot;AuralizerPreset.ReflexMirror&quot;
+           InitialRender=&quot;InitialRender.WithFullSpectrumAudioDataPrefilledWithRandomData&quot;
+           KeepState=&quot;true&quot;
+           GradientChanged=&quot;@MainLayout.Instance.ColorsChanged&quot;
+           Presets=&quot;@AuralizerPreset.All&quot;                      
+           Height=&quot;400px&quot;           
+           Overlay=&quot;true&quot;&gt;
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">style</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;display:none;&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@((_track ??= TracksService.MainDemoTrack).Url)&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+@code {
+    private Auralizer _vis;   
+    private IAuralizerTrack _track = null;
+
+    private async Task OnMouseIn()
+    {
+        if(_vis.JsReference is null || _vis.IsPlaying)
+        {
+            return;
+        }
+        var simulating = await _vis.IsSimulationRunning();
+        if (!simulating)
+        {
+            _ = _vis.SimulateFullAudioSpectrumAsync(null, 1, true);            
+        }
+        else
+        {
+            await _vis.ResumeSimulationAsync();
+        }
+    }
+
+    private async Task OnMouseOut()
+    {
+        await _vis.PauseSimulationAsync();
+    }
+
+    private Task TrackSelected()
+    {
+        return _vis.StopSimulationAsync();            
+    }
+
+
+}
+
+</pre></div>

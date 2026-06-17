@@ -1,9 +1,7 @@
-﻿// Copyright (c) MudBlazor 2021
+// Copyright (c) MudBlazor 2021
 // MudBlazor licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Text.RegularExpressions;
-using AuralizeBlazor.Sample.Layout;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using MudBlazor.Extensions.Helper;
@@ -12,14 +10,14 @@ namespace AuralizeBlazor.Sample.Helper
 {
     public partial class SectionSource
     {
-        [Inject]
-        protected IJsApiService JsApiService { get; set; }
+        [Inject] protected IJsApiService JsApiService { get; set; }
+        [Inject] protected HttpClient HttpClient { get; set; }
 
+        /// <summary>
+        /// Name of the example component. The matching source is loaded from the
+        /// generated markdown file under wwwroot/example-codes/{Code}.md.
+        /// </summary>
         [Parameter] public string Code { get; set; }
-        [Parameter] public string Code2 { get; set; }
-
-        [Parameter] public string ButtonTextCode1 { get; set; }
-        [Parameter] public string ButtonTextCode2 { get; set; }
 
         [Parameter] public string Class { get; set; }
 
@@ -34,87 +32,40 @@ namespace AuralizeBlazor.Sample.Helper
         private string ShowCodeExampleString { get; set; } = "Show code example";
         private string HideCodeExampleString { get; set; } = "Hide code example";
 
-        private string CurrentCode { get; set; }
-        private Color Button1Color { get; set; }
-        private Color Button2Color { get; set; }
+        private string _sourceCode;
 
         private async Task CopyTextToClipboard()
         {
-            await JsApiService.CopyToClipboardAsync((Code));
-        }
-
-        private string StyleStr()
-        {
-            return "";
-            //var isActive = MainLayout.ActiveAuralizer?.IsPlaying == true && MainLayout.ActiveAuralizer?.IsActive == true;
-            //return MudExStyleBuilder.Default.WithAnimatedGradientBorder(3, MainLayout.Instance.CurrentTheme, true, isActive).ToString();
+            await JsApiService.CopyToClipboardAsync(_sourceCode);
         }
 
         public void OnShowCode()
         {
-            if (!string.IsNullOrEmpty(Code))
-            {
-                ShowCode = !ShowCode;
-                if (ShowCode)
-                {
-                    TooltipSourceCodeText = HideCodeExampleString;
-                }
-                else
-                {
-                    TooltipSourceCodeText = ShowCodeExampleString;
-                }
-            }
+            ShowCode = !ShowCode;
+            TooltipSourceCodeText = ShowCode ? HideCodeExampleString : ShowCodeExampleString;
         }
 
-        RenderFragment CodeComponent(string code) => builder =>
+        protected override async Task OnInitializedAsync()
         {
+            TooltipSourceCodeText = ShowCode ? HideCodeExampleString : ShowCodeExampleString;
+            await LoadSourceCodeAsync();
+        }
+
+        private async Task LoadSourceCodeAsync()
+        {
+            if (string.IsNullOrEmpty(Code))
+            {
+                return;
+            }
+
             try
             {
-                var key = typeof(SectionSource).Assembly.GetManifestResourceNames().FirstOrDefault(x => x.Contains($".{code}.razor.html"));
-                if (!string.IsNullOrEmpty(key))
-                {
-                    using (var stream = typeof(SectionSource).Assembly.GetManifestResourceStream(key))
-                    using (var reader = new StreamReader(stream))
-                    {
-                        builder.AddMarkupContent(0, reader.ReadToEnd());
-                    }
-                }
+                _sourceCode = await HttpClient.GetStringAsync($"example-codes/{Code}.md");
             }
             catch (Exception)
             {
-                // todo: log this
-            }
-        };
-
-      
-        protected override void OnInitialized()
-        {
-            CurrentCode = Code;
-            Button1Color = Color.Primary;
-
-            if (ShowCode)
-            {
-                TooltipSourceCodeText = HideCodeExampleString;
-            }
-            else
-            {
-                TooltipSourceCodeText = ShowCodeExampleString;
-            }
-        }
-
-        private void SwapCode(string code)
-        {
-            CurrentCode = code;
-
-            if (CurrentCode == Code)
-            {
-                Button1Color = Color.Primary;
-                Button2Color = Color.Default;
-            }
-            else if (CurrentCode == Code2)
-            {
-                Button1Color = Color.Default;
-                Button2Color = Color.Primary;
+                // The generated source file might not exist yet (e.g. before the first build with Nextended.CodeGen).
+                _sourceCode = null;
             }
         }
     }

@@ -1,0 +1,87 @@
+<div class="html"><pre>
+@using System.Reflection
+@using AuralizeBlazor.Features
+@using MudBlazor.Extensions.Components.ObjectEdit.Options
+@using MudBlazor.Extensions.Options
+@using Nextended.Core.Extensions
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExSelect</span> <span class="htmlAttributeName">Value</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@_appliedFeatures.FirstOrDefault()&quot;</span> <span class="htmlAttributeName">Label</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;Select a Feature to test&quot;</span> <span class="htmlAttributeName">Variant</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;Variant.Outlined&quot;</span> <span class="htmlAttributeName">T</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;IVisualizerFeature&quot;</span> <span class="htmlAttributeName">ValueChanged</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@FeatureSelected&quot;</span> <span class="htmlAttributeName">ItemCollection</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;_availableFeatures&quot;</span> <span class="htmlAttributeName">ToStringFunc</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@(x =&gt; x.ToString().Split(&quot;.&quot;).Last())&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExSelect</span><span class="htmlTagDelimiter">&gt;</span>
+
+&lt;Auralizer @ref=_vis
+InitialPreset=&quot;AuralizerPreset.DeepSeaDive&quot;
+TrackList=&quot;_tracks&quot;
+GradientChanged=&quot;@MainLayout.Instance.ColorsChanged&quot;
+ApplyBackgroundImageFromTrack=&quot;false&quot;
+ShowTrackInfosOnPlay=&quot;false&quot;
+Presets=&quot;AuralizerPreset.All&quot;
+@bind-Features=&quot;_appliedFeatures&quot;
+Height=&quot;700px&quot;&gt;
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;audio-main mud-ex-animate-all-properties&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;metadata&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;lazy&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@TracksService.DemoTracks[1].Url&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+
+
+@code {
+    Auralizer _vis;
+    [Inject] private IDialogService DialogService { get; set; }
+    private IVisualizerFeature[] _availableFeatures;
+    private IAuralizerTrack[] _tracks;
+    protected override async Task OnInitializedAsync()
+    {
+        _availableFeatures = typeof(IVisualizerFeature).GetAllImplementations(typeof(IVisualizerFeature).Assembly).Distinct().Select(t =&gt; t.CreateInstance()).Cast<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">IVisualizerFeature</span><span class="htmlTagDelimiter">&gt;</span>().ToArray();
+        var tracks = await TracksService.GetEyirishAsync();
+        _tracks = [TracksService.DemoTracks[1], tracks[0]];
+        await base.OnInitializedAsync();
+    }
+
+    private IVisualizerFeature[] _appliedFeatures =
+    [
+        new LineParticleFeature() {ParticleCount = 555, Text = &quot;To test display lyrics feature select the other song left in the track select&quot;, ConnectionThreshold = 180}
+    ];
+
+
+    private async Task FeatureSelected(IVisualizerFeature obj)
+    {
+        if (obj == null)
+        {
+            _appliedFeatures = [];
+            return;
+        }
+
+        if (obj == _appliedFeatures.FirstOrDefault())
+            return;
+
+        var propertyInfos = obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+        if (!propertyInfos.Any(p =&gt; p.CanWrite))
+        {
+            // Nothing to edit
+            _appliedFeatures = [obj];
+            return;
+        }
+
+        var res = await DialogService.EditObject(obj, $&quot;Specify {obj.GetType().Name.Split(&quot;.&quot;).Last()} Options&quot;, metaConfig: MetaConfig, options: DialogOptionsEx.DefaultDialogOptions.SetProperties(d =&gt;
+        {
+            d.DragMode = MudDialogDragMode.Simple;
+            d.Resizeable = true;
+            d.Animation = AnimationType.Fade;
+        }));
+        if (res.Cancelled)
+            return;
+        _appliedFeatures = [res.Result];
+    }
+
+    private void MetaConfig(ObjectEditMeta<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">IVisualizerFeature</span><span class="htmlTagDelimiter">&gt;</span> meta)
+    {
+        meta.Properties(
+            m =&gt; m.FullJsNamespace,
+            m =&gt; m.RequiredJsFiles,
+            m =&gt; m.AppliedFromPreset,
+            m =&gt; m.OnCanvasDrawCallbackName).Ignore();
+        meta.WrapEachInMudItem();
+    }
+
+}
+
+
+</pre></div>

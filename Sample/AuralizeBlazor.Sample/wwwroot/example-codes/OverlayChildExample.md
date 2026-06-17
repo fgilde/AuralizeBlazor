@@ -1,0 +1,44 @@
+```razor
+@using AuralizeBlazor.Features
+@using VisualizationMode = AuralizeBlazor.Options.VisualizationMode
+
+
+<Auralizer GradientChanged="@MainLayout.Instance.ColorsChanged"
+           Presets="@AuralizerPreset.All"
+           IgnoredPropertiesForReset="@(new [] {nameof(Auralizer.Overlay), nameof(Auralizer.ShowBgColor)})"
+           OverlayChildContent="true"
+           Overlay="true"
+           HoverOpacity=".1"
+           ShowBgColor="false">
+    @* <video height="800px;" preload="metadata" loading="lazy" controls="true" src="/sample.mp4"></video> *@
+    <video height="720px;" crossorigin="" controls="true" data-poster="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg" id="player">
+
+        
+        <source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4" type="video/mp4" size="720">
+        <source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1080p.mp4" type="video/mp4" size="1080">
+
+        <track kind="captions" label="English" srclang="en" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt" default="">
+        <track kind="captions" label="Français" srclang="fr" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt">
+
+        <a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" download="">Download</a>
+    </video>
+</Auralizer>
+<br />
+
+<MudDivider Class="mt-5 mb-5"></MudDivider>
+
+<p>Audio sample</p>
+<Auralizer IgnoredPropertiesForReset="@(new [] {nameof(Auralizer.Overlay), nameof(Auralizer.ShowBgColor)})"
+           ShowScaleX="false"
+           ShowScaleY="false"
+           Mode="VisualizationMode.LineAreaGraph"
+           OverlayChildContent="true"
+           HoverOpacity=".2"
+           Opacity="1"
+           BgAlpha="1"
+           Overlay="false"
+           ShowBgColor="true">
+    <audio preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+</Auralizer>
+
+```

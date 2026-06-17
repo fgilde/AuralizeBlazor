@@ -1,0 +1,60 @@
+<div class="html"><pre>
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+@using AuralizeBlazor.Types
+
+&lt;Auralizer @ref=_vis
+           @bind-Features=&quot;_features&quot;
+           InitialPreset=&quot;AuralizerPreset.DualChannelCombined&quot;
+           InitialRender=&quot;InitialRender.WithRandomData&quot;
+           KeepState=&quot;false&quot;
+           PreviewImageInPresetList=&quot;true&quot;
+           GradientChanged=&quot;@MainLayout.Instance.ColorsChanged&quot;
+           Presets=&quot;@AuralizerPreset.All&quot;
+           BackgroundSize=&quot;contain&quot;
+           TrackList=&quot;@_tracks&quot;
+           Height=&quot;700px&quot;        
+           ClickAction=&quot;VisualizerAction.TogglePlayPause&quot;
+           AutoApplyGradient=&quot;AutoGradientFrom.MetaCoverImage&quot;
+           ApplyBackgroundImageFromTrack=&quot;true&quot;
+           ContextMenuAction=&quot;VisualizerAction.None&quot;
+           FullPaged=&quot;_fullPaged&quot;
+           ShowTrackInfosOnPlay=&quot;true&quot;
+           Lyrics=&quot;@_lyrics&quot;
+           MetaInfosChanged=&quot;@MetaChanged&quot;
+           Overlay=&quot;false&quot;&gt;
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;audio-main mud-ex-animate-all-properties&quot;</span> <span class="htmlAttributeName">autoplay</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;metadata&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;lazy&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@_file&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+
+@code {
+    [Inject] IJSRuntime _jsRuntime { get; set; }
+
+    string _file;
+    bool _fullPaged = false;
+    private Auralizer _vis;
+    private IVisualizerFeature[] _features = [
+        new ShowLogoFeature { Label = string.Empty, LabelPosition = VisualPosition.CenterCenter },
+        new LyricsDisplayFeature() {TextPosition = LyricsPosition.Top, FontSize = 28, Colors = [&quot;#ffffff&quot;]}
+    ];
+    IAuralizerTrack[]? _tracks = null;
+    private LyricData? _lyrics;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _tracks ??= (await TracksService.GetEyirishAsync()).Concat([TracksService.LebenWieImFilm()]).ToArray();
+        _file = _tracks[0].Url;
+        _lyrics = _tracks[0].Lyrics;
+        _fullPaged = Navigation.FullPaged();
+        await base.OnInitializedAsync();
+    }
+    
+    private void MetaChanged(TagLib.File f)
+    {
+        _vis.Feature<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">ShowLogoFeature</span><span class="htmlTagDelimiter">&gt;</span>().Label = $&quot;{string.Join(&quot;,&quot;, f.Tag.Performers)} - {f.Tag.Title}&quot;;
+    }
+
+}
+
+</pre></div>

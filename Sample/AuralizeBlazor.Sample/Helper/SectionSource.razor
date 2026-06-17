@@ -1,21 +1,22 @@
-﻿<div class="docs-section-source @Class">
+<div class="docs-section-source @Class">
     @if (!NoToolbar)
     {
         <MudToolBar DisableGutters="true" Dense="true">
-            @if (ShowCode && !String.IsNullOrEmpty(Code2))
-            {
-                <MudButton Variant="Variant.Filled" Size="Size.Small" DisableElevation="true" Color="@Button1Color" OnClick="@(e => SwapCode(Code))">@ButtonTextCode1</MudButton>
-                <MudButton Variant="Variant.Filled" Size="Size.Small" DisableElevation="true" Color="Button2Color" Class="ml-2" OnClick="@(e => SwapCode(Code2))">@ButtonTextCode2</MudButton>
-            }
             <MudTooltip Text="@TooltipSourceCodeText" Placement="Placement.Top">
                 <MudIconButton Icon="@Icons.Material.Filled.Code" Size="Size.Small" Class="pa-3" OnClick="OnShowCode" />
             </MudTooltip>
-         </MudToolBar>
+            <MudTooltip Text="Copy code" Placement="Placement.Top">
+                <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Size="Size.Small" Class="pa-3" OnClick="CopyTextToClipboard" />
+            </MudTooltip>
+        </MudToolBar>
     }
-    
+
     <MudExpansionPanel Class="mt-2" Style="border: 1px var(--mud-palette-primary) solid" Text="Code">
-        <div class="docs-source-code @(ShowCode? "docs-show-code" : "docs-hide-code")">
-            @CodeComponent(CurrentCode)
+        <div class="docs-source-code @(ShowCode ? "docs-show-code" : "docs-hide-code")">
+            @if (!string.IsNullOrEmpty(_sourceCode))
+            {
+                <MudExMarkdown Value="@_sourceCode" />
+            }
         </div>
     </MudExpansionPanel>
 </div>

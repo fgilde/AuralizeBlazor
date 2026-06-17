@@ -1,0 +1,58 @@
+<div class="html"><pre>
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+&lt;Auralizer @ref=_vis
+           @bind-Features=&quot;_features&quot;
+           InitialPreset=&quot;AuralizerPreset.ReflexMirror&quot;
+           PreviewImageInPresetList=&quot;true&quot;
+           InitialRender=&quot;InitialRender.WithRandomData&quot;
+           GradientChanged=&quot;@MainLayout.Instance.ColorsChanged&quot;
+           Presets=&quot;@AuralizerPreset.All.Except(new List<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">AuralizerPreset</span><span class="htmlTagDelimiter">&gt;</span>{AuralizerPreset.ElectricPulse, AuralizerPreset.NeonPulse, AuralizerPreset.RoundBarsBarLevelColorMode}).ToArray()&quot;
+           OnPresetApplied=&quot;OnPresetApplied&quot;
+           TrackList=&quot;@TracksService.DemoTracks&quot;
+           Height=&quot;700px&quot;
+           BackgroundImage=&quot;/bg1.jpg&quot;
+           OnReady=&quot;@(() =&gt; _vis.ShowMessage(&quot;Welcome to Auralizer, press play !&quot;, TimeSpan.FromSeconds(2)))&quot;
+           DoubleClickAction=&quot;VisualizerAction.ToggleFullscreen&quot;
+           ClickAction=&quot;VisualizerAction.TogglePlayPause&quot;
+           ApplyBackgroundImageFromTrack=&quot;false&quot;
+           Overlay=&quot;true&quot;&gt;
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;audio-main mud-ex-animate-all-properties&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;metadata&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;lazy&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@TracksService.DemoTracks[0].Url&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+
+@code {
+
+    private Auralizer _vis;
+    private IVisualizerFeature[] _features = [
+        new ShowLogoFeature
+        {
+            Label = Const.AppName,
+            Image = &quot;Logo.png&quot;,
+            ImageScale = .3f,
+            LabelPosition = VisualPosition.CenterCenter,
+            ImagePosition = VisualPosition.CenterCenter.WithMarginBottom(80)
+        },
+        //new LyricsDisplayFeature(),
+        new LyricsDisplayFeature() {ShowTimer = false, TextPosition = LyricsPosition.Top, FontSize = 28, Colors = [&quot;#ffffff&quot;]},
+        new SwitchPresetFeature
+            {
+                OverridePresetColorsWithRandoms = true,
+                MinDebounceForColorTimeInMs = 123,
+                MinEnergy = .20
+            }
+    ];
+
+    private void OnPresetApplied(AppliedPresetEventArgs arg)
+    {
+        if (arg.ApplySettings.Reason is PresetApplyReason.UserSelectedFromList or PresetApplyReason.UserSelectedAsAction)
+        {
+            _vis.RemoveFeature<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">SwitchPresetFeature</span><span class="htmlTagDelimiter">&gt;</span>();
+        }
+    }
+
+}
+
+</pre></div>

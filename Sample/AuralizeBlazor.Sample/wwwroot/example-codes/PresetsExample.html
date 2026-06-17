@@ -1,0 +1,60 @@
+<div class="html"><pre>
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+@using VisualizationMode = AuralizeBlazor.Options.VisualizationMode
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudIconButton</span> <span class="htmlAttributeName">Title</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;Fullscreen&quot;</span> <span class="htmlAttributeName">OnClick</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@(() =&gt; _vis.ToggleFullScreen())&quot;</span> <span class="htmlAttributeName">Icon</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@Icons.Material.Filled.Fullscreen&quot;</span><span class="htmlTagDelimiter">/&gt;</span>
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudIconButton</span> <span class="htmlAttributeName">Title</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;Picture in picture&quot;</span> <span class="htmlAttributeName">OnClick</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@(() =&gt; _vis.TogglePictureInPicture())&quot;</span> <span class="htmlAttributeName">Icon</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@Icons.Material.Filled.PictureInPicture&quot;</span> <span class="htmlTagDelimiter">/&gt;</span>
+&lt;Auralizer @ref=_vis
+           InitialPreset=&quot;_myPresets[0]&quot;
+           PreviewImageInPresetList=&quot;true&quot;
+           GradientChanged=&quot;@MainLayout.Instance.ColorsChanged&quot;
+           ShowPresetNameOnChange=&quot;true&quot;
+           Presets=&quot;@_myPresets&quot;
+           Height=&quot;700px&quot;
+           MouseWheelDownAction=&quot;VisualizerAction.NextPreset&quot;
+           MouseWheelUpAction=&quot;VisualizerAction.PreviousPreset&quot;
+           ContextMenuAction=&quot;VisualizerAction.TogglePictureInPicture&quot;
+           DoubleClickAction=&quot;VisualizerAction.ToggleFullscreen&quot;&gt;
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;audio-main mud-ex-animate-all-properties&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;metadata&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;lazy&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;/sample.mp3&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+
+@code {
+    Auralizer _vis;
+    private AuralizerPreset[] _myPresets = new[]
+    {
+        new AuralizerPreset(1, &quot;Simple Bar&quot;, auralizer =&gt;
+        {
+            auralizer.Mode = VisualizationMode.OneEighthOctaveBands;
+            auralizer.Gradient = new Options.AudioMotionGradient()
+            {
+                Name = &quot;MyCustomGradient&quot;,
+                ColorStops = new ColorStop[]
+                {
+                    new() { Color = &quot;pink&quot;, Position = 0 },
+                    new() { Color = &quot;azure&quot;, Position = 0.166 },
+                    new() { Color = &quot;purple&quot;, Position = 0.333 },
+                    new() { Color = &quot;#C0C0C0&quot;, Position = 0.5 },
+                    new() { Color = &quot;#cec000&quot;, Position = 0.666 }
+                }
+            };
+        }),
+        new AuralizerPreset(2, &quot;Simple Wave&quot;, auralizer =&gt;
+        {
+            auralizer.Mode = VisualizationMode.LineAreaGraph;
+            auralizer.Gradient = Options.AudioMotionGradient.Apple;
+        }),
+        new AuralizerPreset(3, &quot;Simple Led Bar&quot;, auralizer =&gt;
+        {
+            auralizer.Mode = VisualizationMode.OneEighthOctaveBands;
+            auralizer.LedBars = true;
+            auralizer.LumiBars = true;
+            auralizer.Gradient = Options.AudioMotionGradient.Prism;
+        }),
+    };
+}
+
+
+</pre></div>

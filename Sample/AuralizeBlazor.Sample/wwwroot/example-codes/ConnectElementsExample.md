@@ -1,0 +1,65 @@
+```razor
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+
+
+<MudExGrid Column="4" Row="1">
+    <MudExGridSection Column="1" ColSpan="3">
+        <Auralizer @ref=_vis
+                   InitialPreset="AuralizerPreset.RadialSpectrumScale"
+                   GradientChanged="@MainLayout.Instance.ColorsChanged"
+                   Presets="@AuralizerPreset.All"
+                   Height="700px"
+                   Style="overflow: hidden;"
+                   AudioElements="@_audioElements.Where(r => _checkedAudioIndexes.Contains(_audioElements.IndexOf(r))).ToArray()"
+                   ConnectAllAudioSources="@_connectToAll"
+                   ConnectMicrophone="@_connectToMic"
+                   ClickAction="VisualizerAction.TogglePlayPause"
+                   ContextMenuAction="VisualizerAction.TogglePictureInPicture"
+                   DoubleClickAction="VisualizerAction.ToggleFullscreen" />
+    </MudExGridSection>
+    <MudExGridSection Column="4">
+        <MudToolBar>
+            <MudSwitch Color="Color.Primary" @bind-Value="_connectToAll">Connect To all sources</MudSwitch>
+            <MudSwitch Color="Color.Primary" @bind-Value="_connectToMic">Connect To Microphone</MudSwitch>
+        </MudToolBar>
+        @for (int i = 0; i < TracksService.DemoTracks.Length; i++)
+        {
+            var idx = i;
+            <MudPaper Elevation="1" Style="display: flex">
+                @if (!_connectToAll)
+                {
+                    <MudCheckBox T="bool" ValueChanged="@(connect => AddOrRemove(connect, idx))"></MudCheckBox>
+                }
+                <audio @ref="_audio" preload="metadata" loading="lazy" controls="true" src="@TracksService.DemoTracks[idx].Url"></audio>
+            </MudPaper>
+        }
+    </MudExGridSection>
+</MudExGrid>
+
+
+
+
+
+@code {
+    private Auralizer _vis;
+    private ElementReference _audio { set => _audioElements.Add(value); }
+    private List<ElementReference> _audioElements = new();
+    private bool _connectToAll = false;
+    private bool _connectToMic = false;
+    private List<int> _checkedAudioIndexes = new();
+
+    private void AddOrRemove(bool add, int idx)
+    {
+        if (add && !_checkedAudioIndexes.Contains(idx))
+            _checkedAudioIndexes.Add(idx);
+        else if (!add && _checkedAudioIndexes.Contains(idx))
+            _checkedAudioIndexes.Remove(idx);
+
+        StateHasChanged();
+    }
+}
+
+
+```

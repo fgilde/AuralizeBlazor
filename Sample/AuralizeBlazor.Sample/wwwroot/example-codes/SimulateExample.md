@@ -1,0 +1,54 @@
+```razor
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+<MudExSelect T="IAuralizerTrack" @bind-Value="_track" SelectedValuesChanged="@((_) => TrackSelected())" ItemCollection="@TracksService.DemoTracks"></MudExSelect>
+<Auralizer @ref=_vis
+           OnContainerMouseOver="OnMouseIn"
+           OnContainerMouseOut="OnMouseOut"           
+           InitialPreset="AuralizerPreset.ReflexMirror"
+           InitialRender="InitialRender.WithFullSpectrumAudioDataPrefilledWithRandomData"
+           KeepState="true"
+           GradientChanged="@MainLayout.Instance.ColorsChanged"
+           Presets="@AuralizerPreset.All"                      
+           Height="400px"           
+           Overlay="true">
+    <center>
+        <audio style="display:none;" src="@((_track ??= TracksService.MainDemoTrack).Url)"></audio>
+    </center>
+</Auralizer>
+@code {
+    private Auralizer _vis;   
+    private IAuralizerTrack _track = null;
+
+    private async Task OnMouseIn()
+    {
+        if(_vis.JsReference is null || _vis.IsPlaying)
+        {
+            return;
+        }
+        var simulating = await _vis.IsSimulationRunning();
+        if (!simulating)
+        {
+            _ = _vis.SimulateFullAudioSpectrumAsync(null, 1, true);            
+        }
+        else
+        {
+            await _vis.ResumeSimulationAsync();
+        }
+    }
+
+    private async Task OnMouseOut()
+    {
+        await _vis.PauseSimulationAsync();
+    }
+
+    private Task TrackSelected()
+    {
+        return _vis.StopSimulationAsync();            
+    }
+
+
+}
+
+```

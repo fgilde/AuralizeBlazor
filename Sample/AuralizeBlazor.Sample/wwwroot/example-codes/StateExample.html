@@ -1,0 +1,42 @@
+<div class="html"><pre>
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExEnumSelect</span> <span class="htmlAttributeName">Variant</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;Variant.Outlined&quot;</span> <span class="htmlAttributeName">TEnum</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;InitialRender&quot;</span> <span class="htmlAttributeName">Disabled</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@(!_rendered)&quot;</span> <span class="htmlAttributeName">Value</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@_initialRender&quot;</span> <span class="htmlAttributeName">ValueChanged</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@OnInitialRenderChanged&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExEnumSelect</span><span class="htmlTagDelimiter">&gt;</span>
+@if (_rendered)
+{
+    &lt;Auralizer @ref=_vis
+               InitialPreset=&quot;@_preset&quot;
+               InitialRender=&quot;@_initialRender&quot;        
+               KeepState=&quot;true&quot;
+               GradientChanged=&quot;@MainLayout.Instance.ColorsChanged&quot;
+               Height=&quot;400px&quot;
+               ContextMenuAction=&quot;VisualizerAction.None&quot;               
+               ClickAction=&quot;VisualizerAction.TogglePlayPause&quot;
+               Overlay=&quot;true&quot;&gt;
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;audio-main mud-ex-animate-all-properties&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;metadata&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;lazy&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@TracksService.DemoTracks[0].Url&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+}
+@code {
+    private bool _rendered = true;
+    private AuralizerPreset _preset = AuralizerPreset.Default;
+    private Auralizer _vis;
+    private InitialRender _initialRender = InitialRender.WithFullSpectrumAudioData;
+    private void OnInitialRenderChanged(InitialRender render)
+    {
+        _rendered = false;
+        InvokeAsync(StateHasChanged);
+        _initialRender = render;
+
+        Task.Delay(200).ContinueWith(t =&gt;
+        {
+            _rendered = true;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+}
+
+</pre></div>

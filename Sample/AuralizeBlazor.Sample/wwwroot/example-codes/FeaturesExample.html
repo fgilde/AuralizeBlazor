@@ -1,0 +1,44 @@
+<div class="html"><pre>
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+@using BlazorJS.Attributes
+@using VisualizationMode = AuralizeBlazor.Options.VisualizationMode
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudIconButton</span> <span class="htmlAttributeName">Title</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;Fullscreen&quot;</span> <span class="htmlAttributeName">OnClick</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@(() =&gt; _vis.ToggleFullScreen())&quot;</span> <span class="htmlAttributeName">Icon</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@Icons.Material.Filled.Fullscreen&quot;</span><span class="htmlTagDelimiter">/&gt;</span>
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudIconButton</span> <span class="htmlAttributeName">Title</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;Picture in picture&quot;</span> <span class="htmlAttributeName">OnClick</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@(() =&gt; _vis.TogglePictureInPicture())&quot;</span> <span class="htmlAttributeName">Icon</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@Icons.Material.Filled.PictureInPicture&quot;</span> <span class="htmlTagDelimiter">/&gt;</span>
+&lt;Auralizer @ref=_vis
+           InitialPreset=&quot;AuralizerPreset.NeonPulse&quot;
+           GradientChanged=&quot;@MainLayout.Instance.ColorsChanged&quot;
+           Features=&quot;_myFeatrues&quot;
+           Height=&quot;700px&quot;&gt;
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;audio-main mud-ex-animate-all-properties&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;metadata&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;lazy&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;/sample.mp3&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+
+@code {
+    Auralizer _vis;
+    private IVisualizerFeature[] _myFeatrues = new IVisualizerFeature[]
+    {
+        new ShowLogoFeature() {Label = &quot;Hello&quot;},
+        new MyCustomFeature() {NumDots = 10},
+        new VortexParticleFeature() {Text = &quot;Vortext Particle Feature&quot;, ParticleCount = 777},
+
+    };
+
+    /// <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">summary</span><span class="htmlTagDelimiter">&gt;</span>
+    /// Sample implementation of a custom feature that displays a dot on the canvas
+    /// <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">summary</span><span class="htmlTagDelimiter">&gt;</span>
+    public class MyCustomFeature : VisualizerFeatureBase
+    {
+        public override string FullJsNamespace =&gt; &quot;window.myCustomFeature&quot;; 
+        public override string OnCanvasDrawCallbackName =&gt; &quot;onCanvasDraw&quot;;
+        public override string[] RequiredJsFiles =&gt; [&quot;/js/myCustomFeature.js&quot;];
+        [ForJs]
+        public int NumDots { get; set; } = 5;
+    }
+
+}
+
+
+</pre></div>

@@ -1,0 +1,49 @@
+```razor
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+@using AuralizeBlazor.Types
+
+<Auralizer @ref=_vis
+           @bind-Features="_features"
+           Lyrics="@_lyrics"
+           InitialPreset="AuralizerPreset.GalacticJourney"
+           InitialRender="InitialRender.WithRandomData"
+           KeepState="false"
+           PreviewImageInPresetList="true"
+           GradientChanged="@MainLayout.Instance.ColorsChanged"
+           Presets="@AuralizerPreset.All"
+           TrackList="@_tracks"
+           Height="700px"        
+           ClickAction="VisualizerAction.TogglePlayPause"
+           AutoApplyGradient="AutoGradientFrom.MetaCoverImage"
+           ApplyBackgroundImageFromTrack="true"
+           ShowTrackInfosOnPlay="true"
+           BackgroundSize="contain"
+           Overlay="false">
+    <center>
+        <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="@_file"></audio>
+    </center>
+</Auralizer>
+
+@code {
+    [Inject] IJSRuntime _jsRuntime { get; set; }
+
+    string _file;
+    private Auralizer _vis;
+    private IVisualizerFeature[] _features = [
+        new LyricsDisplayFeature() { FontSize = 28, TextPosition = LyricsPosition.Middle, Colors = ["#ff0088", "#ff8800", "#ffff00"]}
+    ];
+    IAuralizerTrack[]? _tracks = null;
+    private LyricData? _lyrics;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _tracks ??= (await TracksService.GetEyirishAsync()).Where(t => t.Lyrics != null).Concat([TracksService.LebenWieImFilm()]).ToArray();
+        _file = _tracks[0].Url;
+        _lyrics = _tracks[0].Lyrics;
+        await base.OnInitializedAsync();
+    }
+
+}
+
+```

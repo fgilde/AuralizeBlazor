@@ -1,0 +1,65 @@
+<div class="html"><pre>
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExGrid</span> <span class="htmlAttributeName">Column</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;4&quot;</span> <span class="htmlAttributeName">Row</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;1&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExGridSection</span> <span class="htmlAttributeName">Column</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;1&quot;</span> <span class="htmlAttributeName">ColSpan</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;3&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+        &lt;Auralizer @ref=_vis
+                   InitialPreset=&quot;AuralizerPreset.RadialSpectrumScale&quot;
+                   GradientChanged=&quot;@MainLayout.Instance.ColorsChanged&quot;
+                   Presets=&quot;@AuralizerPreset.All&quot;
+                   Height=&quot;700px&quot;
+                   Style=&quot;overflow: hidden;&quot;
+                   AudioElements=&quot;@_audioElements.Where(r =&gt; _checkedAudioIndexes.Contains(_audioElements.IndexOf(r))).ToArray()&quot;
+                   ConnectAllAudioSources=&quot;@_connectToAll&quot;
+                   ConnectMicrophone=&quot;@_connectToMic&quot;
+                   ClickAction=&quot;VisualizerAction.TogglePlayPause&quot;
+                   ContextMenuAction=&quot;VisualizerAction.TogglePictureInPicture&quot;
+                   DoubleClickAction=&quot;VisualizerAction.ToggleFullscreen&quot; /&gt;
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExGridSection</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExGridSection</span> <span class="htmlAttributeName">Column</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;4&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudToolBar</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudSwitch</span> <span class="htmlAttributeName">Color</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;Color.Primary&quot; @bind-Value=&quot;_connectToAll&quot;</span><span class="htmlTagDelimiter">&gt;</span>Connect To all sources<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudSwitch</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudSwitch</span> <span class="htmlAttributeName">Color</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;Color.Primary&quot; @bind-Value=&quot;_connectToMic&quot;</span><span class="htmlTagDelimiter">&gt;</span>Connect To Microphone<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudSwitch</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudToolBar</span><span class="htmlTagDelimiter">&gt;</span>
+        @for (int i = 0; i &lt; TracksService.DemoTracks.Length; i++)
+        {
+            var idx = i;
+            <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudPaper</span> <span class="htmlAttributeName">Elevation</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;1&quot;</span> <span class="htmlAttributeName">Style</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;display: flex&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+                @if (!_connectToAll)
+                {
+                    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudCheckBox</span> <span class="htmlAttributeName">T</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;bool&quot;</span> <span class="htmlAttributeName">ValueChanged</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@(connect =&gt; AddOrRemove(connect, idx))&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudCheckBox</span><span class="htmlTagDelimiter">&gt;</span>
+                }
+                &lt;audio @ref=&quot;_audio&quot; preload=&quot;metadata&quot; loading=&quot;lazy&quot; controls=&quot;true&quot; src=&quot;@TracksService.DemoTracks[idx].Url&quot;&gt;<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudPaper</span><span class="htmlTagDelimiter">&gt;</span>
+        }
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExGridSection</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExGrid</span><span class="htmlTagDelimiter">&gt;</span>
+
+
+
+
+
+@code {
+    private Auralizer _vis;
+    private ElementReference _audio { set =&gt; _audioElements.Add(value); }
+    private List<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">ElementReference</span><span class="htmlTagDelimiter">&gt;</span> _audioElements = new();
+    private bool _connectToAll = false;
+    private bool _connectToMic = false;
+    private List<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">int</span><span class="htmlTagDelimiter">&gt;</span> _checkedAudioIndexes = new();
+
+    private void AddOrRemove(bool add, int idx)
+    {
+        if (add &amp;&amp; !_checkedAudioIndexes.Contains(idx))
+            _checkedAudioIndexes.Add(idx);
+        else if (!add &amp;&amp; _checkedAudioIndexes.Contains(idx))
+            _checkedAudioIndexes.Remove(idx);
+
+        StateHasChanged();
+    }
+}
+
+
+</pre></div>

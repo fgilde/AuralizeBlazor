@@ -1,0 +1,42 @@
+```razor
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+<MudExEnumSelect Variant="Variant.Outlined" TEnum="InitialRender" Disabled="@(!_rendered)" Value="@_initialRender" ValueChanged="@OnInitialRenderChanged"></MudExEnumSelect>
+@if (_rendered)
+{
+    <Auralizer @ref=_vis
+               InitialPreset="@_preset"
+               InitialRender="@_initialRender"        
+               KeepState="true"
+               GradientChanged="@MainLayout.Instance.ColorsChanged"
+               Height="400px"
+               ContextMenuAction="VisualizerAction.None"               
+               ClickAction="VisualizerAction.TogglePlayPause"
+               Overlay="true">
+        <center>
+            <audio class="audio-main mud-ex-animate-all-properties" preload="metadata" loading="lazy" controls="true" src="@TracksService.DemoTracks[0].Url"></audio>
+        </center>
+    </Auralizer>
+}
+@code {
+    private bool _rendered = true;
+    private AuralizerPreset _preset = AuralizerPreset.Default;
+    private Auralizer _vis;
+    private InitialRender _initialRender = InitialRender.WithFullSpectrumAudioData;
+    private void OnInitialRenderChanged(InitialRender render)
+    {
+        _rendered = false;
+        InvokeAsync(StateHasChanged);
+        _initialRender = render;
+
+        Task.Delay(200).ContinueWith(t =>
+        {
+            _rendered = true;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+}
+
+```

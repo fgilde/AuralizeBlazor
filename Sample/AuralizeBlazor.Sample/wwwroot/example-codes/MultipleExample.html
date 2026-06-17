@@ -1,0 +1,72 @@
+<div class="html"><pre>
+@using AuralizeBlazor.Features
+@using AuralizeBlazor.Options
+
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+    &lt;audio @ref=&quot;_audio&quot; class=&quot;mb-2&quot; preload=&quot;metadata&quot; loading=&quot;lazy&quot; controls=&quot;true&quot; src=&quot;@TracksService.MainDemoTrack.Url&quot;&gt;<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">center</span><span class="htmlTagDelimiter">&gt;</span>
+
+@if (_rendered)
+{
+    <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExGrid</span> <span class="htmlAttributeName">Column</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;2&quot;</span> <span class="htmlAttributeName">Row</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;2&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExGridSection</span> <span class="htmlAttributeName">Column</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;1&quot;</span> <span class="htmlAttributeName">Row</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;1&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName">InitialPreset</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;AuralizerPreset.ReflexMirror&quot;</span>            
+            <span class="htmlAttributeName">ConnectionMode</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;ConnectionMode.Stream&quot;</span>
+            <span class="htmlAttributeName">GradientChanged</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@MainLayout.Instance.ColorsChanged&quot;</span>
+            <span class="htmlAttributeName">Presets</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@AuralizerPreset.All&quot;</span>
+            <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;400px&quot;</span>
+            <span class="htmlAttributeName">AudioElements</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@(new[] { _audio })&quot;</span>
+            <span class="htmlAttributeName">Overlay</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExGridSection</span><span class="htmlTagDelimiter">&gt;</span>               
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExGridSection</span> <span class="htmlAttributeName">Column</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;1&quot;</span> <span class="htmlAttributeName">Row</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;2&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName">InitialPreset</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;AuralizerPreset.MiamiSpectrumOutline&quot;</span>            
+            <span class="htmlAttributeName">ConnectionMode</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;ConnectionMode.Stream&quot;</span>
+            <span class="htmlAttributeName">GradientChanged</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@MainLayout.Instance.ColorsChanged&quot;</span>
+            <span class="htmlAttributeName">Presets</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@AuralizerPreset.All&quot;</span>
+            <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;400px&quot;</span>
+            <span class="htmlAttributeName">AudioElements</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@(new[] { _audio })&quot;</span>
+            <span class="htmlAttributeName">Overlay</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExGridSection</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExGridSection</span> <span class="htmlAttributeName">Column</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;2&quot;</span> <span class="htmlAttributeName">Row</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;1&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName">InitialPreset</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;AuralizerPreset.GalacticJourney&quot;</span>                               
+                       <span class="htmlAttributeName">ConnectionMode</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;ConnectionMode.Stream&quot;</span>
+                       <span class="htmlAttributeName">GradientChanged</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@MainLayout.Instance.ColorsChanged&quot;</span>
+                       <span class="htmlAttributeName">Presets</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@AuralizerPreset.All&quot;</span>
+                       <span class="htmlAttributeName">IgnoredPropertiesForReset</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@(new []{nameof(Auralizer.ShowScaleX)})&quot;</span>
+                       <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;400px&quot;</span>
+                       <span class="htmlAttributeName">ShowScaleX</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;false&quot;</span>
+                
+                       <span class="htmlAttributeName">AudioElements</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@(new[] { _audio })&quot;</span>
+                       <span class="htmlAttributeName">Overlay</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExGridSection</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">MudExGridSection</span> <span class="htmlAttributeName">Column</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;2&quot;</span> <span class="htmlAttributeName">Row</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;2&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">Auralizer</span> <span class="htmlAttributeName">InitialPreset</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;AuralizerPreset.AuroraDreams&quot;</span>            
+                       <span class="htmlAttributeName">ConnectionMode</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;ConnectionMode.Stream&quot;</span>
+            <span class="htmlAttributeName">GradientChanged</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@MainLayout.Instance.ColorsChanged&quot;</span>
+            <span class="htmlAttributeName">Presets</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@AuralizerPreset.All&quot;</span>
+            <span class="htmlAttributeName">Height</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;400px&quot;</span>
+            <span class="htmlAttributeName">AudioElements</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@(new[] { _audio })&quot;</span>
+            <span class="htmlAttributeName">Overlay</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span><span class="htmlTagDelimiter">&gt;</span>
+            <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">Auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+        <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExGridSection</span><span class="htmlTagDelimiter">&gt;</span>
+    <span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">MudExGrid</span><span class="htmlTagDelimiter">&gt;</span>
+}
+@code {
+    private ElementReference _audio;
+    private bool _rendered;
+    protected override void OnAfterRender(bool firstRender)
+    {        
+        base.OnAfterRender(firstRender);
+        if (firstRender){
+            Task.Delay(100).ContinueWith((_) =&gt; {
+                _rendered = true;
+                StateHasChanged();
+            });
+        }
+    }
+}
+
+</pre></div>
