@@ -25,6 +25,12 @@
     <AdditionalFiles Include="CodeGen.config.json" />
   </ItemGroup>
 
+  <!-- The Blazor SDK ignores a user supplied web.config on publish (CopyToPublishDirectory=Never),
+       so copy it explicitly. Needed for the .md MIME mapping (example-codes/*.md) on IIS/Azure. -->
+  <Target Name="CopyWebConfigToPublish" AfterTargets="Publish">
+    <Copy SourceFiles="web.config" DestinationFiles="$(PublishDir)web.config" />
+  </Target>
+
   <ItemGroup>
     <Content Remove="compilerconfig.json" />
     <Content Remove="wwwroot\Logo.png" />
