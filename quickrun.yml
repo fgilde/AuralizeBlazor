@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://fgilde.github.io/QuickRun/quickrun.schema.json
+name: AuralizeBlazor — sample
+description: "The WebAssembly sample, showing the audio visualisers."
+
+requires:
+  - tool: dotnet
+    version: ">=10.0"
+    install: https://dotnet.microsoft.com/download
+
+setup:
+  - run: dotnet restore
+
+tasks:
+  - name: app
+    run: dotnet run --project Sample/AuralizeBlazor.Sample --urls http://localhost:5085
+    readyWhen: {http: "http://localhost:5085"}
+    open: true
