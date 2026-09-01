@@ -4,6 +4,8 @@
 
 [Live Demo](https://auralizeblazor.azurewebsites.net/)
 
+[![QuickRun](https://quickrun.org/badge.svg)](https://quickrun.org/run?repo=fgilde/AuralizeBlazor)
+
 ![alt text](https://raw.githubusercontent.com/fgilde/AuralizeBlazor/master/AuralizeBlazor/screenshot1.png)
 
 AuralizeBlazor provides a audio visualizer component named `Auralizer`.
