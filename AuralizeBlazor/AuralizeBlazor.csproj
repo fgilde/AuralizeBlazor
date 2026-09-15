@@ -48,7 +48,8 @@
     <PackageReference Include="BlazorJS" Version="2.3.0" />
     <PackageReference Include="Nextended.Core" Version="10.1.37" />    
     <PackageReference Include="Nextended.Blazor" Version="10.1.37" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="4.1.2" />
+    <!-- ImageSharp pinned to 3.x: v4 requires a commercial Six Labors license (build-time license check) -->
+    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 
