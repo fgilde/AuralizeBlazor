@@ -7,12 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Analyzers" Version="10.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.CustomElements" Version="10.0.9" />
-    <PackageReference Include="MudBlazor.Extensions" Version="9.5.0" />
-    <PackageReference Include="Nextended.CodeGen" Version="10.1.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.9" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Analyzers" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.CustomElements" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.12" PrivateAssets="all" />
+    <PackageReference Include="MudBlazor.Extensions" Version="9.9.0" />
+    <PackageReference Include="Nextended.CodeGen" Version="10.1.37" />
+    
   </ItemGroup>
 
   <ItemGroup>
