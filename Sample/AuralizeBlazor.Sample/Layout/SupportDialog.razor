@@ -1,0 +1,14 @@
+@* Inline gilde.org support widget, hosted in our own dialog. Inline + main site: no footer, description or homepage link. *@
+<MudDialog>
+    <DialogContent>
+        <gilde-support project="fgilde/AuralizeBlazor" widget="support" inline theme="dark" accent="@Accent" language="en"
+                       width="560" radius="18" padding="28" show-logo="true" show-description="false" show-homepage="false"
+                       show-preview-notice="false" show-footer="false" footer-brand="AuralizeBlazor" footer-tagline="gilde.org"
+                       show-support-hint="false" support-hint-text="You will be redirected to the respective provider."
+                       support-layout="rows" show-support-icons="true" show-support-qr="true">Support AuralizeBlazor</gilde-support>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [Parameter] public string Accent { get; set; } = "#00bbcc";
+}

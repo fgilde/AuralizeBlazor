@@ -32,7 +32,7 @@
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <PropertyGroup>
-      <DocumentationDestination>$(SolutionDir)AuralizeBlazor/wwwroot/docs/</DocumentationDestination>
+      <DocumentationDestination>$(SolutionDir)AuralizeBlazor/ wwwroot/docs/</DocumentationDestination>
     </PropertyGroup>
     <ItemGroup>
       <DocumentationFile Include="$(TargetDir)$(TargetName).xml" />

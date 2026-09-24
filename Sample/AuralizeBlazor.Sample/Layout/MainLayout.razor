@@ -16,6 +16,9 @@
             <MudImage Src="Logo.png" Height="30" />
             <MudExGradientText Style="font-weight: bold" Typo="Typo.h5" AnimationDuration="@TimeSpan.FromSeconds(20)" Palette="@(_palette)" Class="ml-3">@Const.AppName</MudExGradientText>
             <MudSpacer/>
+            <MudTooltip Text="Support AuralizeBlazor">
+                <MudButton OnClick="@ShowSupport" StartIcon="@Icons.Material.Filled.Favorite" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Class="mr-2">Support project</MudButton>
+            </MudTooltip>
             <MudTooltip Text="GitHub">
                 <MudIconButton Href="https://github.com/fgilde/AuralizeBlazor" Target="_blank" Icon="@Icons.Custom.Brands.GitHub" Color="Color.Primary" Edge="Edge.End"/>
             </MudTooltip>

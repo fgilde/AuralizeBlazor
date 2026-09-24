@@ -13,15 +13,107 @@
     <link id="mudex-styles" href="_content/MudBlazor.Extensions/mudBlazorExtensions.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <script type="module" src="https://connect.gilde.org/widgets/v1.js"></script>
+    <style>
+        /* Boot screen, inline so it paints before any stylesheet or Blazor is loaded. */
+        .aur-boot {
+            position: fixed; inset: 0; z-index: 9999; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.2rem;
+            background: #121518; color: #e6f7fa;
+            font-family: Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --p: var(--blazor-load-percentage, 0%);
+        }
+        .aur-boot::before, .aur-boot::after {
+            content: ""; position: absolute; width: 70vmax; height: 70vmax; border-radius: 50%;
+            filter: blur(90px); opacity: .28; animation: aur-drift 18s ease-in-out infinite alternate;
+        }
+        .aur-boot::before { background: #00bbcc; top: -35vmax; left: -25vmax; }
+        .aur-boot::after { background: #3366bb; bottom: -40vmax; right: -25vmax; animation-delay: -9s; }
+
+        .aur-orb { position: relative; width: 280px; height: 280px; z-index: 1; }
+        .aur-bar {
+            position: absolute; left: 50%; top: 50%; width: 5px; height: 46px; margin-left: -2.5px;
+            transform: rotate(calc(var(--i) * 7.5deg)) translateY(-138px); transform-origin: 50% 0;
+        }
+        .aur-bar > i {
+            display: block; width: 100%; height: 100%; border-radius: 3px;
+            background: linear-gradient(to top, hsl(var(--h) 90% 45%), hsl(calc(var(--h) - 20) 95% 65%));
+            box-shadow: 0 0 10px hsl(var(--h) 90% 55% / .6);
+            transform-origin: 50% 0; transform: scaleY(.15);
+            animation: aur-eq var(--t) ease-in-out var(--d) infinite alternate;
+        }
+        .aur-ring { position: absolute; inset: 42px; width: calc(100% - 84px); height: calc(100% - 84px); transform: rotate(-90deg); overflow: visible; }
+        .aur-ring circle { fill: none; stroke-width: 4; }
+        .aur-ring circle:first-child { stroke: rgba(255,255,255,.07); }
+        .aur-ring circle:last-child {
+            stroke: url(#aur-grad); stroke-linecap: round;
+            stroke-dasharray: calc(var(--p) * 2.89) 400; transition: stroke-dasharray .15s ease-out;
+            filter: drop-shadow(0 0 6px #00bbcc);
+        }
+        .aur-logo {
+            position: absolute; left: 50%; top: 50%; width: 92px; height: 92px; margin: -46px 0 0 -46px;
+            border-radius: 50%; object-fit: contain; animation: aur-beat 1.6s ease-in-out infinite;
+        }
+        .aur-title {
+            z-index: 1; margin: 0; font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 700; letter-spacing: .02em;
+            background: linear-gradient(90deg, #00bbcc, #22ccbb, #0099cc, #3366bb, #22ccbb, #00bbcc);
+            background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+            animation: aur-shine 6s linear infinite;
+        }
+        .aur-sub { z-index: 1; margin: -1.6rem 0 0; opacity: .6; letter-spacing: .25em; text-transform: uppercase; font-size: .75rem; }
+        .aur-pct { z-index: 1; font-variant-numeric: tabular-nums; font-size: .9rem; opacity: .8; }
+        .aur-pct::after { content: var(--blazor-load-percentage-text, "Loading"); }
+        .aur-waves { position: absolute; left: 0; bottom: 0; width: 200%; height: 22vh; z-index: 0; }
+        .aur-waves path { fill: none; stroke-width: 2; animation: aur-flow 8s linear infinite; }
+        .aur-waves path:nth-child(2) { animation-duration: 13s; opacity: .5; }
+        .aur-waves path:nth-child(3) { animation-duration: 19s; opacity: .3; }
+
+        @keyframes aur-eq { to { transform: scaleY(1); } }
+        @keyframes aur-beat { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.09); } 24% { transform: scale(.98); } }
+        @keyframes aur-shine { to { background-position: 300% 0; } }
+        @keyframes aur-flow { to { transform: translateX(-50%); } }
+        @keyframes aur-drift { to { transform: translate(8vmax, 6vmax) scale(1.1); } }
+        @media (prefers-reduced-motion: reduce) { .aur-boot *, .aur-boot::before, .aur-boot::after { animation: none !important; } }
+        @media (max-width: 420px) { .aur-orb { transform: scale(.8); margin: -28px 0; } }
+    </style>
 </head>
 
 <body style="height: 100%">
     <div id="app" style="height: 100%">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <div class="aur-boot" role="status" aria-label="Loading AuralizeBlazor">
+            <div class="aur-orb" id="aur-orb">
+                <svg class="aur-ring" viewBox="0 0 100 100">
+                    <defs>
+                        <linearGradient id="aur-grad" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#00bbcc" /><stop offset=".5" stop-color="#22ccbb" /><stop offset="1" stop-color="#3366bb" />
+                        </linearGradient>
+                    </defs>
+                    <circle r="46" cx="50" cy="50" />
+                    <circle r="46" cx="50" cy="50" />
+                </svg>
+                <img class="aur-logo" src="Logo.png" alt="" />
+            </div>
+            <h1 class="aur-title">AuralizeBlazor</h1>
+            <p class="aur-sub">Audio visualization for Blazor</p>
+            <div class="aur-pct"></div>
+            <svg class="aur-waves" viewBox="0 0 2400 200" preserveAspectRatio="none" aria-hidden="true">
+                <path stroke="#00bbcc" d="M0 120 Q150 40 300 120 T600 120 T900 120 T1200 120 T1500 120 T1800 120 T2100 120 T2400 120" />
+                <path stroke="#22ccbb" d="M0 140 Q300 60 600 140 T1200 140 T1800 140 T2400 140" />
+                <path stroke="#3366bb" d="M0 110 Q100 60 200 110 T400 110 T600 110 T800 110 T1000 110 T1200 110 T1400 110 T1600 110 T1800 110 T2000 110 T2200 110 T2400 110" />
+            </svg>
+        </div>
+        <script>
+            // Radial spectrum: 48 bars with random tempo so it looks like live audio.
+            (function () {
+                var orb = document.getElementById('aur-orb'), html = '';
+                for (var i = 0; i < 48; i++) {
+                    var h = 185 + Math.abs(24 - i) * 1.7;
+                    html += '<span class="aur-bar" style="--i:' + i + ';--h:' + h + ';--t:' + (.35 + Math.random() * .6).toFixed(2) +
+                        's;--d:-' + Math.random().toFixed(2) + 's"><i></i></span>';
+                }
+                orb.insertAdjacentHTML('afterbegin', html);
+            })();
+        </script>
     </div>
     
     <div id="blazor-error-ui">

@@ -1,4 +1,5 @@
 ﻿using AuralizeBlazor.Options;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using MudBlazor.Extensions.Core;
 using MudBlazor.Utilities;
@@ -25,6 +26,13 @@ public partial class MainLayout
                 Surface = "#222529"
             }
         };
+
+    [Inject] private IDialogService DialogService { get; set; } = null!;
+
+    // Widget accent follows the current app accent (primary changes with the visualizer gradient).
+    private Task ShowSupport() => DialogService.ShowAsync<SupportDialog>("Support AuralizeBlazor",
+        new DialogParameters<SupportDialog> { { d => d.Accent, CurrentTheme.PaletteDark.Primary.ToString(MudColorOutputFormats.Hex) } },
+        new DialogOptions { MaxWidth = MaxWidth.Small, CloseButton = true, CloseOnEscapeKey = true });
 
     bool _drawerOpen = true;
     internal static MainLayout Instance;
