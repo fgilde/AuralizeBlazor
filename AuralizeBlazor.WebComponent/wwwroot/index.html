@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auralizer web component</title>
+    <link rel="icon" href="data:," />
+
+    <!-- 1. Include the loader. That's all the setup there is: no Blazor, no build step. -->
+    <script src="auralizer.js"></script>
+
+    <style>
+        body { margin: 0; padding: 16px; background: #121518; color: #e6f7fa; font-family: Roboto, 'Segoe UI', Arial, sans-serif; }
+        auralize-blazor-auralizer { display: block; }
+        .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+        button, select, input { background: #1e2328; color: inherit; border: 1px solid #2c3a44; border-radius: 4px; padding: 6px 10px; font: inherit; }
+        #log { font: 12px monospace; opacity: .7; white-space: pre-wrap; max-height: 6em; overflow: auto; }
+    </style>
+</head>
+<body>
+    <!-- 2. Use the element. Strings, numbers and booleans can be set as kebab-case attributes. -->
+    <auralize-blazor-auralizer id="viz"
+                               height="420px"
+                               background-image="../bg1.jpg"
+                               show-preset-name-on-change="true"
+                               preview-image-in-preset-list="true">
+    </auralize-blazor-auralizer>
+
+    <div class="row">
+        <label>Play your own file <input id="file" type="file" accept="audio/*" /></label>
+        <label>Mode
+            <select id="mode">
+                <option value="0">Discrete frequencies</option>
+                <option value="3">1/8 octave bands</option>
+                <option value="6" selected>1/3 octave bands</option>
+                <option value="10">Line / area graph</option>
+            </select>
+        </label>
+        <label><input id="radial" type="checkbox" /> Radial</label>
+    </div>
+    <div id="log"></div>
+
+    <script>
+        const viz = document.getElementById('viz');
+        const log = text => document.getElementById('log').textContent += text + '\n';
+
+        // 3. Everything else (enums, arrays, objects) is set as camelCase JS property. Enums take their numeric value.
+        viz.initialRender = 2; // InitialRender.WithRandomData
+        // Presets are referenced by name (or id). Use the mouse wheel on the visualizer to switch between them.
+        viz.presets = ['ReflexMirror', 'RadialSpectrumStereo', 'NeonBars', 'GalacticJourney', 'MiamiSpectrumOutline', 'VortexSpiral'];
+        viz.initialPreset = 'ReflexMirror';
+        viz.trackList = [
+            { label: 'Auralizer Celtic', url: '../Auralizer Celtic.mp3' },
+            { label: 'Digital Serenade', url: '../Digital Serenade.mp3' },
+            { label: 'Leaving of Liverpool', url: '../Leaving_of_Liverpool.mp3' }
+        ];
+
+        // 4. Events (EventCallback parameters) are plain functions on the matching property.
+        viz.onPresetApplied = e => log('Preset applied: ' + e.preset);
+        viz.isPlayingChanged = playing => log(playing ? 'Playing' : 'Paused');
+
+        // Attributes and properties can be changed at any time.
+        document.getElementById('mode').onchange = e => viz.mode = +e.target.value;
+        document.getElementById('radial').onchange = e => viz.radial = e.target.checked;
+        document.getElementById('file').onchange = e => {
+            const file = e.target.files[0];
+            if (file) viz.trackList = [{ label: file.name, url: URL.createObjectURL(file) }, ...viz.trackList];
+        };
+
+        // Optional: wait until the runtime is loaded.
+        AuralizeWebComponent.ready.then(() => log('Auralizer web component ready'), err => log(err.message));
+    </script>
+</body>
+</html>

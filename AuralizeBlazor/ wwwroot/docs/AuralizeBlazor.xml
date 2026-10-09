@@ -890,6 +890,11 @@
             If this value is false, the default values are not applied before applying the preset.
             </summary>
         </member>
+        <member name="T:AuralizeBlazor.AuralizerPresetJsonConverter">
+            <summary>
+            (De)serializes a preset by its name (or id), e.g. el.initialPreset = 'ReflexMirror' on the web component.
+            </summary>
+        </member>
         <member name="T:AuralizeBlazor.Features.EnergyMeterFeature">
             <summary>
             Energy meter feature.
@@ -1247,6 +1252,11 @@
             The lyrics for the track.
             </summary>
         </member>
+        <member name="T:AuralizeBlazor.AuralizerTrackJsonConverter">
+            <summary>
+            Deserializes <see cref="T:AuralizeBlazor.IAuralizerTrack"/> as <see cref="T:AuralizeBlazor.AuralizerTrack"/>, e.g. when the track list is set from JavaScript on the web component.
+            </summary>
+        </member>
         <member name="T:AuralizeBlazor.Options.AppliedPresetEventArgs">
             <summary>
             Event arguments for when a preset is applied.
@@ -1297,7 +1307,7 @@
             Returns a gradient from an image.
             </summary>
         </member>
-        <member name="M:AuralizeBlazor.Options.AudioMotionGradient.FromColors(System.String,System.Collections.Generic.List{SixLabors.ImageSharp.PixelFormats.Rgba32},AuralizeBlazor.Options.AudioMotionGradient)">
+        <member name="M:AuralizeBlazor.Options.AudioMotionGradient.FromColors(System.String,System.Collections.Generic.List{System.Drawing.Color},AuralizeBlazor.Options.AudioMotionGradient)">
             <summary>
             Returns a gradient from a list of colors.
             </summary>

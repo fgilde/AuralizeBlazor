@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "AuralizeBlazor.WebComponent": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:5280",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

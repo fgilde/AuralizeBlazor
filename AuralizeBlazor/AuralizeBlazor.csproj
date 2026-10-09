@@ -11,10 +11,10 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Logo.png</PackageIcon>
-    <Version>3.0.6</Version>
+    <Version>3.0.7</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <AssemblyVersion>3.0.6</AssemblyVersion>
+    <AssemblyVersion>3.0.7</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -46,9 +46,9 @@
 
   <ItemGroup>
     <PackageReference Include="BlazorJS" Version="2.3.0" />
-    <PackageReference Include="Nextended.Core" Version="10.1.37" />
-    <PackageReference Include="Nextended.Blazor" Version="10.1.37" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+    <PackageReference Include="Nextended.Core" Version="10.1.42" />
+    <PackageReference Include="Nextended.Blazor" Version="10.1.42" />
+    <PackageReference Include="StbImageSharp" Version="2.30.16" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 

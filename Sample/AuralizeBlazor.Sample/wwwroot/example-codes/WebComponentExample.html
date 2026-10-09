@@ -1,7 +1,11 @@
 <div class="html"><pre>
-<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">auralize-blazor-auralizer</span> <span class="htmlAttributeName">background-image</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;/bg1.jpg&quot;</span> <span class="htmlAttributeName">connect-all-audio-sources</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span><span class="htmlTagDelimiter">&gt;</span>
-<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">auralize-blazor-auralizer</span><span class="htmlTagDelimiter">&gt;</span>
+@* A plain HTML page (no Blazor) that uses the web component. *@
+<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">iframe</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;@DemoUrl&quot;</span> <span class="htmlAttributeName">title</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;Auralizer web component demo&quot;</span> <span class="htmlAttributeName">allow</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;autoplay; microphone; fullscreen&quot;</span>
+        <span class="htmlAttributeName">style</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;width: 100%; height: 560px; border: 0; border-radius: 4px; background: #121518;&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">iframe</span><span class="htmlTagDelimiter">&gt;</span>
 
-<span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">audio</span> <span class="htmlAttributeName">class</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;mt-2&quot;</span> <span class="htmlAttributeName">preload</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;metadata&quot;</span> <span class="htmlAttributeName">loading</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;lazy&quot;</span> <span class="htmlAttributeName">controls</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;true&quot;</span> <span class="htmlAttributeName">src</span><span class="htmlOperator">=</span><span class="htmlAttributeValue">&quot;/sample.mp3&quot;</span><span class="htmlTagDelimiter">&gt;</span><span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">audio</span><span class="htmlTagDelimiter">&gt;</span>
+@code {
+    /// <span class="htmlTagDelimiter">&lt;</span><span class="htmlElementName">summary</span><span class="htmlTagDelimiter">&gt;</span>Url of the plain HTML demo page.<span class="htmlTagDelimiter">&lt;/</span><span class="htmlElementName">summary</span><span class="htmlTagDelimiter">&gt;</span>
+    public const string DemoUrl = &quot;wc/index.html&quot;;
+}
 
 </pre></div>

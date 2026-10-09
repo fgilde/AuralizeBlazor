@@ -20,7 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Nextended.Blazor.Models;
 using Nextended.Core.Extensions;
-using SixLabors.ImageSharp.PixelFormats;
+using System.Drawing;
 
 
 
@@ -38,7 +38,7 @@ public partial class Auralizer
     public static Version Version => typeof(Auralizer).Assembly.GetName().Version;
     public static string VersionString => Version.ToString(3);
     protected override string ComponentJsFile() => Minify ? $"./_content/AuralizeBlazor/js/auralize.min.js?v={VersionString}" : $"./_content/AuralizeBlazor/js/components/auralizer.js?v={VersionString}";
-    protected string AudioMotionLib() => $"./_content/AuralizeBlazor/js/lib/audioMotion4.4.0.min.js?v={VersionString}"; // => "https://cdn.skypack.dev/audiomotion-analyzer?min";
+    protected string AudioMotionLib() => $"./_content/AuralizeBlazor/js/lib/audioMotion4.5.4.min.js?v={VersionString}"; // => "https://cdn.skypack.dev/audiomotion-analyzer?min";
 
     private const bool Minify = true;
 
@@ -373,7 +373,7 @@ public partial class Auralizer
         }
     }
 
-    private ConcurrentDictionary<string, List<Rgba32>> _colorCache = new();
+    private ConcurrentDictionary<string, List<Color>> _colorCache = new();
     private Task _updateColorsTask;
     private string _trackImage;
     

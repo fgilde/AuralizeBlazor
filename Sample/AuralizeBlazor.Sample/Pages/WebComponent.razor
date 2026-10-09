@@ -1,18 +1,149 @@
-﻿@page "/web-component"
-@using AuralizeBlazor.Options
+@page "/web-component"
+@using System.Reflection
+@inject HttpClient Http
 
-<PageTitle>Connect Elements</PageTitle>
-
+<PageTitle>Web Component</PageTitle>
 
 <DocsPageSection>
-    <SectionHeader Title="Connect Elements">
+    <SectionHeader Title="Web Component">
         <Description>
-            If you want you can use the Auralizer independent of blazor in any app/page as web component also known as custom element by using this tag <CodeInline>@(Auralizer.SuggestedWebComponentName)</CodeInline> <br />
+            The Auralizer can be used without Blazor in any web page or framework (plain HTML, React, Angular, Vue, ...) as web component (custom element)
+            <CodeInline>&lt;@(Auralizer.SuggestedWebComponentName)&gt;</CodeInline>.<br />
+            Everything below runs in a plain HTML page without Blazor. Use the mouse wheel on the visualizer to switch presets, the button in the top left corner for the track list,
+            or pick your own audio file. <MudLink Href="@WebComponentExample.DemoUrl" Target="_blank">Open the page standalone</MudLink>.
         </Description>
     </SectionHeader>
     <SectionContent Outlined="true" FullWidth="true">
         <WebComponentExample />
     </SectionContent>
-    <SectionSource Code="@nameof(WebComponentExample)" />
 </DocsPageSection>
 
+<DocsPageSection>
+    <SectionHeader Title="Getting started">
+        <Description>
+            Include the loader script once and use the element. The loader boots the WebAssembly runtime from the folder it is loaded from, so the page needs no other setup.
+        </Description>
+    </SectionHeader>
+    <SectionContent Outlined="true" FullWidth="true">
+        <MudExMarkdown Value="@GettingStarted" />
+    </SectionContent>
+</DocsPageSection>
+
+<DocsPageSection>
+    <SectionHeader Title="Parameters">
+        <Description>
+            All parameters of the <CodeInline>Auralizer</CodeInline> component are available.
+            <ul class="ml-6" style="list-style: disc">
+                <li><b>Attribute</b>: strings, numbers and booleans can be set as kebab-case attribute, e.g. <CodeInline>show-preset-name-on-change="true"</CodeInline>, or as camelCase property.</li>
+                <li><b>Property</b>: everything else is set as camelCase JavaScript property, e.g. <CodeInline>el.trackList = [{ label: 'Song', url: 'song.mp3' }]</CodeInline>.
+                    Enums take their numeric value, presets their name (<CodeInline>el.initialPreset = 'ReflexMirror'</CodeInline>).</li>
+                <li><b>Event</b>: assign a function to the property, e.g. <CodeInline>el.onPresetApplied = e =&gt; console.log(e.preset)</CodeInline>.</li>
+                <li>Properties assigned before the runtime is loaded are applied automatically. To wait for it use <CodeInline>await AuralizeWebComponent.ready</CodeInline>.</li>
+            </ul>
+        </Description>
+    </SectionHeader>
+    <SectionContent Outlined="true" FullWidth="true">
+        <MudTable Items="@Parameters" Dense="true" Hover="true" FixedHeader="true" Height="500px" Filter="@(p => string.IsNullOrEmpty(_search) || p.Name.Contains(_search, StringComparison.OrdinalIgnoreCase))">
+            <ToolBarContent>
+                <MudSpacer />
+                <MudTextField @bind-Value="_search" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Class="mt-0" />
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Attribute</MudTh>
+                <MudTh>Property</MudTh>
+                <MudTh>Kind</MudTh>
+                <MudTh>Type</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd><CodeInline>@context.Attribute</CodeInline></MudTd>
+                <MudTd><CodeInline>@context.Property</CodeInline></MudTd>
+                <MudTd>@context.Kind</MudTd>
+                <MudTd><MudLink Href="@($"api/{nameof(Auralizer)}/{context.Name}")">@context.Type</MudLink></MudTd>
+            </RowTemplate>
+        </MudTable>
+    </SectionContent>
+</DocsPageSection>
+
+<DocsPageSection>
+    <SectionHeader Title="Hosting">
+        <Description>
+            The script above is served by this demo site and always contains the latest version. For production host the files yourself:
+        </Description>
+    </SectionHeader>
+    <SectionContent Outlined="true" FullWidth="true">
+        <MudExMarkdown Value="@Hosting" />
+    </SectionContent>
+</DocsPageSection>
+
+<DocsPageSection>
+    <SectionHeader Title="Source of the demo page" />
+    <SectionContent Outlined="true" FullWidth="true">
+        <MudExMarkdown Value="@_demoSource" />
+    </SectionContent>
+</DocsPageSection>
+
+@code {
+    private string _search;
+    private string _demoSource;
+
+    private string ScriptUrl => $"{Navigation.BaseUri}wc/auralizer.js";
+
+    private string GettingStarted => $$"""
+        ```html
+        <script src="{{ScriptUrl}}"></script>
+
+        <auralize-blazor-auralizer id="viz" height="400px" connect-all-audio-sources="true"></auralize-blazor-auralizer>
+        <audio controls src="my-song.mp3"></audio>
+
+        <script>
+            const viz = document.getElementById('viz');
+            viz.presets = ['ReflexMirror', 'NeonBars', 'VortexSpiral'];
+            viz.initialPreset = 'NeonBars';
+            viz.isPlayingChanged = playing => console.log(playing ? 'playing' : 'paused');
+        </script>
+        ```
+        """;
+
+    private const string Hosting = """
+        ```bash
+        dotnet publish AuralizeBlazor.WebComponent -c Release -o out
+        # upload the content of out/wwwroot (e.g. to https://your-host/auralizer/)
+        ```
+        ```html
+        <script src="https://your-host/auralizer/auralizer.js"></script>
+        ```
+        - Use a classic script tag (not `type="module"`), the loader finds its folder through it.
+        - If the files are hosted on another origin than the page, the server has to send CORS headers (`Access-Control-Allow-Origin`).
+        - Audio files from another origin are only visualized if they are served with CORS headers as well, otherwise the browser mutes them for the analyzer.
+        - Pages that already run Blazor should use the `<Auralizer>` component directly, only one Blazor runtime can run per page.
+        """;
+
+    private record ParameterInfo(string Name, string Attribute, string Property, string Kind, string Type);
+
+    private static readonly ParameterInfo[] Parameters = typeof(Auralizer).GetProperties()
+        .Where(p => p.GetCustomAttribute<ParameterAttribute>() != null)
+        .Where(p => p.PropertyType != typeof(RenderFragment) && !typeof(Delegate).IsAssignableFrom(p.PropertyType))
+        .OrderBy(p => p.Name)
+        .Select(p => new ParameterInfo(p.Name, KindOf(p.PropertyType) == "Attribute" ? Kebab(p.Name) : "", char.ToLower(p.Name[0]) + p.Name[1..], KindOf(p.PropertyType), TypeName(p.PropertyType)))
+        .ToArray();
+
+    // Same classification Blazor uses for custom element parameters.
+    private static string KindOf(Type type)
+    {
+        type = Nullable.GetUnderlyingType(type) ?? type;
+        if (type == typeof(EventCallback) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(EventCallback<>))
+            return "Event";
+        return type == typeof(string) || type == typeof(bool) || (type.IsPrimitive && type != typeof(char)) || type == typeof(decimal) ? "Attribute" : "Property";
+    }
+
+    private static string Kebab(string name) => string.Concat(name.Select((c, i) => char.IsUpper(c) && i > 0 ? "-" + char.ToLower(c) : char.ToLower(c).ToString()));
+
+    private static string TypeName(Type type) => Nullable.GetUnderlyingType(type) is { } u ? TypeName(u) + "?"
+        : type.IsGenericType ? $"{type.Name[..type.Name.IndexOf('`')]}<{string.Join(", ", type.GetGenericArguments().Select(TypeName))}>"
+        : type.Name;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _demoSource = $"```html\n{await Http.GetStringAsync(WebComponentExample.DemoUrl)}\n```";
+    }
+}

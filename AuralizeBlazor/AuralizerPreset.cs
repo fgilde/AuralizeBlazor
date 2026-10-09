@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using AuralizeBlazor.Features;
 using AuralizeBlazor.Options;
 using BlazorJS.Attributes;
@@ -13,6 +15,7 @@ namespace AuralizeBlazor;
 /// <summary>
 /// The AuralizerPreset class is used to define a set of properties that can be applied to an Auralizer instance.
 /// </summary>
+[JsonConverter(typeof(AuralizerPresetJsonConverter))]
 public class AuralizerPreset : SuperType<AuralizerPreset>
 {
     private readonly Action<Auralizer> _action;
@@ -460,4 +463,24 @@ public class AuralizerPreset : SuperType<AuralizerPreset>
 internal static class AuralizerPresetExtensions
 {
     public static string Format(this string s) => string.Join(" ", s.SplitByUpperCase());
+}
+
+/// <summary>
+/// (De)serializes a preset by its name (or id), e.g. el.initialPreset = 'ReflexMirror' on the web component.
+/// </summary>
+internal class AuralizerPresetJsonConverter : JsonConverter<AuralizerPreset>
+{
+    public override AuralizerPreset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            var id = reader.GetInt32();
+            return AuralizerPreset.All.FirstOrDefault(p => p.Id == id);
+        }
+        var name = reader.GetString()?.Replace(" ", "");
+        return AuralizerPreset.All.FirstOrDefault(p => string.Equals(p.Name.Replace(" ", ""), name, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public override void Write(Utf8JsonWriter writer, AuralizerPreset value, JsonSerializerOptions options)
+        => writer.WriteStringValue(value.Name);
 }

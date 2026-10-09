@@ -1,9 +1,8 @@
-﻿using SixLabors.ImageSharp.PixelFormats;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
+using StbImageSharp;
 
 namespace AuralizeBlazor.Extensions;
 
@@ -15,45 +14,30 @@ internal static class ImageHelper
         return string.Concat(sha1.ComputeHash(data).Select(x => x.ToString("X2")));
     }
 
-    public static Task<List<Rgba32>> ExtractMainColorsFromImageAsync(byte[] imageBytes, int maxColors = 16,
-        int sampleInterval = 10, int? targetHeight = null)
+    public static string ToHex(this Color color) => $"{color.R:X2}{color.G:X2}{color.B:X2}{color.A:X2}";
+
+    public static Task<List<Color>> ExtractMainColorsFromImageAsync(byte[] imageBytes, int maxColors = 16, int sampleInterval = 10)
     {
-        return Task.Run(() => ExtractMainColorsFromImage(imageBytes, maxColors, sampleInterval, targetHeight));
+        return Task.Run(() => ExtractMainColorsFromImage(imageBytes, maxColors, sampleInterval));
     }
 
-    public static List<Rgba32> ExtractMainColorsFromImage(byte[] imageBytes, int maxColors = 16, int sampleInterval = 10, int? targetHeight = null)
+    public static List<Color> ExtractMainColorsFromImage(byte[] imageBytes, int maxColors = 16, int sampleInterval = 10)
     {
-        using var image = Image.Load<Rgba32>(imageBytes);
+        var image = ImageResult.FromMemory(imageBytes, ColorComponents.RedGreenBlueAlpha);
+        var data = image.Data;
 
-        // Calculate the new width to maintain aspect ratio
-
-        // Downscale the image
-        if (targetHeight.HasValue)
-        {
-            int targetWidth = (int)(image.Width * (targetHeight.Value / (float)image.Height));
-            image.Mutate(x => x.Resize(targetWidth, targetHeight.Value));
-        }
-
-        // After downscaling, proceed with color extraction
-        Dictionary<Rgba32, int> colorCounts = new Dictionary<Rgba32, int>();
+        Dictionary<Color, int> colorCounts = new Dictionary<Color, int>();
 
         for (int y = 0; y < image.Height; y += sampleInterval)
         {
             for (int x = 0; x < image.Width; x += sampleInterval)
             {
-                Rgba32 pixelColor = image[x, y];
+                int i = (y * image.Width + x) * 4;
 
-                // Optional: Reduce color precision to group similar colors together
-                pixelColor = ReduceColorPrecision(pixelColor);
+                // Reduce color precision to group similar colors together
+                var pixelColor = Color.FromArgb(data[i + 3], Reduce(data[i]), Reduce(data[i + 1]), Reduce(data[i + 2]));
 
-                if (colorCounts.ContainsKey(pixelColor))
-                {
-                    colorCounts[pixelColor]++;
-                }
-                else
-                {
-                    colorCounts[pixelColor] = 1;
-                }
+                colorCounts[pixelColor] = colorCounts.GetValueOrDefault(pixelColor) + 1;
             }
         }
 
@@ -65,11 +49,5 @@ internal static class ImageHelper
             .ToList();
     }
 
-    private static Rgba32 ReduceColorPrecision(Rgba32 color, int bitReduction = 3)
-    {
-        byte reduce(byte component) => (byte)(component & ~(0xFF >> bitReduction));
-
-        return new Rgba32(reduce(color.R), reduce(color.G), reduce(color.B), color.A);
-    }
-
+    private static byte Reduce(byte component, int bitReduction = 3) => (byte)(component & ~(0xFF >> bitReduction));
 }

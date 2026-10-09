@@ -1,4 +1,8 @@
-﻿<auralize-blazor-auralizer background-image="/bg1.jpg" connect-all-audio-sources="true">
-</auralize-blazor-auralizer>
+@* A plain HTML page (no Blazor) that uses the web component. *@
+<iframe src="@DemoUrl" title="Auralizer web component demo" allow="autoplay; microphone; fullscreen"
+        style="width: 100%; height: 560px; border: 0; border-radius: 4px; background: #121518;"></iframe>
 
-<audio class="mt-2" preload="metadata" loading="lazy" controls="true" src="/sample.mp3"></audio>
+@code {
+    /// <summary>Url of the plain HTML demo page.</summary>
+    public const string DemoUrl = "wc/index.html";
+}

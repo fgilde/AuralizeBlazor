@@ -56,9 +56,22 @@ After adding the namespace, you can use the `Auralizer` component in your pages 
 
 ```
 
+## Web Component (without Blazor)
+The Auralizer can also be used in any web page or framework as custom element. Include the loader and use the tag:
+
+```html
+<script src="https://auralizeblazor.azurewebsites.net/wc/auralizer.js"></script>
+
+<auralize-blazor-auralizer height="400px" connect-all-audio-sources="true"></auralize-blazor-auralizer>
+<audio src="path/to/audio1.mp3" controls></audio>
+```
+
+Strings, numbers and booleans are kebab-case attributes, everything else (enums, track list, presets) is set as camelCase JS property and events are functions (`el.onPresetApplied = e => ...`).
+For production host the files yourself: `dotnet publish AuralizeBlazor.WebComponent -c Release` and upload `wwwroot`. See the [live documentation](https://auralizeblazor.azurewebsites.net/web-component) for details.
+
 
 ## License
 
 MIT — see [LICENSE](LICENSE).
 
-This package bundles [audioMotion-analyzer](https://github.com/hvianna/audioMotion-analyzer) (`wwwroot/js/lib/audioMotion4.4.0.min.js`), copyright (c) Henrique Avila Vianna, licensed under the [AGPL-3.0-or-later](https://www.gnu.org/licenses/agpl.html). That license applies to that file.
+This package bundles [audioMotion-analyzer](https://github.com/hvianna/audioMotion-analyzer) (`wwwroot/js/lib/audioMotion4.5.4.min.js`), copyright (c) Henrique Avila Vianna, licensed under the [AGPL-3.0-or-later](https://www.gnu.org/licenses/agpl.html). That license applies to that file.

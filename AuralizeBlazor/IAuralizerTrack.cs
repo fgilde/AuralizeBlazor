@@ -5,6 +5,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace AuralizeBlazor;
@@ -12,6 +14,7 @@ namespace AuralizeBlazor;
 /// <summary>
 /// Track interface for track selection in the Auralizer component.
 /// </summary>
+[JsonConverter(typeof(AuralizerTrackJsonConverter))]
 public interface IAuralizerTrack
 {
     /// <summary>
@@ -76,4 +79,16 @@ public class AuralizerTrack: IAuralizerTrack
     
     public override string ToString() => Label;
 
+}
+
+/// <summary>
+/// Deserializes <see cref="IAuralizerTrack"/> as <see cref="AuralizerTrack"/>, e.g. when the track list is set from JavaScript on the web component.
+/// </summary>
+internal class AuralizerTrackJsonConverter : JsonConverter<IAuralizerTrack>
+{
+    public override IAuralizerTrack Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        => JsonSerializer.Deserialize<AuralizerTrack>(ref reader, options);
+
+    public override void Write(Utf8JsonWriter writer, IAuralizerTrack value, JsonSerializerOptions options)
+        => JsonSerializer.Serialize(writer, value, value.GetType(), options);
 }

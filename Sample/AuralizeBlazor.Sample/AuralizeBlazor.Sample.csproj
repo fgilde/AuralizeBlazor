@@ -4,15 +4,16 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Hot reload (BrowserRefresh middleware) fails with HTTP 500 on precompressed html files outside the SPA fallback (wc/index.html). -->
+    <CompressionExcludePatterns Condition="'$(Configuration)' == 'Debug'">wc/**/*.html</CompressionExcludePatterns>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Analyzers" Version="10.0.12" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.CustomElements" Version="10.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.12" PrivateAssets="all" />
-    <PackageReference Include="MudBlazor.Extensions" Version="9.9.0" />
-    <PackageReference Include="Nextended.CodeGen" Version="10.1.37" />
+    <PackageReference Include="MudBlazor.Extensions" Version="9.11.0" />
+    <PackageReference Include="Nextended.CodeGen" Version="10.1.42" />
     
   </ItemGroup>
 
@@ -30,6 +31,36 @@
        so copy it explicitly. Needed for the .md MIME mapping (example-codes/*.md) on IIS/Azure. -->
   <Target Name="CopyWebConfigToPublish" AfterTargets="Publish">
     <Copy SourceFiles="web.config" DestinationFiles="$(PublishDir)web.config" />
+  </Target>
+
+  <!-- Publishes the framework independent web component into wwwroot/wc (git ignored), so it is served at /wc/auralizer.js
+       locally and in production, and the web component page can show it in a plain HTML page.
+       Only republished when the web component or the library changed. -->
+  <ItemGroup>
+    <_WebComponentInputs Include="..\..\AuralizeBlazor\**\*.cs;..\..\AuralizeBlazor\**\*.razor;..\..\AuralizeBlazor\**\*.css;..\..\AuralizeBlazor\wwwroot\js\**\*.js;..\..\AuralizeBlazor\*.csproj;..\..\AuralizeBlazor.WebComponent\**\*"
+                         Exclude="..\..\AuralizeBlazor*\bin\**;..\..\AuralizeBlazor*\obj\**" />
+    <Content Remove="wwwroot\wc\**" />
+  </ItemGroup>
+
+  <Target Name="PublishWebComponent" BeforeTargets="ResolveProjectStaticWebAssets" Inputs="@(_WebComponentInputs)" Outputs="wwwroot\wc\auralizer.js">
+    <PropertyGroup>
+      <_WcPublishDir>$(BaseIntermediateOutputPath)wc-publish\</_WcPublishDir>
+    </PropertyGroup>
+    <RemoveDir Directories="$(_WcPublishDir);wwwroot\wc" />
+    <!-- Compression is done by this project for all its static assets. -->
+    <Exec Command="dotnet publish &quot;..\..\AuralizeBlazor.WebComponent\AuralizeBlazor.WebComponent.csproj&quot; -c $(Configuration) -o &quot;$(_WcPublishDir.TrimEnd('\'))&quot; -p:CompressionEnabled=false" />
+    <ItemGroup>
+      <_WcFiles Include="$(_WcPublishDir)wwwroot\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_WcFiles)" DestinationFiles="@(_WcFiles->'wwwroot\wc\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <!-- Copied files keep their original date, mark the output as up to date for the incremental check. -->
+    <Touch Files="wwwroot\wc\auralizer.js" />
+  </Target>
+
+  <Target Name="IncludeWebComponent" AfterTargets="PublishWebComponent" BeforeTargets="ResolveProjectStaticWebAssets">
+    <ItemGroup>
+      <Content Include="wwwroot\wc\**" />
+    </ItemGroup>
   </Target>
 
   <ItemGroup>

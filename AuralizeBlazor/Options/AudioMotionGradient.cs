@@ -1,4 +1,4 @@
-﻿using SixLabors.ImageSharp.PixelFormats;
+﻿using System.Drawing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,7 +65,7 @@ public class AudioMotionGradient : IEquatable<AudioMotionGradient>
     /// <summary>
     /// Returns a gradient from a list of colors.
     /// </summary>
-    public static AudioMotionGradient FromColors(string name, List<Rgba32> colors, AudioMotionGradient? mergeWith = null)
+    public static AudioMotionGradient FromColors(string name, List<Color> colors, AudioMotionGradient? mergeWith = null)
     {
         if (mergeWith == null)
         {
